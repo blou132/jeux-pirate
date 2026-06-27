@@ -7,6 +7,9 @@ extends Node
 @export var broadside_tolerance_degrees: float = 60.0
 @export var broadside_muzzle_offset: float = 2.2
 @export var broadside_muzzle_height: float = 0.75
+@export var broadside_preferred_distance_ratio: float = 0.78
+@export var broadside_distance_margin: float = 1.5
+@export var broadside_radial_weight: float = 0.55
 
 @onready var ship: EnemyShip = get_parent() as EnemyShip
 
@@ -31,10 +34,11 @@ func _physics_process(delta: float) -> void:
 		ship.brake(delta)
 		return
 
-	var offset := _player.global_position - ship.global_position
+	var offset: Vector3 = _player.global_position - ship.global_position
 	offset.y = 0.0
-	var distance_squared := offset.length_squared()
-	var attack_range := _get_attack_range()
+	var distance_squared: float = offset.length_squared()
+	var attack_range: float = _get_attack_range()
+	var distance_to_player: float = sqrt(distance_squared)
 
 	if distance_squared > detection_range * detection_range:
 		ship.brake(delta)
@@ -43,7 +47,7 @@ func _physics_process(delta: float) -> void:
 	if distance_squared <= attack_range * attack_range:
 		var fire_direction: Vector3 = _get_broadside_fire_direction(offset)
 		if fire_direction == Vector3.ZERO:
-			_maneuver_for_broadside(offset, delta)
+			_maneuver_for_broadside(offset, distance_to_player, attack_range, delta)
 			return
 
 		ship.brake(delta)
@@ -106,26 +110,34 @@ func _get_broadside_fire_direction(offset_to_player: Vector3) -> Vector3:
 	return Vector3.ZERO
 
 
-func _maneuver_for_broadside(offset_to_player: Vector3, delta: float) -> void:
+func _maneuver_for_broadside(offset_to_player: Vector3, distance_to_player: float, attack_range: float, delta: float) -> void:
 	if offset_to_player.length_squared() < 0.01:
 		ship.brake(delta)
 		return
 
-	var to_player := offset_to_player.normalized()
-	var broadside_forward := Vector3.UP.cross(to_player)
+	var to_player: Vector3 = offset_to_player.normalized()
+	var broadside_forward: Vector3 = Vector3.UP.cross(to_player)
 	if broadside_forward.length_squared() < 0.01:
 		ship.brake(delta)
 		return
 
 	broadside_forward = broadside_forward.normalized()
-	var opposite_forward := -broadside_forward
-	var current_forward := -ship.global_transform.basis.z
+	var opposite_forward: Vector3 = -broadside_forward
+	var current_forward: Vector3 = -ship.global_transform.basis.z
 
 	if current_forward.dot(opposite_forward) > current_forward.dot(broadside_forward):
 		broadside_forward = opposite_forward
 
+	var desired_forward: Vector3 = broadside_forward
+	var preferred_distance: float = attack_range * broadside_preferred_distance_ratio
+
+	if distance_to_player < preferred_distance - broadside_distance_margin:
+		desired_forward = (desired_forward + (-to_player * broadside_radial_weight)).normalized()
+	elif distance_to_player > preferred_distance + broadside_distance_margin:
+		desired_forward = (desired_forward + (to_player * broadside_radial_weight)).normalized()
+
 	if ship.has_method("steer_along_direction"):
-		ship.steer_along_direction(broadside_forward, delta)
+		ship.steer_along_direction(desired_forward, delta)
 	else:
 		ship.steer_toward(_player.global_position, delta)
 
