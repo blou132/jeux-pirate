@@ -1,13 +1,14 @@
-[gd_scene load_steps=17 format=3 uid="uid://world_root_v01"]
+[gd_scene load_steps=18 format=3 uid="uid://world_root_v01"]
 
 [ext_resource type="Script" path="res://scripts/world/World.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/boats/PlayerBoat.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="3_hud"]
-[ext_resource type="PackedScene" path="res://scenes/boats/EnemyShip.tscn" id="4_enemy"]
+[ext_resource type="Script" path="res://scripts/world/SpawnManager.gd" id="4_spawn_manager"]
 [ext_resource type="Script" path="res://scripts/world/LootSystem.gd" id="5_loot_system"]
 [ext_resource type="PackedScene" path="res://scenes/world/Port.tscn" id="6_port"]
 [ext_resource type="PackedScene" path="res://scenes/ui/PortMenu.tscn" id="7_port_menu"]
 [ext_resource type="Script" path="res://scripts/world/DebugTools.gd" id="8_debug_tools"]
+[ext_resource type="Script" path="res://scripts/world/EnemySpawnPoint.gd" id="9_enemy_spawn_point"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ocean"]
 albedo_color = Color(0.02, 0.28, 0.45, 1)
@@ -73,16 +74,45 @@ script = ExtResource("5_loot_system")
 [node name="DebugTools" type="Node" parent="."]
 script = ExtResource("8_debug_tools")
 
+[node name="SpawnManager" type="Node3D" parent="."]
+script = ExtResource("4_spawn_manager")
+
+[node name="SpawnPortOuter" type="Marker3D" parent="SpawnManager"]
+position = Vector3(28, 0, -18)
+rotation_degrees = Vector3(0, -35, 0)
+script = ExtResource("9_enemy_spawn_point")
+danger_zone = "port"
+
+[node name="SpawnNorthChannel" type="Marker3D" parent="SpawnManager"]
+position = Vector3(-8, 0, -46)
+rotation_degrees = Vector3(0, 155, 0)
+script = ExtResource("9_enemy_spawn_point")
+danger_zone = "archipelago"
+
+[node name="SpawnEastReef" type="Marker3D" parent="SpawnManager"]
+position = Vector3(54, 0, 18)
+rotation_degrees = Vector3(0, -105, 0)
+script = ExtResource("9_enemy_spawn_point")
+danger_zone = "archipelago"
+
+[node name="SpawnHostileSouth" type="Marker3D" parent="SpawnManager"]
+position = Vector3(-42, 0, 52)
+rotation_degrees = Vector3(0, 35, 0)
+script = ExtResource("9_enemy_spawn_point")
+danger_zone = "hostile"
+
+[node name="SpawnHostileWest" type="Marker3D" parent="SpawnManager"]
+position = Vector3(-58, 0, -18)
+rotation_degrees = Vector3(0, 80, 0)
+script = ExtResource("9_enemy_spawn_point")
+danger_zone = "hostile"
+
 [node name="Port" parent="." instance=ExtResource("6_port")]
 position = Vector3(-9, 0, 8)
 rotation_degrees = Vector3(0, 25, 0)
 
 [node name="PlayerBoat" parent="." instance=ExtResource("2_player")]
 position = Vector3(0, 0, 0)
-
-[node name="EnemyShip" parent="." instance=ExtResource("4_enemy")]
-position = Vector3(18, 0, -22)
-rotation_degrees = Vector3(0, -35, 0)
 
 [node name="HUD" parent="." instance=ExtResource("3_hud")]
 
