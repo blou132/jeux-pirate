@@ -15,6 +15,8 @@ signal destroyed
 @export var hull_health_bonus_per_level: int = 25
 @export var sail_speed_bonus_per_level: float = 1.0
 @export var hit_feedback_cooldown: float = 0.8
+@export var fallback_respawn_position: Vector3 = Vector3.ZERO
+@export var respawn_offset_from_port: Vector3 = Vector3(8.0, 0.0, -8.0)
 
 var health: int
 var current_speed: float = 0.0
@@ -62,6 +64,18 @@ func _physics_process(delta: float) -> void:
 	speed_changed.emit(current_speed)
 
 
+func _unhandled_input(event: InputEvent) -> void:
+	if not _destroyed:
+		return
+	if not (event is InputEventKey):
+		return
+
+	var key_event: InputEventKey = event as InputEventKey
+	if key_event.pressed and not key_event.echo and key_event.keycode == KEY_R:
+		respawn_at_port()
+		get_viewport().set_input_as_handled()
+
+
 func take_damage(amount: int) -> void:
 	if _destroyed or health <= 0:
 		return
@@ -107,6 +121,25 @@ func get_current_speed() -> float:
 
 func is_destroyed() -> bool:
 	return _destroyed
+
+
+func respawn_at_port() -> void:
+	if not _destroyed:
+		return
+
+	var respawn_position := _get_respawn_position()
+	respawn_position.y = 0.0
+
+	_destroyed = false
+	health = max_health
+	current_speed = 0.0
+	velocity = Vector3.ZERO
+	global_position = respawn_position
+	global_rotation = Vector3.ZERO
+
+	health_changed.emit(health, max_health)
+	speed_changed.emit(current_speed)
+	_show_respawn_feedback()
 
 
 func _get_throttle() -> float:
@@ -183,7 +216,26 @@ func _handle_destroyed() -> void:
 func _show_destroyed_feedback() -> void:
 	var hud := get_tree().get_first_node_in_group("hud")
 	if hud != null and hud.has_method("set_context_message"):
-		hud.set_context_message("Bateau détruit")
+		hud.set_context_message("Bateau détruit\nAppuie sur R pour réapparaître au port")
+
+
+func _show_respawn_feedback() -> void:
+	var hud := get_tree().get_first_node_in_group("hud")
+	if hud == null:
+		return
+
+	if hud.has_method("set_context_message"):
+		hud.set_context_message("")
+	if hud.has_method("show_temporary_context_message"):
+		hud.show_temporary_context_message("Réapparition au port", 1.6)
+
+
+func _get_respawn_position() -> Vector3:
+	var port := get_tree().get_first_node_in_group("ports") as Node3D
+	if port != null:
+		return port.global_position + respawn_offset_from_port
+
+	return fallback_respawn_position
 
 
 func _show_hit_feedback(damage_taken: int) -> void:
