@@ -55,13 +55,13 @@ func get_upgrade_status(upgrade_id: String) -> String:
 		return "%s : niv. %d/%d — niveau maximum atteint" % [label, level, MAX_LEVEL]
 
 	var next_level := level + 1
-	var cost := COSTS[next_level]
+	var cost: Dictionary = COSTS[next_level]
 	var status := "%s : niv. %d/%d — Coût : %d or, %d bois" % [
 		label,
 		level,
 		MAX_LEVEL,
-		cost["gold"],
-		cost["wood"],
+		int(cost["gold"]),
+		int(cost["wood"]),
 	]
 
 	if not can_afford_next(upgrade_id):
@@ -75,12 +75,12 @@ func can_afford_next(upgrade_id: String) -> bool:
 		return false
 
 	var next_level := get_level(upgrade_id) + 1
-	var cost := COSTS[next_level]
+	var cost: Dictionary = COSTS[next_level]
 	var game_state := _get_game_state()
 	if game_state == null or not game_state.has_method("can_afford"):
 		return false
 
-	return game_state.can_afford(cost["gold"], cost["wood"])
+	return game_state.can_afford(int(cost["gold"]), int(cost["wood"]))
 
 
 func purchase_upgrade(upgrade_id: String) -> String:
@@ -92,12 +92,12 @@ func purchase_upgrade(upgrade_id: String) -> String:
 		return "Niveau maximum atteint"
 
 	var next_level := level + 1
-	var cost := COSTS[next_level]
+	var cost: Dictionary = COSTS[next_level]
 	var game_state := _get_game_state()
 	if game_state == null or not game_state.has_method("spend_resources"):
 		return "Ressources insuffisantes"
 
-	if not game_state.spend_resources(cost["gold"], cost["wood"]):
+	if not game_state.spend_resources(int(cost["gold"]), int(cost["wood"])):
 		return "Ressources insuffisantes"
 
 	_levels[upgrade_id] = next_level
