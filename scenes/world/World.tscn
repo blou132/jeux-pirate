@@ -1,4 +1,4 @@
-[gd_scene load_steps=28 format=3 uid="uid://world_root_v01"]
+[gd_scene load_steps=29 format=3 uid="uid://world_root_v01"]
 
 [ext_resource type="Script" path="res://scripts/world/World.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/boats/PlayerBoat.tscn" id="2_player"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://scripts/world/DebugTools.gd" id="8_debug_tools"]
 [ext_resource type="Script" path="res://scripts/world/EnemySpawnPoint.gd" id="9_enemy_spawn_point"]
 [ext_resource type="Script" path="res://scripts/world/DangerZone.gd" id="10_danger_zone"]
+[ext_resource type="Script" path="res://scripts/world/WorldBounds.gd" id="11_world_bounds"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ocean"]
 albedo_color = Color(0.02, 0.28, 0.45, 1)
@@ -160,6 +161,9 @@ script = ExtResource("5_loot_system")
 
 [node name="DebugTools" type="Node" parent="."]
 script = ExtResource("8_debug_tools")
+
+[node name="WorldBounds" type="Node" parent="."]
+script = ExtResource("11_world_bounds")
 
 [node name="SpawnManager" type="Node3D" parent="."]
 script = ExtResource("4_spawn_manager")

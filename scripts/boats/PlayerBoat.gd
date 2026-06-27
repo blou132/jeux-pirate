@@ -142,6 +142,14 @@ func respawn_at_port() -> void:
 	_show_respawn_feedback()
 
 
+func return_to_safe_position(world_position: Vector3) -> void:
+	world_position.y = 0.0
+	global_position = world_position
+	current_speed = 0.0
+	velocity = Vector3.ZERO
+	speed_changed.emit(current_speed)
+
+
 func _get_throttle() -> float:
 	var throttle := 0.0
 
