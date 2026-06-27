@@ -25,6 +25,9 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not _can_fire():
+		return
+
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			fire_port()
@@ -33,7 +36,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func fire_port() -> void:
-	if _port_cooldown > 0.0:
+	if _port_cooldown > 0.0 or not _can_fire():
 		return
 
 	_fire(port_muzzle, -global_transform.basis.x)
@@ -41,7 +44,7 @@ func fire_port() -> void:
 
 
 func fire_starboard() -> void:
-	if _starboard_cooldown > 0.0:
+	if _starboard_cooldown > 0.0 or not _can_fire():
 		return
 
 	_fire(starboard_muzzle, global_transform.basis.x)
@@ -67,6 +70,14 @@ func _fire(muzzle: Marker3D, direction: Vector3) -> void:
 	if parent == null:
 		parent = get_tree().root
 	parent.add_child(cannon_ball)
+
+
+func _can_fire() -> bool:
+	var owner := get_parent()
+	if owner != null and owner.has_method("is_destroyed") and owner.is_destroyed():
+		return false
+
+	return true
 
 
 func _connect_upgrade_system() -> void:
