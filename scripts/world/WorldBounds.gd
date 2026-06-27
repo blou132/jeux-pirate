@@ -7,8 +7,12 @@ signal player_returned
 @export var hard_limit: Vector2 = Vector2(112.0, 112.0)
 @export var push_speed: float = 16.0
 @export var safe_port_offset: Vector3 = Vector3(8.0, 0.0, -8.0)
+@export var warning_message: String = "Limite de la carte"
+@export var return_message: String = "Retour dans la zone navigable"
+@export var feedback_cooldown: float = 1.4
 
 var _player: Node3D
+var _feedback_cooldown_remaining: float = 0.0
 
 
 func _ready() -> void:
@@ -16,6 +20,7 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	_feedback_cooldown_remaining = maxf(0.0, _feedback_cooldown_remaining - delta)
 	_refresh_player()
 	if _player == null:
 		return
@@ -23,11 +28,13 @@ func _physics_process(delta: float) -> void:
 	var player_position: Vector3 = _player.global_position
 	if _is_outside_limit(player_position, hard_limit):
 		_return_player_to_safe_area()
+		_show_bounds_feedback(return_message, 1.8, true)
 		player_returned.emit()
 		return
 
 	if _is_outside_limit(player_position, soft_limit):
 		_push_player_inside(delta)
+		_show_bounds_feedback(warning_message, 1.0)
 		boundary_warning.emit()
 
 
@@ -56,6 +63,17 @@ func _return_player_to_safe_area() -> void:
 
 	safe_position.y = 0.0
 	_player.global_position = safe_position
+
+
+func _show_bounds_feedback(message: String, duration: float, force: bool = false) -> void:
+	if not force and _feedback_cooldown_remaining > 0.0:
+		return
+
+	var hud: Node = get_tree().get_first_node_in_group("hud")
+	if hud != null and hud.has_method("show_temporary_context_message"):
+		hud.show_temporary_context_message(message, duration)
+
+	_feedback_cooldown_remaining = feedback_cooldown
 
 
 func _get_safe_position() -> Vector3:
