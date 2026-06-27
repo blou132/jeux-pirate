@@ -12,6 +12,8 @@ La v0.3 ajoute le spawn d'ennemis, le respawn après destruction, trois variante
 
 La v0.3.2 améliore la jouabilité de la v0.3 : attaque ennemie effective, feedback de défaite du joueur, silhouettes ennemies plus distinctes, noms au-dessus des ennemis et notifications d'entrée de zone.
 
+La v0.3.3 rend les attaques ennemies visibles avec des boulets dédiés, ajoute un feedback HUD quand le joueur est touché et permet de réapparaître au port avec `R` après destruction.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -57,6 +59,12 @@ La v0.3.2 améliore la jouabilité de la v0.3 : attaque ennemie effective, feedb
 - Les ennemis affichent un nom et leurs PV au-dessus du bateau.
 - L'entrée dans une zone affiche une notification claire : portuaire, archipel ou hostile.
 
+## Correctifs v0.3.3
+
+- Les ennemis tirent maintenant des boulets visibles vers le joueur.
+- Le HUD affiche `Touché ! -X PV` quand le joueur prend des dégâts.
+- Après destruction, le HUD affiche l'aide de reprise et `R` fait réapparaître le joueur près du port.
+
 ## Lancement
 
 1. Installer Godot 4.x.
@@ -76,6 +84,7 @@ Godot n'est pas inclus dans ce depot.
 - Clic droit : canon droit
 - `E` : interagir avec le port
 - `Échap` : fermer le menu
+- `R` : réapparaître au port après destruction
 
 ## Debug développement
 

@@ -77,6 +77,15 @@ Les ennemis doivent être immédiatement lisibles et réellement menaçants :
 - Les nameplates affichent le type et les PV des ennemis.
 - Les zones de danger affichent une notification quand le joueur change de zone.
 
+## Lisibilité combat v0.3.3
+
+Le combat doit montrer clairement quand un ennemi attaque et donner une sortie propre après une défaite :
+
+- Les attaques ennemies utilisent des boulets visibles qui partent du bateau ennemi vers le joueur.
+- Le HUD affiche un message court quand le joueur prend des dégâts.
+- À 0 PV, le bateau reste détruit mais le joueur peut appuyer sur `R` pour réapparaître près du port.
+- Le respawn restaure les PV et le contrôle sans retirer les ressources du joueur.
+
 ## Piliers a long terme
 
 - Navigation lisible : le joueur doit toujours comprendre son cap, sa vitesse et les menaces proches.
