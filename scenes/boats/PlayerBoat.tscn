@@ -1,0 +1,72 @@
+[gd_scene load_steps=11 format=3 uid="uid://player_boat_v01"]
+
+[ext_resource type="Script" path="res://scripts/boats/PlayerBoat.gd" id="1_player_boat"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hull"]
+albedo_color = Color(0.34, 0.18, 0.08, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_deck"]
+albedo_color = Color(0.48, 0.30, 0.14, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mast"]
+albedo_color = Color(0.24, 0.12, 0.05, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sail"]
+albedo_color = Color(0.93, 0.88, 0.72, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_hull"]
+size = Vector3(2.4, 0.7, 4.8)
+
+[sub_resource type="BoxMesh" id="BoxMesh_deck"]
+size = Vector3(1.8, 0.2, 3.2)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_mast"]
+top_radius = 0.08
+bottom_radius = 0.08
+height = 2.4
+
+[sub_resource type="BoxMesh" id="BoxMesh_sail"]
+size = Vector3(1.7, 1.1, 0.08)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_collision"]
+size = Vector3(2.5, 1.0, 5.0)
+
+[node name="PlayerBoat" type="CharacterBody3D"]
+script = ExtResource("1_player_boat")
+
+[node name="Visuals" type="Node3D" parent="."]
+
+[node name="Hull" type="MeshInstance3D" parent="Visuals"]
+mesh = SubResource("BoxMesh_hull")
+material_override = SubResource("StandardMaterial3D_hull")
+
+[node name="Deck" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 0.45, 0)
+mesh = SubResource("BoxMesh_deck")
+material_override = SubResource("StandardMaterial3D_deck")
+
+[node name="Mast" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 1.45, -0.15)
+mesh = SubResource("CylinderMesh_mast")
+material_override = SubResource("StandardMaterial3D_mast")
+
+[node name="Sail" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 1.55, -0.2)
+mesh = SubResource("BoxMesh_sail")
+material_override = SubResource("StandardMaterial3D_sail")
+
+[node name="BowMarker" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 0.55, -2.55)
+scale = Vector3(0.45, 0.28, 0.25)
+mesh = SubResource("BoxMesh_deck")
+material_override = SubResource("StandardMaterial3D_deck")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.25, 0)
+shape = SubResource("BoxShape3D_collision")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+position = Vector3(0, 7.5, 11)
+rotation_degrees = Vector3(-35, 0, 0)
+current = true
+fov = 60.0

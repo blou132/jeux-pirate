@@ -1,0 +1,91 @@
+class_name PlayerBoat
+extends CharacterBody3D
+
+signal health_changed(current_health: int, max_health: int)
+signal speed_changed(speed: float)
+
+@export var max_health: int = 100
+@export var max_forward_speed: float = 16.0
+@export var max_reverse_speed: float = 5.0
+@export var acceleration: float = 12.0
+@export var reverse_acceleration: float = 8.0
+@export var drag: float = 6.0
+@export var turn_speed: float = 1.7
+
+var health: int
+var current_speed: float = 0.0
+
+
+func _ready() -> void:
+	health = max_health
+	add_to_group("player")
+	health_changed.emit(health, max_health)
+	speed_changed.emit(current_speed)
+
+
+func _physics_process(delta: float) -> void:
+	var throttle := _get_throttle()
+
+	if throttle > 0.0:
+		current_speed = move_toward(current_speed, max_forward_speed, acceleration * delta)
+	elif throttle < 0.0:
+		current_speed = move_toward(current_speed, -max_reverse_speed, reverse_acceleration * delta)
+	else:
+		current_speed = move_toward(current_speed, 0.0, drag * delta)
+
+	_apply_turn(delta)
+	velocity = -global_transform.basis.z * current_speed
+	move_and_slide()
+	global_position.y = 0.0
+
+	speed_changed.emit(current_speed)
+
+
+func take_damage(amount: int) -> void:
+	if health <= 0:
+		return
+
+	health = clampi(health - amount, 0, max_health)
+	health_changed.emit(health, max_health)
+
+
+func get_health() -> int:
+	return health
+
+
+func get_max_health() -> int:
+	return max_health
+
+
+func get_current_speed() -> float:
+	return current_speed
+
+
+func _get_throttle() -> float:
+	var throttle := 0.0
+
+	if Input.is_key_pressed(KEY_W) or Input.is_key_pressed(KEY_Z):
+		throttle += 1.0
+	if Input.is_key_pressed(KEY_S):
+		throttle -= 1.0
+
+	return throttle
+
+
+func _apply_turn(delta: float) -> void:
+	var turn_input := 0.0
+
+	if Input.is_key_pressed(KEY_A) or Input.is_key_pressed(KEY_Q):
+		turn_input += 1.0
+	if Input.is_key_pressed(KEY_D):
+		turn_input -= 1.0
+
+	if is_zero_approx(turn_input) or absf(current_speed) < 0.05:
+		return
+
+	var speed_factor := clampf(absf(current_speed) / max_forward_speed, 0.25, 1.0)
+	var direction_factor := 1.0
+	if current_speed < 0.0:
+		direction_factor = -1.0
+
+	rotate_y(turn_input * turn_speed * speed_factor * direction_factor * delta)
