@@ -14,12 +14,14 @@ signal destroyed
 @export var turn_speed: float = 1.7
 @export var hull_health_bonus_per_level: int = 25
 @export var sail_speed_bonus_per_level: float = 1.0
+@export var hit_feedback_cooldown: float = 0.8
 
 var health: int
 var current_speed: float = 0.0
 var _base_max_health: int
 var _base_max_forward_speed: float
 var _destroyed: bool = false
+var _hit_feedback_cooldown_remaining: float = 0.0
 
 
 func _ready() -> void:
@@ -33,6 +35,8 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	_hit_feedback_cooldown_remaining = maxf(0.0, _hit_feedback_cooldown_remaining - delta)
+
 	if _destroyed:
 		current_speed = move_toward(current_speed, 0.0, drag * 2.0 * delta)
 		velocity = -global_transform.basis.z * current_speed
@@ -62,11 +66,14 @@ func take_damage(amount: int) -> void:
 	if _destroyed or health <= 0:
 		return
 
+	var previous_health := health
 	health = clampi(health - amount, 0, max_health)
 	health_changed.emit(health, max_health)
 
 	if health <= 0:
 		_handle_destroyed()
+	else:
+		_show_hit_feedback(previous_health - health)
 
 
 func repair(amount: int) -> int:
@@ -177,3 +184,14 @@ func _show_destroyed_feedback() -> void:
 	var hud := get_tree().get_first_node_in_group("hud")
 	if hud != null and hud.has_method("set_context_message"):
 		hud.set_context_message("Bateau détruit")
+
+
+func _show_hit_feedback(damage_taken: int) -> void:
+	if damage_taken <= 0 or _hit_feedback_cooldown_remaining > 0.0:
+		return
+
+	var hud := get_tree().get_first_node_in_group("hud")
+	if hud != null and hud.has_method("show_temporary_context_message"):
+		hud.show_temporary_context_message("Touché ! -%d PV" % damage_taken, 0.9)
+
+	_hit_feedback_cooldown_remaining = hit_feedback_cooldown
