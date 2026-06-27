@@ -122,12 +122,8 @@ func _get_broadside_fire_direction(offset_to_player: Vector3) -> Vector3:
 		return Vector3.ZERO
 
 	var to_player: Vector3 = offset_to_player.normalized()
-	var port_direction: Vector3 = -ship.global_transform.basis.x
-	var starboard_direction: Vector3 = ship.global_transform.basis.x
-	port_direction.y = 0.0
-	starboard_direction.y = 0.0
-	port_direction = port_direction.normalized()
-	starboard_direction = starboard_direction.normalized()
+	var port_direction: Vector3 = _get_port_axis()
+	var starboard_direction: Vector3 = _get_starboard_axis()
 
 	var port_alignment: float = to_player.dot(port_direction)
 	var starboard_alignment: float = to_player.dot(starboard_direction)
@@ -194,6 +190,24 @@ func _get_desired_broadside_forward(to_player: Vector3) -> Vector3:
 	return broadside_forward
 
 
+func _get_starboard_axis() -> Vector3:
+	if ship.has_method("get_starboard_axis"):
+		var starboard_axis: Vector3 = ship.get_starboard_axis()
+		return starboard_axis
+
+	var fallback_axis: Vector3 = ship.global_transform.basis.x
+	fallback_axis.y = 0.0
+	return fallback_axis.normalized()
+
+
+func _get_port_axis() -> Vector3:
+	if ship.has_method("get_port_axis"):
+		var port_axis: Vector3 = ship.get_port_axis()
+		return port_axis
+
+	return -_get_starboard_axis()
+
+
 func _fire_projectile(damage: int, fire_direction: Vector3) -> void:
 	if enemy_cannon_ball_scene == null or not is_instance_valid(_player):
 		return
@@ -238,7 +252,7 @@ func _show_broadside_debug(fire_direction: Vector3) -> void:
 	if _debug_message_cooldown_remaining > 0.0:
 		return
 
-	var starboard_direction: Vector3 = ship.global_transform.basis.x.normalized()
+	var starboard_direction: Vector3 = _get_starboard_axis()
 	var side_name: String = "tribord"
 	if fire_direction.normalized().dot(starboard_direction) < 0.0:
 		side_name = "babord"

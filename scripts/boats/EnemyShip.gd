@@ -154,6 +154,24 @@ func get_broadside_cannon_position(fire_direction: Vector3, fallback_offset: flo
 	return global_position + (side_direction * fallback_offset) + Vector3(0.0, fallback_height, 0.0)
 
 
+func get_starboard_axis() -> Vector3:
+	var left_point := get_node_or_null("LeftCannonPoint") as Node3D
+	var right_point := get_node_or_null("RightCannonPoint") as Node3D
+	if left_point != null and right_point != null:
+		var marker_axis: Vector3 = right_point.global_position - left_point.global_position
+		marker_axis.y = 0.0
+		if marker_axis.length_squared() > 0.01:
+			return marker_axis.normalized()
+
+	var fallback_axis: Vector3 = global_transform.basis.x
+	fallback_axis.y = 0.0
+	return fallback_axis.normalized()
+
+
+func get_port_axis() -> Vector3:
+	return -get_starboard_axis()
+
+
 func _destroy() -> void:
 	_destroyed = true
 	var sink_position := global_position
@@ -285,7 +303,7 @@ func _get_broadside_cannon_point(fire_direction: Vector3) -> Node3D:
 	if fire_direction.length_squared() < 0.01:
 		return null
 
-	var right_direction: Vector3 = global_transform.basis.x.normalized()
+	var right_direction: Vector3 = get_starboard_axis()
 	if fire_direction.normalized().dot(right_direction) >= 0.0:
 		return get_node_or_null("RightCannonPoint") as Node3D
 
