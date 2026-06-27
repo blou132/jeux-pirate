@@ -52,11 +52,11 @@ func get_upgrade_status(upgrade_id: String) -> String:
 	var level := get_level(upgrade_id)
 
 	if level >= MAX_LEVEL:
-		return "%s: niveau %d/%d - maximum atteint" % [label, level, MAX_LEVEL]
+		return "%s : niv. %d/%d — niveau maximum atteint" % [label, level, MAX_LEVEL]
 
 	var next_level := level + 1
 	var cost := COSTS[next_level]
-	var status := "%s: niveau %d/%d - prochain %d or + %d bois" % [
+	var status := "%s : niv. %d/%d — Coût : %d or, %d bois" % [
 		label,
 		level,
 		MAX_LEVEL,
@@ -65,7 +65,7 @@ func get_upgrade_status(upgrade_id: String) -> String:
 	]
 
 	if not can_afford_next(upgrade_id):
-		status += " - ressources insuffisantes"
+		status += " — Ressources insuffisantes"
 
 	return status
 
