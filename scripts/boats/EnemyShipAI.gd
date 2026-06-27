@@ -2,7 +2,6 @@ extends Node
 
 @export var detection_range: float = 55.0
 @export var stop_distance: float = 7.0
-@export var attack_cooldown: float = 1.6
 
 @onready var ship: EnemyShip = get_parent() as EnemyShip
 
@@ -26,12 +25,13 @@ func _physics_process(delta: float) -> void:
 	var offset := _player.global_position - ship.global_position
 	offset.y = 0.0
 	var distance_squared := offset.length_squared()
+	var attack_range := _get_attack_range()
 
 	if distance_squared > detection_range * detection_range:
 		ship.brake(delta)
 		return
 
-	if distance_squared <= stop_distance * stop_distance:
+	if distance_squared <= attack_range * attack_range:
 		ship.brake(delta)
 		_try_attack_player()
 		return
@@ -51,4 +51,18 @@ func _try_attack_player() -> void:
 		return
 
 	_player.take_damage(damage)
-	_attack_cooldown_remaining = attack_cooldown
+	_attack_cooldown_remaining = _get_attack_cooldown()
+
+
+func _get_attack_range() -> float:
+	if ship.has_method("get_attack_range"):
+		return ship.get_attack_range()
+
+	return stop_distance
+
+
+func _get_attack_cooldown() -> float:
+	if ship.has_method("get_attack_cooldown"):
+		return ship.get_attack_cooldown()
+
+	return 2.0

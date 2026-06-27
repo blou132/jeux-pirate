@@ -10,6 +10,8 @@ signal destroyed(world_position: Vector3, gold_reward: int, wood_reward: int)
 @export var move_speed: float = 7.0
 @export var turn_speed: float = 1.15
 @export var contact_damage: int = 12
+@export var attack_range: float = 20.0
+@export var attack_cooldown: float = 2.2
 @export var reward_gold: int = 12
 @export var reward_wood: int = 8
 
@@ -30,6 +32,8 @@ func configure_variant(config: Dictionary) -> void:
 	move_speed = float(config.get("move_speed", move_speed))
 	turn_speed = float(config.get("turn_speed", turn_speed))
 	contact_damage = int(config.get("contact_damage", contact_damage))
+	attack_range = float(config.get("attack_range", attack_range))
+	attack_cooldown = float(config.get("attack_cooldown", attack_cooldown))
 	reward_gold = int(config.get("reward_gold", reward_gold))
 	reward_wood = int(config.get("reward_wood", reward_wood))
 
@@ -89,6 +93,14 @@ func take_damage(amount: int) -> void:
 
 func get_contact_damage() -> int:
 	return contact_damage
+
+
+func get_attack_range() -> float:
+	return attack_range
+
+
+func get_attack_cooldown() -> float:
+	return attack_cooldown
 
 
 func get_display_name() -> String:
