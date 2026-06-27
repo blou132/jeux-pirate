@@ -79,7 +79,18 @@ func steer_toward(target_position: Vector3, delta: float) -> void:
 		brake(delta)
 		return
 
-	var desired_forward := to_target.normalized()
+	steer_along_direction(to_target.normalized(), delta)
+
+
+func steer_along_direction(desired_forward: Vector3, delta: float) -> void:
+	if _destroyed:
+		return
+	if desired_forward.length_squared() < 0.01:
+		brake(delta)
+		return
+
+	desired_forward.y = 0.0
+	desired_forward = desired_forward.normalized()
 	var current_forward := -global_transform.basis.z
 	var signed_angle := current_forward.signed_angle_to(desired_forward, Vector3.UP)
 	var turn_amount := clampf(signed_angle, -turn_speed * delta, turn_speed * delta)

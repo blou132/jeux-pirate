@@ -4,6 +4,7 @@ extends Node
 @export var detection_range: float = 55.0
 @export var stop_distance: float = 7.0
 @export var projectile_speed: float = 13.0
+@export var broadside_tolerance_degrees: float = 60.0
 
 @onready var ship: EnemyShip = get_parent() as EnemyShip
 
@@ -38,14 +39,19 @@ func _physics_process(delta: float) -> void:
 		return
 
 	if distance_squared <= attack_range * attack_range:
+		var fire_direction: Vector3 = _get_broadside_fire_direction(offset)
+		if fire_direction == Vector3.ZERO:
+			_maneuver_for_broadside(offset, delta)
+			return
+
 		ship.brake(delta)
-		_try_attack_player()
+		_try_attack_player(fire_direction)
 		return
 
 	ship.steer_toward(_player.global_position, delta)
 
 
-func _try_attack_player() -> void:
+func _try_attack_player(fire_direction: Vector3) -> void:
 	if _attack_cooldown_remaining > 0.0 or _player == null:
 		return
 
@@ -56,7 +62,7 @@ func _try_attack_player() -> void:
 	if damage <= 0:
 		return
 
-	_fire_projectile(damage)
+	_fire_projectile(damage, fire_direction)
 	_attack_cooldown_remaining = _get_attack_cooldown()
 
 
@@ -74,7 +80,55 @@ func _get_attack_cooldown() -> float:
 	return 2.0
 
 
-func _fire_projectile(damage: int) -> void:
+func _get_broadside_fire_direction(offset_to_player: Vector3) -> Vector3:
+	if offset_to_player.length_squared() < 0.01:
+		return Vector3.ZERO
+
+	var to_player := offset_to_player.normalized()
+	var port_direction := -ship.global_transform.basis.x
+	var starboard_direction := ship.global_transform.basis.x
+	port_direction.y = 0.0
+	starboard_direction.y = 0.0
+	port_direction = port_direction.normalized()
+	starboard_direction = starboard_direction.normalized()
+
+	var port_alignment := to_player.dot(port_direction)
+	var starboard_alignment := to_player.dot(starboard_direction)
+	var required_alignment := cos(deg_to_rad(broadside_tolerance_degrees))
+
+	if port_alignment >= starboard_alignment and port_alignment >= required_alignment:
+		return port_direction
+	if starboard_alignment >= required_alignment:
+		return starboard_direction
+
+	return Vector3.ZERO
+
+
+func _maneuver_for_broadside(offset_to_player: Vector3, delta: float) -> void:
+	if offset_to_player.length_squared() < 0.01:
+		ship.brake(delta)
+		return
+
+	var to_player := offset_to_player.normalized()
+	var broadside_forward := Vector3.UP.cross(to_player)
+	if broadside_forward.length_squared() < 0.01:
+		ship.brake(delta)
+		return
+
+	broadside_forward = broadside_forward.normalized()
+	var opposite_forward := -broadside_forward
+	var current_forward := -ship.global_transform.basis.z
+
+	if current_forward.dot(opposite_forward) > current_forward.dot(broadside_forward):
+		broadside_forward = opposite_forward
+
+	if ship.has_method("steer_along_direction"):
+		ship.steer_along_direction(broadside_forward, delta)
+	else:
+		ship.steer_toward(_player.global_position, delta)
+
+
+func _fire_projectile(damage: int, fire_direction: Vector3) -> void:
 	if enemy_cannon_ball_scene == null or not is_instance_valid(_player):
 		return
 
@@ -84,7 +138,7 @@ func _fire_projectile(damage: int) -> void:
 		return
 
 	var projectile_node := projectile as Node3D
-	var start_position := ship.global_position + Vector3(0.0, 0.7, 0.0)
+	var start_position := ship.global_position + (fire_direction.normalized() * 1.5) + Vector3(0.0, 0.7, 0.0)
 	var target_position := _player.global_position + Vector3(0.0, 0.45, 0.0)
 	var direction := target_position - start_position
 	direction.y = clampf(direction.y, -0.2, 0.35)
