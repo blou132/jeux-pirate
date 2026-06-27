@@ -16,12 +16,16 @@ extends Node
 # Temporary v0.3.5 console helper to verify enemy broadside selection during tests.
 @export var debug_broadside_fire: bool = true
 @export var debug_broadside_fire_interval: float = 1.5
+@export var debug_show_broadside_lines: bool = true
+@export var debug_broadside_line_length: float = 28.0
 
 @onready var ship: EnemyShip = get_parent() as EnemyShip
 
 var _player: Node3D
 var _attack_cooldown_remaining: float = 0.0
 var _debug_message_cooldown_remaining: float = 0.0
+var _debug_line_instance: MeshInstance3D
+var _debug_line_material: StandardMaterial3D
 
 
 func _physics_process(delta: float) -> void:
@@ -35,10 +39,12 @@ func _physics_process(delta: float) -> void:
 		_player = get_tree().get_first_node_in_group("player") as Node3D
 
 	if _player == null:
+		_clear_broadside_debug_lines()
 		ship.brake(delta)
 		return
 
 	if _player.has_method("is_destroyed") and _player.is_destroyed():
+		_clear_broadside_debug_lines()
 		ship.brake(delta)
 		return
 
@@ -50,8 +56,11 @@ func _physics_process(delta: float) -> void:
 	var distance_to_player: float = sqrt(distance_squared)
 
 	if distance_squared > detection_range * detection_range:
+		_clear_broadside_debug_lines()
 		ship.brake(delta)
 		return
+
+	_update_broadside_debug_lines(offset)
 
 	if distance_squared <= attack_range * attack_range:
 		var fire_direction: Vector3 = _get_broadside_fire_direction(offset)
@@ -159,6 +168,20 @@ func _get_broadside_fire_direction(offset_to_player: Vector3) -> Vector3:
 		return starboard_direction
 
 	return Vector3.ZERO
+
+
+func _get_preferred_broadside_direction(offset_to_player: Vector3) -> Vector3:
+	if offset_to_player.length_squared() < 0.01:
+		return Vector3.ZERO
+
+	var to_player: Vector3 = offset_to_player.normalized()
+	var port_direction: Vector3 = _get_port_axis()
+	var starboard_direction: Vector3 = _get_starboard_axis()
+
+	if to_player.dot(port_direction) >= to_player.dot(starboard_direction):
+		return port_direction
+
+	return starboard_direction
 
 
 func _maneuver_for_broadside(offset_to_player: Vector3, distance_to_player: float, attack_range: float, delta: float) -> void:
@@ -283,3 +306,71 @@ func _show_broadside_debug(fire_direction: Vector3) -> void:
 
 	print("Tir ennemi %s" % side_name)
 	_debug_message_cooldown_remaining = debug_broadside_fire_interval
+
+
+func _update_broadside_debug_lines(offset_to_player: Vector3) -> void:
+	if not debug_show_broadside_lines:
+		_clear_broadside_debug_lines()
+		return
+
+	var fire_direction: Vector3 = _get_preferred_broadside_direction(offset_to_player)
+	if fire_direction == Vector3.ZERO:
+		_clear_broadside_debug_lines()
+		return
+
+	var line_origin: Vector3 = _get_broadside_muzzle_position(fire_direction)
+	var line_direction: Vector3 = fire_direction.normalized()
+	line_direction.y = 0.0
+	if line_direction.length_squared() < 0.01:
+		_clear_broadside_debug_lines()
+		return
+
+	var target_position: Vector3 = _get_player_aim_position()
+	var to_target: Vector3 = target_position - line_origin
+	var parallel_distance: float = maxf(0.0, to_target.dot(line_direction))
+	var closest_point: Vector3 = line_origin + (line_direction * parallel_distance)
+	var line_end: Vector3 = line_origin + (line_direction * debug_broadside_line_length)
+	var shot_color: Color = Color(0.2, 0.45, 1.0, 1.0)
+	if fire_direction.normalized().dot(_get_starboard_axis()) >= 0.0:
+		shot_color = Color(1.0, 0.25, 0.18, 1.0)
+
+	var line_mesh: ImmediateMesh = ImmediateMesh.new()
+	line_mesh.surface_begin(Mesh.PRIMITIVE_LINES, _get_debug_line_material())
+	line_mesh.surface_set_color(shot_color)
+	line_mesh.surface_add_vertex(line_origin)
+	line_mesh.surface_add_vertex(line_end)
+	line_mesh.surface_set_color(Color(0.35, 1.0, 0.35, 1.0))
+	line_mesh.surface_add_vertex(closest_point)
+	line_mesh.surface_add_vertex(target_position)
+	line_mesh.surface_end()
+
+	var line_instance: MeshInstance3D = _get_debug_line_instance()
+	line_instance.global_transform = Transform3D.IDENTITY
+	line_instance.mesh = line_mesh
+	line_instance.visible = true
+
+
+func _clear_broadside_debug_lines() -> void:
+	if _debug_line_instance != null and is_instance_valid(_debug_line_instance):
+		_debug_line_instance.visible = false
+
+
+func _get_debug_line_instance() -> MeshInstance3D:
+	if _debug_line_instance != null and is_instance_valid(_debug_line_instance):
+		return _debug_line_instance
+
+	_debug_line_instance = MeshInstance3D.new()
+	_debug_line_instance.name = "BroadsideDebugLines"
+	_debug_line_instance.top_level = true
+	ship.add_child(_debug_line_instance)
+	return _debug_line_instance
+
+
+func _get_debug_line_material() -> StandardMaterial3D:
+	if _debug_line_material != null:
+		return _debug_line_material
+
+	_debug_line_material = StandardMaterial3D.new()
+	_debug_line_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_debug_line_material.vertex_color_use_as_albedo = true
+	return _debug_line_material
