@@ -105,6 +105,15 @@ La direction du joueur sert seulement à choisir le côté de tir. Le projectile
 - Le boulet apparaît sur le côté de la coque, pas au centre.
 - À portée d'attaque, l'ennemi orbite et corrige sa distance pour placer le joueur dans un arc latéral.
 
+## Positionnement de bordée v0.3.6
+
+L'ennemi doit se comporter davantage comme un navire qui prépare une bordée :
+
+- À portée, il cherche une orientation où son côté vise directement le joueur.
+- Le seuil de tir est plus strict pour éviter les tirs de flanc mal alignés.
+- Pendant l'alignement, il avance moins vite pour éviter de dépasser ou coller le joueur.
+- Le tir est confirmé au dernier moment avant de créer le projectile.
+
 ## Piliers a long terme
 
 - Navigation lisible : le joueur doit toujours comprendre son cap, sa vitesse et les menaces proches.

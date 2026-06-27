@@ -18,6 +18,8 @@ La v0.3.4 améliore les règles de combat naval : tirs ennemis limités aux bord
 
 La v0.3.5 corrige les bordées ennemies : les boulets partent strictement vers bâbord ou tribord, depuis le côté de la coque, avec une manœuvre ennemie plus lisible pour présenter le flanc.
 
+La v0.3.6 améliore le positionnement de bordée : les ennemis alignent davantage leur flanc avant de tirer, manœuvrent plus lentement à portée et ne tirent que lorsque le côté vise vraiment le joueur.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -83,6 +85,13 @@ La v0.3.5 corrige les bordées ennemies : les boulets partent strictement vers b
 - Le côté bâbord ou tribord est choisi selon la position relative du joueur.
 - Les projectiles ennemis apparaissent depuis le côté de la coque avec un offset vertical.
 - Les ennemis manœuvrent à portée pour mieux présenter leur flanc avant de tirer.
+
+## Correctifs v0.3.6
+
+- L'alignement de tir ennemi est plus strict avant une bordée.
+- Les ennemis manœuvrent plus lentement à portée pour présenter leur flanc.
+- Le tir est revalidé juste avant le lancement du boulet.
+- Le debug console de bordée est limité par cooldown pour rester lisible.
 
 ## Lancement
 
