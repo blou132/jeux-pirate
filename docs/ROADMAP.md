@@ -24,6 +24,7 @@
 - Ajouter des variantes d'ennemis.
 - Afficher danger et ennemis détruits dans le HUD.
 - Ajouter des zones de danger simples.
+- Correctif v0.3.2 : attaque ennemie, feedback de défaite joueur, variantes plus lisibles, nameplates, notifications de zone.
 
 ## v0.4 - Îles explorables, coffres et trésors
 

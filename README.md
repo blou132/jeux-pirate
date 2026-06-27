@@ -10,6 +10,8 @@ La v0.2 ajoute un port de test, une interaction au port, un menu, la réparation
 
 La v0.3 ajoute le spawn d'ennemis, le respawn après destruction, trois variantes d'ennemis, un niveau de danger global, des zones de danger simples et un feedback de victoire plus lisible.
 
+La v0.3.2 améliore la jouabilité de la v0.3 : attaque ennemie effective, feedback de défaite du joueur, silhouettes ennemies plus distinctes, noms au-dessus des ennemis et notifications d'entrée de zone.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -46,6 +48,14 @@ La v0.3 ajoute le spawn d'ennemis, le respawn après destruction, trois variante
 - Vitesse de base du bateau joueur réduite à 7.0.
 - Voiles rapides : vitesse max 8.0 au niveau 1, 9.0 au niveau 2, 10.0 au niveau 3.
 - Vitesses ennemies ajustées : Petit pirate rapide, Brigantin moyen, Patrouilleur lourd lent.
+
+## Correctifs v0.3.2
+
+- Les ennemis attaquent le joueur avec portée, cooldown et dégâts par type.
+- Le HUD affiche `Bateau détruit` quand le joueur arrive à 0 PV.
+- Les variantes ennemies ont des silhouettes plus lisibles.
+- Les ennemis affichent un nom et leurs PV au-dessus du bateau.
+- L'entrée dans une zone affiche une notification claire : portuaire, archipel ou hostile.
 
 ## Lancement
 

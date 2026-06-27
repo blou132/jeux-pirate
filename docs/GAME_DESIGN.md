@@ -67,6 +67,16 @@ Les zones de danger structurent la carte de test :
 
 Le niveau de danger global démarre à 1 et augmente tous les 3 ennemis détruits. Il ne remplace pas les zones : il rend progressivement les spawns plus dangereux dans toutes les zones.
 
+## Lisibilité combat v0.3.2
+
+Les ennemis doivent être immédiatement lisibles et réellement menaçants :
+
+- Chaque variante possède une portée d'attaque, un cooldown et des dégâts propres.
+- Le joueur reçoit un feedback clair quand son bateau est détruit.
+- Les silhouettes ennemies utilisent des primitives différentes pour distinguer vitesse, taille et danger.
+- Les nameplates affichent le type et les PV des ennemis.
+- Les zones de danger affichent une notification quand le joueur change de zone.
+
 ## Piliers a long terme
 
 - Navigation lisible : le joueur doit toujours comprendre son cap, sa vitesse et les menaces proches.
