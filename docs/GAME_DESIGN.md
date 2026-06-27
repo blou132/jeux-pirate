@@ -123,6 +123,15 @@ Les calculs de bordée ne doivent plus dépendre d'une origine invisible si elle
 - L'axe tribord est calculé depuis les points de canon quand ils existent.
 - Des marqueurs debug temporaires permettent de vérifier les points dans Godot.
 
+## Ligne de bordée v0.3.8
+
+Une bordée ennemie doit être validée comme une vraie ligne de tir :
+
+- La ligne part du point de canon latéral choisi.
+- Elle suit l'axe bâbord ou tribord du bateau ennemi.
+- Le tir est autorisé seulement si le `AimPoint` du joueur est devant la ligne et assez proche d'elle.
+- Une ligne debug temporaire montre le rayon de bordée et l'écart au point de visée.
+
 ## Piliers a long terme
 
 - Navigation lisible : le joueur doit toujours comprendre son cap, sa vitesse et les menaces proches.

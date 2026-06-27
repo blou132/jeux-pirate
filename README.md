@@ -22,6 +22,8 @@ La v0.3.6 améliore le positionnement de bordée : les ennemis alignent davantag
 
 La v0.3.7 fiabilise les points de visée et de tir : le joueur possède un vrai `AimPoint`, les ennemis ont des points de canon latéraux explicites, et l'alignement de bordée utilise les axes réels du bateau.
 
+La v0.3.8 ajoute une validation de bordée par distance à la ligne de tir : l'ennemi ne tire que si la ligne issue du canon latéral passe près du `AimPoint` du joueur.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -102,6 +104,13 @@ La v0.3.7 fiabilise les points de visée et de tir : le joueur possède un vrai 
 - L'alignement de bordée utilise l'axe réel entre les points de canon.
 - Des marqueurs debug temporaires rendent les points de visée et de tir visibles dans Godot.
 
+## Correctifs v0.3.8
+
+- Le tir ennemi est validé par la distance entre le `AimPoint` et la ligne de bordée.
+- Si la ligne passe trop loin du joueur ou part dans le mauvais sens, l'ennemi ne tire pas.
+- Les lignes debug de bordée montrent le rayon latéral et l'écart jusqu'au `AimPoint`.
+- La manœuvre ennemie corrige légèrement sa trajectoire quand la ligne de tir passe à côté.
+
 ## Lancement
 
 1. Installer Godot 4.x.
@@ -133,6 +142,8 @@ Outil temporaire pour tester les améliorations sans farmer les ressources :
 Ces raccourcis sont activés via `DebugTools` et doivent rester identifiés comme aide de développement.
 
 Les marqueurs `AimPoint`, `LeftCannonPoint` et `RightCannonPoint` peuvent être affichés pendant les tests avec `debug_show_aim_points` sur les bateaux. Cette aide est temporaire pour vérifier l'alignement des bordées.
+
+Les lignes de bordée ennemies peuvent être affichées avec `debug_show_broadside_lines` dans `EnemyShipAI`. Elles servent à vérifier si la ligne latérale passe près du `AimPoint`.
 
 ## Structure
 
