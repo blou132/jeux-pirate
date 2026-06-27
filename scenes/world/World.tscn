@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://world_root_v01"]
+[gd_scene load_steps=16 format=3 uid="uid://world_root_v01"]
 
 [ext_resource type="Script" path="res://scripts/world/World.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/boats/PlayerBoat.tscn" id="2_player"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/boats/EnemyShip.tscn" id="4_enemy"]
 [ext_resource type="Script" path="res://scripts/world/LootSystem.gd" id="5_loot_system"]
 [ext_resource type="PackedScene" path="res://scenes/world/Port.tscn" id="6_port"]
+[ext_resource type="PackedScene" path="res://scenes/ui/PortMenu.tscn" id="7_port_menu"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ocean"]
 albedo_color = Color(0.02, 0.28, 0.45, 1)
@@ -80,3 +81,5 @@ position = Vector3(18, 0, -22)
 rotation_degrees = Vector3(0, -35, 0)
 
 [node name="HUD" parent="." instance=ExtResource("3_hud")]
+
+[node name="PortMenu" parent="." instance=ExtResource("7_port_menu")]

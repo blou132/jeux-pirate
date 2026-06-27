@@ -1,0 +1,61 @@
+[gd_scene load_steps=2 format=3 uid="uid://port_menu_v02"]
+
+[ext_resource type="Script" path="res://scripts/ui/PortMenu.gd" id="1_port_menu"]
+
+[node name="PortMenu" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_port_menu")
+
+[node name="Root" type="Control" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Backdrop" type="ColorRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.35)
+
+[node name="CenterContainer" type="CenterContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Root/CenterContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(360, 0)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Port du Pavillon"
+horizontal_alignment = 1
+
+[node name="StatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = ""
+horizontal_alignment = 1
+
+[node name="RepairButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Réparer le bateau"
+
+[node name="UpgradesButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Améliorations"
+
+[node name="QuitButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Quitter"
