@@ -102,6 +102,7 @@ func _destroy() -> void:
 	if loot_system != null and loot_system.has_method("drop_from_ship"):
 		loot_system.drop_from_ship(sink_position, reward_gold, reward_wood)
 
+	_show_defeat_feedback()
 	destroyed.emit(sink_position, reward_gold, reward_wood)
 	queue_free()
 
@@ -114,3 +115,15 @@ func _set_mesh_color(node_path: NodePath, color: Color) -> void:
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
 	mesh_instance.material_override = material
+
+
+func _show_defeat_feedback() -> void:
+	var hud := get_tree().get_first_node_in_group("hud")
+	if hud == null:
+		return
+
+	var message := "%s vaincu : +%d or, +%d bois" % [display_name, reward_gold, reward_wood]
+	if hud.has_method("show_temporary_context_message"):
+		hud.show_temporary_context_message(message, 2.4)
+	elif hud.has_method("set_context_message"):
+		hud.set_context_message(message)
