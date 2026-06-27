@@ -1,4 +1,4 @@
-[gd_scene load_steps=24 format=3 uid="uid://world_root_v01"]
+[gd_scene load_steps=28 format=3 uid="uid://world_root_v01"]
 
 [ext_resource type="Script" path="res://scripts/world/World.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/boats/PlayerBoat.tscn" id="2_player"]
@@ -9,6 +9,7 @@
 [ext_resource type="PackedScene" path="res://scenes/ui/PortMenu.tscn" id="7_port_menu"]
 [ext_resource type="Script" path="res://scripts/world/DebugTools.gd" id="8_debug_tools"]
 [ext_resource type="Script" path="res://scripts/world/EnemySpawnPoint.gd" id="9_enemy_spawn_point"]
+[ext_resource type="Script" path="res://scripts/world/DangerZone.gd" id="10_danger_zone"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ocean"]
 albedo_color = Color(0.02, 0.28, 0.45, 1)
@@ -52,6 +53,15 @@ size = Vector3(74, 0.06, 48)
 
 [sub_resource type="BoxMesh" id="BoxMesh_zone_hostile"]
 size = Vector3(82, 0.06, 68)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_zone_port"]
+size = Vector3(32, 5, 32)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_zone_archipelago"]
+size = Vector3(74, 5, 48)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_zone_hostile"]
+size = Vector3(82, 5, 68)
 
 [node name="World" type="Node3D"]
 script = ExtResource("1_world")
@@ -99,6 +109,14 @@ text = "Zone portuaire"
 font_size = 36
 billboard = 1
 
+[node name="PortDangerArea" type="Area3D" parent="DangerZones"]
+position = Vector3(-8, 1.5, 9)
+script = ExtResource("10_danger_zone")
+zone_message = "Zone portuaire — danger faible"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DangerZones/PortDangerArea"]
+shape = SubResource("BoxShape3D_zone_port")
+
 [node name="ArchipelagoDangerZone" type="MeshInstance3D" parent="DangerZones"]
 position = Vector3(28, 0.03, -22)
 mesh = SubResource("BoxMesh_zone_archipelago")
@@ -110,6 +128,14 @@ text = "Zone d'archipel"
 font_size = 36
 billboard = 1
 
+[node name="ArchipelagoDangerArea" type="Area3D" parent="DangerZones"]
+position = Vector3(28, 1.5, -22)
+script = ExtResource("10_danger_zone")
+zone_message = "Zone d'archipel — danger moyen"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DangerZones/ArchipelagoDangerArea"]
+shape = SubResource("BoxShape3D_zone_archipelago")
+
 [node name="HostileDangerZone" type="MeshInstance3D" parent="DangerZones"]
 position = Vector3(-46, 0.02, 24)
 mesh = SubResource("BoxMesh_zone_hostile")
@@ -120,6 +146,14 @@ position = Vector3(-46, 2.0, 58)
 text = "Zone hostile"
 font_size = 36
 billboard = 1
+
+[node name="HostileDangerArea" type="Area3D" parent="DangerZones"]
+position = Vector3(-46, 1.5, 24)
+script = ExtResource("10_danger_zone")
+zone_message = "Zone hostile — danger élevé"
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DangerZones/HostileDangerArea"]
+shape = SubResource("BoxShape3D_zone_hostile")
 
 [node name="LootSystem" type="Node3D" parent="."]
 script = ExtResource("5_loot_system")

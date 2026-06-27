@@ -10,6 +10,7 @@ extends CanvasLayer
 @onready var danger_label: Label = $MarginContainer/PanelContainer/VBoxContainer/DangerLabel
 @onready var enemies_defeated_label: Label = $MarginContainer/PanelContainer/VBoxContainer/EnemiesDefeatedLabel
 @onready var context_label: Label = $MarginContainer/PanelContainer/VBoxContainer/ContextLabel
+@onready var zone_notification_label: Label = $ZoneNotificationContainer/ZoneNotificationLabel
 
 var _player: Node
 var _game_state: Node
@@ -17,11 +18,14 @@ var _upgrade_system: Node
 var _context_message: String = ""
 var _temporary_context_message: String = ""
 var _temporary_message_version: int = 0
+var _current_zone_message: String = ""
+var _zone_notification_version: int = 0
 
 
 func _ready() -> void:
 	add_to_group("hud")
 	context_label.visible = false
+	zone_notification_label.visible = false
 	_connect_game_state()
 	_connect_upgrade_system()
 	call_deferred("_bind_player_from_tree")
@@ -144,6 +148,25 @@ func _refresh_context_label() -> void:
 
 	context_label.text = message
 	context_label.visible = not message.is_empty()
+
+
+func show_zone_notification(message: String, duration: float = 2.5) -> void:
+	if message == _current_zone_message:
+		return
+
+	_current_zone_message = message
+	_zone_notification_version += 1
+	var notification_version := _zone_notification_version
+
+	zone_notification_label.text = message
+	zone_notification_label.visible = true
+
+	await get_tree().create_timer(duration, true).timeout
+
+	if notification_version != _zone_notification_version:
+		return
+
+	zone_notification_label.visible = false
 
 
 func _connect_upgrade_system() -> void:
