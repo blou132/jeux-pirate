@@ -41,7 +41,8 @@ func _physics_process(delta: float) -> void:
 		ship.brake(delta)
 		return
 
-	var offset: Vector3 = _player.global_position - ship.global_position
+	var player_aim_position: Vector3 = _get_player_aim_position()
+	var offset: Vector3 = player_aim_position - ship.global_position
 	offset.y = 0.0
 	var distance_squared: float = offset.length_squared()
 	var attack_range: float = _get_attack_range()
@@ -61,7 +62,7 @@ func _physics_process(delta: float) -> void:
 		_try_attack_player(fire_direction)
 		return
 
-	ship.steer_toward(_player.global_position, delta)
+	ship.steer_toward(player_aim_position, delta)
 
 
 func _try_attack_player(fire_direction: Vector3) -> void:
@@ -104,7 +105,7 @@ func _get_confirmed_broadside_fire_direction(candidate_direction: Vector3) -> Ve
 	if candidate_direction.length_squared() < 0.01:
 		return Vector3.ZERO
 
-	var offset_to_player: Vector3 = _player.global_position - ship.global_position
+	var offset_to_player: Vector3 = _get_player_aim_position() - ship.global_position
 	offset_to_player.y = 0.0
 	var aligned_direction: Vector3 = _get_broadside_fire_direction(offset_to_player)
 	if aligned_direction == Vector3.ZERO:
@@ -165,7 +166,17 @@ func _maneuver_for_broadside(offset_to_player: Vector3, distance_to_player: floa
 	elif ship.has_method("steer_along_direction"):
 		ship.steer_along_direction(desired_forward, delta)
 	else:
-		ship.steer_toward(_player.global_position, delta)
+		ship.steer_toward(_get_player_aim_position(), delta)
+
+
+func _get_player_aim_position() -> Vector3:
+	if is_instance_valid(_player) and _player.has_method("get_aim_position"):
+		var aim_position: Vector3 = _player.get_aim_position()
+		return aim_position
+	if is_instance_valid(_player):
+		return _player.global_position
+
+	return ship.global_position
 
 
 func _get_desired_broadside_forward(to_player: Vector3) -> Vector3:
