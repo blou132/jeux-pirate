@@ -1,6 +1,7 @@
-[gd_scene load_steps=11 format=3 uid="uid://player_boat_v01"]
+[gd_scene load_steps=12 format=3 uid="uid://player_boat_v01"]
 
 [ext_resource type="Script" path="res://scripts/boats/PlayerBoat.gd" id="1_player_boat"]
+[ext_resource type="Script" path="res://scripts/combat/CannonSystem.gd" id="2_cannon_system"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hull"]
 albedo_color = Color(0.34, 0.18, 0.08, 1)
@@ -64,6 +65,15 @@ material_override = SubResource("StandardMaterial3D_deck")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 position = Vector3(0, 0.25, 0)
 shape = SubResource("BoxShape3D_collision")
+
+[node name="CannonSystem" type="Node3D" parent="."]
+script = ExtResource("2_cannon_system")
+
+[node name="PortMuzzle" type="Marker3D" parent="CannonSystem"]
+position = Vector3(-1.55, 0.55, -0.45)
+
+[node name="StarboardMuzzle" type="Marker3D" parent="CannonSystem"]
+position = Vector3(1.55, 0.55, -0.45)
 
 [node name="Camera3D" type="Camera3D" parent="."]
 position = Vector3(0, 7.5, 11)
