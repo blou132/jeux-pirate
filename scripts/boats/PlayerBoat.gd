@@ -5,14 +5,14 @@ signal health_changed(current_health: int, max_health: int)
 signal speed_changed(speed: float)
 
 @export var max_health: int = 100
-@export var max_forward_speed: float = 16.0
+@export var max_forward_speed: float = 7.0
 @export var max_reverse_speed: float = 5.0
 @export var acceleration: float = 12.0
 @export var reverse_acceleration: float = 8.0
 @export var drag: float = 6.0
 @export var turn_speed: float = 1.7
 @export var hull_health_bonus_per_level: int = 25
-@export var sail_speed_bonus_per_level: float = 1.5
+@export var sail_speed_bonus_per_level: float = 1.0
 
 var health: int
 var current_speed: float = 0.0

@@ -41,6 +41,12 @@ La v0.3 ajoute le spawn d'ennemis, le respawn après destruction, trois variante
 - Message HUD quand un ennemi est vaincu avec loot reçu.
 - Debug temporaire `F1`/`F2` encore présent pour tester les achats d'amélioration.
 
+## Equilibrage v0.3.1
+
+- Vitesse de base du bateau joueur réduite à 7.0.
+- Voiles rapides : vitesse max 8.0 au niveau 1, 9.0 au niveau 2, 10.0 au niveau 3.
+- Vitesses ennemies ajustées : Petit pirate rapide, Brigantin moyen, Patrouilleur lourd lent.
+
 ## Lancement
 
 1. Installer Godot 4.x.
