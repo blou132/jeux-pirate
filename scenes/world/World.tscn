@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://world_root_v01"]
+[gd_scene load_steps=24 format=3 uid="uid://world_root_v01"]
 
 [ext_resource type="Script" path="res://scripts/world/World.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/boats/PlayerBoat.tscn" id="2_player"]
@@ -29,11 +29,29 @@ albedo_color = Color(0.96, 0.68, 0.13, 1)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rock"]
 albedo_color = Color(0.38, 0.40, 0.42, 1)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_zone_port"]
+albedo_color = Color(0.12, 0.46, 0.24, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_zone_archipelago"]
+albedo_color = Color(0.78, 0.56, 0.14, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_zone_hostile"]
+albedo_color = Color(0.62, 0.10, 0.08, 1)
+
 [sub_resource type="BoxMesh" id="BoxMesh_marker"]
 size = Vector3(1.2, 2.4, 1.2)
 
 [sub_resource type="BoxMesh" id="BoxMesh_island"]
 size = Vector3(4.5, 0.6, 4.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_zone_port"]
+size = Vector3(32, 0.06, 32)
+
+[sub_resource type="BoxMesh" id="BoxMesh_zone_archipelago"]
+size = Vector3(74, 0.06, 48)
+
+[sub_resource type="BoxMesh" id="BoxMesh_zone_hostile"]
+size = Vector3(82, 0.06, 68)
 
 [node name="World" type="Node3D"]
 script = ExtResource("1_world")
@@ -67,6 +85,41 @@ material_override = SubResource("StandardMaterial3D_gold")
 position = Vector3(22, 0.3, 30)
 mesh = SubResource("BoxMesh_island")
 material_override = SubResource("StandardMaterial3D_rock")
+
+[node name="DangerZones" type="Node3D" parent="."]
+
+[node name="PortDangerZone" type="MeshInstance3D" parent="DangerZones"]
+position = Vector3(-8, 0.04, 9)
+mesh = SubResource("BoxMesh_zone_port")
+material_override = SubResource("StandardMaterial3D_zone_port")
+
+[node name="PortDangerLabel" type="Label3D" parent="DangerZones"]
+position = Vector3(-8, 2.0, 25)
+text = "Zone portuaire"
+font_size = 36
+billboard = 1
+
+[node name="ArchipelagoDangerZone" type="MeshInstance3D" parent="DangerZones"]
+position = Vector3(28, 0.03, -22)
+mesh = SubResource("BoxMesh_zone_archipelago")
+material_override = SubResource("StandardMaterial3D_zone_archipelago")
+
+[node name="ArchipelagoDangerLabel" type="Label3D" parent="DangerZones"]
+position = Vector3(28, 2.0, -46)
+text = "Zone d'archipel"
+font_size = 36
+billboard = 1
+
+[node name="HostileDangerZone" type="MeshInstance3D" parent="DangerZones"]
+position = Vector3(-46, 0.02, 24)
+mesh = SubResource("BoxMesh_zone_hostile")
+material_override = SubResource("StandardMaterial3D_zone_hostile")
+
+[node name="HostileDangerLabel" type="Label3D" parent="DangerZones"]
+position = Vector3(-46, 2.0, 58)
+text = "Zone hostile"
+font_size = 36
+billboard = 1
 
 [node name="LootSystem" type="Node3D" parent="."]
 script = ExtResource("5_loot_system")

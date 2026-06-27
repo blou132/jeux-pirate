@@ -48,7 +48,7 @@ func _spawn_enemy_if_possible() -> bool:
 		enemy.queue_free()
 		return false
 
-	var variant_config := _pick_enemy_variant()
+	var variant_config := _pick_enemy_variant(_get_spawn_point_zone(spawn_point))
 	if enemy.has_method("configure_variant"):
 		enemy.configure_variant(variant_config)
 
@@ -128,14 +128,14 @@ func _cleanup_inactive_enemies() -> void:
 	)
 
 
-func _pick_enemy_variant() -> Dictionary:
+func _pick_enemy_variant(danger_zone: String) -> Dictionary:
 	var variants := _get_enemy_variants()
 	var weighted_variants: Array[Dictionary] = []
 	var danger_level := _get_danger_level()
 
 	for config in variants:
 		var variant_id := String(config.get("id", ""))
-		var weight := _get_variant_weight(variant_id, danger_level)
+		var weight := _get_variant_weight(variant_id, danger_level, danger_zone)
 		for i in range(weight):
 			weighted_variants.append(config)
 
@@ -197,7 +197,40 @@ func _get_danger_level() -> int:
 	return 1
 
 
-func _get_variant_weight(variant_id: String, danger_level: int) -> int:
+func _get_spawn_point_zone(spawn_point: Marker3D) -> String:
+	if spawn_point.has_method("get_danger_zone"):
+		return spawn_point.get_danger_zone()
+
+	return "open"
+
+
+func _get_variant_weight(variant_id: String, danger_level: int, danger_zone: String) -> int:
+	match danger_zone:
+		"port":
+			match variant_id:
+				"small_pirate":
+					return 8
+				"brigantine":
+					return 1 + mini(danger_level, 2)
+				"heavy_patrol":
+					return 0
+		"archipelago":
+			match variant_id:
+				"small_pirate":
+					return max(2, 6 - danger_level)
+				"brigantine":
+					return 4 + danger_level
+				"heavy_patrol":
+					return max(0, danger_level - 2)
+		"hostile":
+			match variant_id:
+				"small_pirate":
+					return max(1, 4 - danger_level)
+				"brigantine":
+					return 4
+				"heavy_patrol":
+					return 2 + danger_level
+
 	if danger_level <= 1:
 		match variant_id:
 			"small_pirate":

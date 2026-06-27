@@ -5,3 +5,7 @@ extends Marker3D
 
 func _ready() -> void:
 	add_to_group("enemy_spawn_points")
+
+
+func get_danger_zone() -> String:
+	return danger_zone
