@@ -48,6 +48,15 @@ Godot n'est pas inclus dans ce depot.
 - `E` : interagir avec le port
 - `Échap` : fermer le menu
 
+## Debug développement
+
+Outil temporaire pour tester les améliorations sans farmer les ressources :
+
+- `F1` : ajoute 100 or
+- `F2` : ajoute 100 bois
+
+Ces raccourcis sont activés via `DebugTools` et doivent rester identifiés comme aide de développement.
+
 ## Structure
 
 - `scenes/` : scenes Godot reutilisables
