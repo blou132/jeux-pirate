@@ -1,0 +1,70 @@
+[gd_scene load_steps=12 format=3 uid="uid://enemy_ship_v01"]
+
+[ext_resource type="Script" path="res://scripts/boats/EnemyShip.gd" id="1_enemy_ship"]
+[ext_resource type="Script" path="res://scripts/boats/EnemyShipAI.gd" id="2_enemy_ai"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hull"]
+albedo_color = Color(0.42, 0.08, 0.06, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_deck"]
+albedo_color = Color(0.35, 0.20, 0.10, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mast"]
+albedo_color = Color(0.16, 0.08, 0.03, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sail"]
+albedo_color = Color(0.12, 0.11, 0.10, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_hull"]
+size = Vector3(2.1, 0.65, 4.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_deck"]
+size = Vector3(1.5, 0.18, 2.7)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_mast"]
+top_radius = 0.07
+bottom_radius = 0.07
+height = 2.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_sail"]
+size = Vector3(1.35, 0.95, 0.08)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_collision"]
+size = Vector3(2.2, 1.0, 4.4)
+
+[node name="EnemyShip" type="CharacterBody3D"]
+script = ExtResource("1_enemy_ship")
+
+[node name="EnemyShipAI" type="Node" parent="."]
+script = ExtResource("2_enemy_ai")
+
+[node name="Visuals" type="Node3D" parent="."]
+
+[node name="Hull" type="MeshInstance3D" parent="Visuals"]
+mesh = SubResource("BoxMesh_hull")
+material_override = SubResource("StandardMaterial3D_hull")
+
+[node name="Deck" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 0.42, 0)
+mesh = SubResource("BoxMesh_deck")
+material_override = SubResource("StandardMaterial3D_deck")
+
+[node name="Mast" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 1.25, -0.12)
+mesh = SubResource("CylinderMesh_mast")
+material_override = SubResource("StandardMaterial3D_mast")
+
+[node name="Sail" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 1.35, -0.18)
+mesh = SubResource("BoxMesh_sail")
+material_override = SubResource("StandardMaterial3D_sail")
+
+[node name="BowMarker" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 0.5, -2.25)
+scale = Vector3(0.4, 0.25, 0.24)
+mesh = SubResource("BoxMesh_deck")
+material_override = SubResource("StandardMaterial3D_deck")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.25, 0)
+shape = SubResource("BoxShape3D_collision")
