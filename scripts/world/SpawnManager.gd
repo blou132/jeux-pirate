@@ -158,9 +158,14 @@ func _get_enemy_variants() -> Array[Dictionary]:
 		"attack_cooldown": 1.8,
 		"reward_gold": 8,
 		"reward_wood": 5,
-		"visual_scale": 0.82,
-		"hull_color": Color(0.55, 0.14, 0.08, 1.0),
-		"sail_color": Color(0.18, 0.16, 0.12, 1.0),
+		"visual_scale": 0.74,
+		"hull_scale": Vector3(0.82, 0.86, 0.82),
+		"deck_scale": Vector3(0.8, 1.0, 0.72),
+		"mast_scale": Vector3(0.9, 0.88, 0.9),
+		"sail_scale": Vector3(0.75, 0.85, 1.0),
+		"hull_color": Color(0.68, 0.23, 0.11, 1.0),
+		"sail_color": Color(0.78, 0.63, 0.36, 1.0),
+		"visual_style": "small",
 	})
 	variants.append({
 		"id": "brigantine",
@@ -174,8 +179,13 @@ func _get_enemy_variants() -> Array[Dictionary]:
 		"reward_gold": 16,
 		"reward_wood": 10,
 		"visual_scale": 1.0,
+		"hull_scale": Vector3(1.0, 1.0, 1.12),
+		"deck_scale": Vector3(1.0, 1.0, 1.08),
+		"mast_scale": Vector3(1.0, 1.0, 1.0),
+		"sail_scale": Vector3(1.0, 1.0, 1.0),
 		"hull_color": Color(0.42, 0.08, 0.06, 1.0),
 		"sail_color": Color(0.12, 0.11, 0.10, 1.0),
+		"visual_style": "brigantine",
 	})
 	variants.append({
 		"id": "heavy_patrol",
@@ -188,9 +198,14 @@ func _get_enemy_variants() -> Array[Dictionary]:
 		"attack_cooldown": 2.8,
 		"reward_gold": 30,
 		"reward_wood": 18,
-		"visual_scale": 1.18,
+		"visual_scale": 1.2,
+		"hull_scale": Vector3(1.25, 1.18, 1.12),
+		"deck_scale": Vector3(1.18, 1.0, 1.0),
+		"mast_scale": Vector3(1.1, 1.18, 1.1),
+		"sail_scale": Vector3(1.08, 1.1, 1.0),
 		"hull_color": Color(0.16, 0.18, 0.23, 1.0),
 		"sail_color": Color(0.28, 0.27, 0.24, 1.0),
+		"visual_style": "heavy",
 	})
 	return variants
 

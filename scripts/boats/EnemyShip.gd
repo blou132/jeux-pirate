@@ -42,10 +42,21 @@ func configure_variant(config: Dictionary) -> void:
 	if visuals != null:
 		visuals.scale = Vector3.ONE * visual_scale
 
+	if config.has("hull_scale"):
+		_set_node_scale("Visuals/Hull", config["hull_scale"])
+	if config.has("deck_scale"):
+		_set_node_scale("Visuals/Deck", config["deck_scale"])
+	if config.has("mast_scale"):
+		_set_node_scale("Visuals/Mast", config["mast_scale"])
+	if config.has("sail_scale"):
+		_set_node_scale("Visuals/Sail", config["sail_scale"])
+
 	if config.has("hull_color"):
 		_set_mesh_color("Visuals/Hull", config["hull_color"])
 	if config.has("sail_color"):
 		_set_mesh_color("Visuals/Sail", config["sail_color"])
+
+	_apply_visual_style(String(config.get("visual_style", "brigantine")))
 
 	if is_inside_tree():
 		health = clampi(health, 1, max_health)
@@ -127,6 +138,66 @@ func _set_mesh_color(node_path: NodePath, color: Color) -> void:
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
 	mesh_instance.material_override = material
+
+
+func _set_node_scale(node_path: NodePath, scale_value: Vector3) -> void:
+	var node := get_node_or_null(node_path) as Node3D
+	if node != null:
+		node.scale = scale_value
+
+
+func _apply_visual_style(visual_style: String) -> void:
+	var details := _get_variant_details()
+	if details == null:
+		return
+
+	for child in details.get_children():
+		child.queue_free()
+
+	match visual_style:
+		"small":
+			_add_box_detail(details, "LightSailStripe", Vector3(0, 1.9, -0.24), Vector3(1.35, 0.08, 0.1), Color(0.95, 0.74, 0.26, 1.0))
+			_add_box_detail(details, "NarrowStern", Vector3(0, 0.55, 1.75), Vector3(1.1, 0.25, 0.45), Color(0.62, 0.22, 0.12, 1.0))
+		"brigantine":
+			_add_box_detail(details, "SecondSail", Vector3(0, 1.35, 0.75), Vector3(1.15, 0.85, 0.08), Color(0.18, 0.16, 0.13, 1.0))
+			_add_box_detail(details, "LongDeck", Vector3(0, 0.62, 0.35), Vector3(1.55, 0.16, 1.0), Color(0.38, 0.22, 0.1, 1.0))
+		"heavy":
+			_add_box_detail(details, "PortArmor", Vector3(-1.2, 0.62, 0), Vector3(0.28, 0.5, 3.8), Color(0.12, 0.13, 0.16, 1.0))
+			_add_box_detail(details, "StarboardArmor", Vector3(1.2, 0.62, 0), Vector3(0.28, 0.5, 3.8), Color(0.12, 0.13, 0.16, 1.0))
+			_add_box_detail(details, "HeavyCabin", Vector3(0, 0.9, 1.2), Vector3(1.25, 0.65, 0.9), Color(0.18, 0.18, 0.2, 1.0))
+			_add_box_detail(details, "TallSailTop", Vector3(0, 2.05, -0.18), Vector3(1.55, 0.35, 0.1), Color(0.34, 0.33, 0.3, 1.0))
+
+
+func _get_variant_details() -> Node3D:
+	var visuals := get_node_or_null("Visuals") as Node3D
+	if visuals == null:
+		return null
+
+	var details := visuals.get_node_or_null("VariantDetails") as Node3D
+	if details == null:
+		details = Node3D.new()
+		details.name = "VariantDetails"
+		visuals.add_child(details)
+
+	return details
+
+
+func _add_box_detail(parent: Node3D, node_name: String, position: Vector3, size: Vector3, color: Color) -> void:
+	var mesh := BoxMesh.new()
+	mesh.size = size
+
+	var mesh_instance := MeshInstance3D.new()
+	mesh_instance.name = node_name
+	mesh_instance.position = position
+	mesh_instance.mesh = mesh
+	mesh_instance.material_override = _make_material(color)
+	parent.add_child(mesh_instance)
+
+
+func _make_material(color: Color) -> StandardMaterial3D:
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	return material
 
 
 func _show_defeat_feedback() -> void:
