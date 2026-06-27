@@ -9,7 +9,7 @@ script = ExtResource("1_hud")
 offset_left = 16.0
 offset_top = 16.0
 offset_right = 286.0
-offset_bottom = 228.0
+offset_bottom = 284.0
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
@@ -49,6 +49,14 @@ text = "Voiles: niv. 0/3"
 [node name="CannonsLevelLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
 text = "Canons: niv. 0/3"
+
+[node name="DangerLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Danger: 1"
+
+[node name="EnemiesDefeatedLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Ennemis détruits: 0"
 
 [node name="ContextLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2

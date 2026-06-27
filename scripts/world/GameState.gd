@@ -1,7 +1,12 @@
 extends Node
 
 signal resources_changed(gold: int, wood: int)
+signal danger_changed(danger_level: int, enemies_defeated: int)
 
+const ENEMIES_PER_DANGER_LEVEL := 3
+
+var danger_level: int = 1
+var enemies_defeated: int = 0
 var gold: int = 0
 var wood: int = 0
 
@@ -33,6 +38,20 @@ func reset_resources() -> void:
 	gold = 0
 	wood = 0
 	resources_changed.emit(gold, wood)
+
+
+func record_enemy_destroyed() -> void:
+	enemies_defeated += 1
+	danger_level = 1 + int(enemies_defeated / ENEMIES_PER_DANGER_LEVEL)
+	danger_changed.emit(danger_level, enemies_defeated)
+
+
+func get_danger_level() -> int:
+	return danger_level
+
+
+func get_enemies_defeated() -> int:
+	return enemies_defeated
 
 
 func get_gold() -> int:

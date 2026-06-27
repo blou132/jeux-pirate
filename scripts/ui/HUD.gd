@@ -7,6 +7,8 @@ extends CanvasLayer
 @onready var hull_level_label: Label = $MarginContainer/PanelContainer/VBoxContainer/HullLevelLabel
 @onready var sails_level_label: Label = $MarginContainer/PanelContainer/VBoxContainer/SailsLevelLabel
 @onready var cannons_level_label: Label = $MarginContainer/PanelContainer/VBoxContainer/CannonsLevelLabel
+@onready var danger_label: Label = $MarginContainer/PanelContainer/VBoxContainer/DangerLabel
+@onready var enemies_defeated_label: Label = $MarginContainer/PanelContainer/VBoxContainer/EnemiesDefeatedLabel
 @onready var context_label: Label = $MarginContainer/PanelContainer/VBoxContainer/ContextLabel
 
 var _player: Node
@@ -97,10 +99,22 @@ func _connect_game_state() -> void:
 	if _game_state.has_method("get_gold") and _game_state.has_method("get_wood"):
 		_on_resources_changed(_game_state.get_gold(), _game_state.get_wood())
 
+	var danger_callback := Callable(self, "_on_danger_changed")
+	if _game_state.has_signal("danger_changed") and not _game_state.is_connected("danger_changed", danger_callback):
+		_game_state.connect("danger_changed", danger_callback)
+
+	if _game_state.has_method("get_danger_level") and _game_state.has_method("get_enemies_defeated"):
+		_on_danger_changed(_game_state.get_danger_level(), _game_state.get_enemies_defeated())
+
 
 func _on_resources_changed(gold: int, wood: int) -> void:
 	gold_label.text = "Or: %d" % gold
 	wood_label.text = "Bois: %d" % wood
+
+
+func _on_danger_changed(danger_level: int, enemies_defeated: int) -> void:
+	danger_label.text = "Danger: %d" % danger_level
+	enemies_defeated_label.text = "Ennemis détruits: %d" % enemies_defeated
 
 
 func set_context_message(message: String) -> void:

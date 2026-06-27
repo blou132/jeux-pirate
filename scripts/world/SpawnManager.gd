@@ -96,6 +96,9 @@ func _is_spawn_point_valid(spawn_point: Marker3D) -> bool:
 
 func _on_enemy_destroyed(_world_position: Vector3, _gold_reward: int, _wood_reward: int, enemy: Node) -> void:
 	_active_enemies.erase(enemy)
+	var game_state := get_node_or_null("/root/GameState")
+	if game_state != null and game_state.has_method("record_enemy_destroyed"):
+		game_state.record_enemy_destroyed()
 	_schedule_spawn_retry()
 
 
@@ -127,7 +130,19 @@ func _cleanup_inactive_enemies() -> void:
 
 func _pick_enemy_variant() -> Dictionary:
 	var variants := _get_enemy_variants()
-	return variants.pick_random()
+	var weighted_variants: Array[Dictionary] = []
+	var danger_level := _get_danger_level()
+
+	for config in variants:
+		var variant_id := String(config.get("id", ""))
+		var weight := _get_variant_weight(variant_id, danger_level)
+		for i in range(weight):
+			weighted_variants.append(config)
+
+	if weighted_variants.is_empty():
+		return variants.pick_random()
+
+	return weighted_variants.pick_random()
 
 
 func _get_enemy_variants() -> Array[Dictionary]:
@@ -172,3 +187,48 @@ func _get_enemy_variants() -> Array[Dictionary]:
 		"sail_color": Color(0.28, 0.27, 0.24, 1.0),
 	})
 	return variants
+
+
+func _get_danger_level() -> int:
+	var game_state := get_node_or_null("/root/GameState")
+	if game_state != null and game_state.has_method("get_danger_level"):
+		return game_state.get_danger_level()
+
+	return 1
+
+
+func _get_variant_weight(variant_id: String, danger_level: int) -> int:
+	if danger_level <= 1:
+		match variant_id:
+			"small_pirate":
+				return 7
+			"brigantine":
+				return 2
+			"heavy_patrol":
+				return 0
+	elif danger_level == 2:
+		match variant_id:
+			"small_pirate":
+				return 5
+			"brigantine":
+				return 4
+			"heavy_patrol":
+				return 1
+	elif danger_level == 3:
+		match variant_id:
+			"small_pirate":
+				return 3
+			"brigantine":
+				return 5
+			"heavy_patrol":
+				return 2
+
+	match variant_id:
+		"small_pirate":
+			return 2
+		"brigantine":
+			return 5
+		"heavy_patrol":
+			return 4
+
+	return 1
