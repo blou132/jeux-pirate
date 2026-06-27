@@ -9,7 +9,7 @@ script = ExtResource("1_hud")
 offset_left = 16.0
 offset_top = 16.0
 offset_right = 248.0
-offset_bottom = 112.0
+offset_bottom = 148.0
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
@@ -33,3 +33,7 @@ text = "PV: 100/100"
 [node name="ResourcesLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
 text = "Or: 0  Bois: 0"
+
+[node name="ContextLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Appuie sur E pour ouvrir le port"

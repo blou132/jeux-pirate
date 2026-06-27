@@ -3,13 +3,16 @@ extends CanvasLayer
 @onready var speed_label: Label = $MarginContainer/PanelContainer/VBoxContainer/SpeedLabel
 @onready var health_label: Label = $MarginContainer/PanelContainer/VBoxContainer/HealthLabel
 @onready var resources_label: Label = $MarginContainer/PanelContainer/VBoxContainer/ResourcesLabel
+@onready var context_label: Label = $MarginContainer/PanelContainer/VBoxContainer/ContextLabel
 
 var _player: Node
 var _game_state: Node
 
 
 func _ready() -> void:
+	add_to_group("hud")
 	resources_label.visible = false
+	context_label.visible = false
 	_connect_game_state()
 	call_deferred("_bind_player_from_tree")
 
@@ -91,3 +94,8 @@ func _connect_game_state() -> void:
 
 func _on_resources_changed(gold: int, wood: int) -> void:
 	resources_label.text = "Or: %d  Bois: %d" % [gold, wood]
+
+
+func set_context_message(message: String) -> void:
+	context_label.text = message
+	context_label.visible = not message.is_empty()

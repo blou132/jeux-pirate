@@ -1,0 +1,60 @@
+[gd_scene load_steps=10 format=3 uid="uid://port_v02"]
+
+[ext_resource type="Script" path="res://scripts/world/Port.gd" id="1_port"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_stone"]
+albedo_color = Color(0.36, 0.36, 0.34, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wood"]
+albedo_color = Color(0.46, 0.28, 0.12, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_flag"]
+albedo_color = Color(0.88, 0.18, 0.12, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_island"]
+size = Vector3(7.5, 0.7, 6.0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_dock"]
+size = Vector3(2.2, 0.25, 5.8)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_marker"]
+top_radius = 0.12
+bottom_radius = 0.12
+height = 3.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_flag"]
+size = Vector3(1.2, 0.55, 0.08)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_interaction"]
+size = Vector3(11.0, 3.0, 11.0)
+
+[node name="Port" type="Node3D"]
+script = ExtResource("1_port")
+
+[node name="Visuals" type="Node3D" parent="."]
+
+[node name="StonePlatform" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 0.15, 0)
+mesh = SubResource("BoxMesh_island")
+material_override = SubResource("StandardMaterial3D_stone")
+
+[node name="Dock" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 0.55, 4.3)
+mesh = SubResource("BoxMesh_dock")
+material_override = SubResource("StandardMaterial3D_wood")
+
+[node name="MarkerPole" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(-2.6, 2.0, -1.9)
+mesh = SubResource("CylinderMesh_marker")
+material_override = SubResource("StandardMaterial3D_wood")
+
+[node name="PortFlag" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(-1.95, 3.1, -1.9)
+mesh = SubResource("BoxMesh_flag")
+material_override = SubResource("StandardMaterial3D_flag")
+
+[node name="InteractionArea" type="Area3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteractionArea"]
+position = Vector3(0, 1.0, 1.0)
+shape = SubResource("BoxShape3D_interaction")
