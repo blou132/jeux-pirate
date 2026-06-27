@@ -66,6 +66,9 @@ material_override = SubResource("StandardMaterial3D_deck")
 position = Vector3(0, 0.25, 0)
 shape = SubResource("BoxShape3D_collision")
 
+[node name="AimPoint" type="Marker3D" parent="."]
+position = Vector3(0, 0.55, -0.1)
+
 [node name="CannonSystem" type="Node3D" parent="."]
 script = ExtResource("2_cannon_system")
 

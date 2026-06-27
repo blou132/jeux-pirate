@@ -119,6 +119,14 @@ func get_current_speed() -> float:
 	return current_speed
 
 
+func get_aim_position() -> Vector3:
+	var aim_point := get_node_or_null("AimPoint") as Node3D
+	if aim_point != null:
+		return aim_point.global_position
+
+	return global_position
+
+
 func is_destroyed() -> bool:
 	return _destroyed
 
