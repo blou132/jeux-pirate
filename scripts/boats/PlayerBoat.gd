@@ -11,14 +11,21 @@ signal speed_changed(speed: float)
 @export var reverse_acceleration: float = 8.0
 @export var drag: float = 6.0
 @export var turn_speed: float = 1.7
+@export var hull_health_bonus_per_level: int = 25
+@export var sail_speed_bonus_per_level: float = 1.5
 
 var health: int
 var current_speed: float = 0.0
+var _base_max_health: int
+var _base_max_forward_speed: float
 
 
 func _ready() -> void:
+	_base_max_health = max_health
+	_base_max_forward_speed = max_forward_speed
 	health = max_health
 	add_to_group("player")
+	_connect_upgrade_system()
 	health_changed.emit(health, max_health)
 	speed_changed.emit(current_speed)
 
@@ -103,3 +110,32 @@ func _apply_turn(delta: float) -> void:
 		direction_factor = -1.0
 
 	rotate_y(turn_input * turn_speed * speed_factor * direction_factor * delta)
+
+
+func _connect_upgrade_system() -> void:
+	var upgrade_system := get_node_or_null("/root/UpgradeSystem")
+	if upgrade_system == null:
+		return
+
+	var callback := Callable(self, "_on_upgrades_changed")
+	if upgrade_system.has_signal("upgrades_changed") and not upgrade_system.is_connected("upgrades_changed", callback):
+		upgrade_system.connect("upgrades_changed", callback)
+
+	if upgrade_system.has_method("get_hull_level") and upgrade_system.has_method("get_sails_level") and upgrade_system.has_method("get_cannons_level"):
+		_on_upgrades_changed(
+			upgrade_system.get_hull_level(),
+			upgrade_system.get_sails_level(),
+			upgrade_system.get_cannons_level()
+		)
+
+
+func _on_upgrades_changed(hull_level: int, sails_level: int, _cannons_level: int) -> void:
+	var previous_max_health := max_health
+	max_health = _base_max_health + (hull_level * hull_health_bonus_per_level)
+	max_forward_speed = _base_max_forward_speed + (sails_level * sail_speed_bonus_per_level)
+
+	if max_health > previous_max_health:
+		health += max_health - previous_max_health
+
+	health = clampi(health, 0, max_health)
+	health_changed.emit(health, max_health)

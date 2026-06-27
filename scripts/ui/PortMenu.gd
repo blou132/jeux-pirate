@@ -8,6 +8,13 @@ const REPAIR_HEALTH_PER_WOOD := 5
 @onready var status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/StatusLabel
 @onready var repair_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/RepairButton
 @onready var upgrades_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesButton
+@onready var upgrades_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer
+@onready var hull_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/HullStatusLabel
+@onready var sails_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/SailsStatusLabel
+@onready var cannons_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/CannonsStatusLabel
+@onready var hull_upgrade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/HullUpgradeButton
+@onready var sails_upgrade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/SailsUpgradeButton
+@onready var cannons_upgrade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/CannonsUpgradeButton
 @onready var quit_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/QuitButton
 
 var _player: Node
@@ -17,8 +24,12 @@ var _previous_pause_state: bool = false
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	root_control.visible = false
+	upgrades_container.visible = false
 	repair_button.pressed.connect(_on_repair_pressed)
 	upgrades_button.pressed.connect(_on_upgrades_pressed)
+	hull_upgrade_button.pressed.connect(_on_hull_upgrade_pressed)
+	sails_upgrade_button.pressed.connect(_on_sails_upgrade_pressed)
+	cannons_upgrade_button.pressed.connect(_on_cannons_upgrade_pressed)
 	quit_button.pressed.connect(close)
 
 
@@ -34,6 +45,8 @@ func _unhandled_input(event: InputEvent) -> void:
 func open(player: Node) -> void:
 	_player = player
 	status_label.text = ""
+	upgrades_container.visible = false
+	_refresh_upgrade_rows()
 	root_control.visible = true
 	_previous_pause_state = get_tree().paused
 	get_tree().paused = true
@@ -86,8 +99,60 @@ func _on_repair_pressed() -> void:
 
 
 func _on_upgrades_pressed() -> void:
-	status_label.text = "Améliorations bientôt disponibles"
+	upgrades_container.visible = not upgrades_container.visible
+	if upgrades_container.visible:
+		status_label.text = "Choisis une amélioration"
+		_refresh_upgrade_rows()
+	else:
+		status_label.text = ""
 
 
 func _get_game_state() -> Node:
 	return get_node_or_null("/root/GameState")
+
+
+func _get_upgrade_system() -> Node:
+	return get_node_or_null("/root/UpgradeSystem")
+
+
+func _on_hull_upgrade_pressed() -> void:
+	_purchase_upgrade("hull")
+
+
+func _on_sails_upgrade_pressed() -> void:
+	_purchase_upgrade("sails")
+
+
+func _on_cannons_upgrade_pressed() -> void:
+	_purchase_upgrade("cannons")
+
+
+func _purchase_upgrade(upgrade_id: String) -> void:
+	var upgrade_system := _get_upgrade_system()
+	if upgrade_system == null or not upgrade_system.has_method("purchase_upgrade"):
+		status_label.text = "Améliorations indisponibles"
+		return
+
+	status_label.text = upgrade_system.purchase_upgrade(upgrade_id)
+	_refresh_upgrade_rows()
+
+
+func _refresh_upgrade_rows() -> void:
+	var upgrade_system := _get_upgrade_system()
+	if upgrade_system == null:
+		hull_status_label.text = "Coque renforcée: indisponible"
+		sails_status_label.text = "Voiles rapides: indisponible"
+		cannons_status_label.text = "Canons améliorés: indisponible"
+		return
+
+	_set_upgrade_row(upgrade_system, "hull", hull_status_label, hull_upgrade_button)
+	_set_upgrade_row(upgrade_system, "sails", sails_status_label, sails_upgrade_button)
+	_set_upgrade_row(upgrade_system, "cannons", cannons_status_label, cannons_upgrade_button)
+
+
+func _set_upgrade_row(upgrade_system: Node, upgrade_id: String, label: Label, button: Button) -> void:
+	if upgrade_system.has_method("get_upgrade_status"):
+		label.text = upgrade_system.get_upgrade_status(upgrade_id)
+
+	if upgrade_system.has_method("is_max_level"):
+		button.disabled = upgrade_system.is_max_level(upgrade_id)

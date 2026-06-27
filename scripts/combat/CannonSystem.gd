@@ -4,12 +4,19 @@ extends Node3D
 @export var cooldown: float = 0.8
 @export var shot_speed: float = 30.0
 @export var damage: int = 25
+@export var cannon_damage_bonus_per_level: int = 8
 
 @onready var port_muzzle: Marker3D = $PortMuzzle
 @onready var starboard_muzzle: Marker3D = $StarboardMuzzle
 
 var _port_cooldown: float = 0.0
 var _starboard_cooldown: float = 0.0
+var _base_damage: int
+
+
+func _ready() -> void:
+	_base_damage = damage
+	_connect_upgrade_system()
 
 
 func _process(delta: float) -> void:
@@ -60,3 +67,24 @@ func _fire(muzzle: Marker3D, direction: Vector3) -> void:
 	if parent == null:
 		parent = get_tree().root
 	parent.add_child(cannon_ball)
+
+
+func _connect_upgrade_system() -> void:
+	var upgrade_system := get_node_or_null("/root/UpgradeSystem")
+	if upgrade_system == null:
+		return
+
+	var callback := Callable(self, "_on_upgrades_changed")
+	if upgrade_system.has_signal("upgrades_changed") and not upgrade_system.is_connected("upgrades_changed", callback):
+		upgrade_system.connect("upgrades_changed", callback)
+
+	if upgrade_system.has_method("get_hull_level") and upgrade_system.has_method("get_sails_level") and upgrade_system.has_method("get_cannons_level"):
+		_on_upgrades_changed(
+			upgrade_system.get_hull_level(),
+			upgrade_system.get_sails_level(),
+			upgrade_system.get_cannons_level()
+		)
+
+
+func _on_upgrades_changed(_hull_level: int, _sails_level: int, cannons_level: int) -> void:
+	damage = _base_damage + (cannons_level * cannon_damage_bonus_per_level)

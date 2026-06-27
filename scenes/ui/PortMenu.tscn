@@ -32,7 +32,7 @@ grow_vertical = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="Root/CenterContainer"]
 layout_mode = 2
-custom_minimum_size = Vector2(360, 0)
+custom_minimum_size = Vector2(520, 0)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer"]
 layout_mode = 2
@@ -55,6 +55,37 @@ text = "Réparer le bateau"
 [node name="UpgradesButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
 text = "Améliorations"
+
+[node name="UpgradesContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="HullStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
+layout_mode = 2
+text = "Coque renforcée: niveau 0/3"
+autowrap_mode = 3
+
+[node name="HullUpgradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
+layout_mode = 2
+text = "Améliorer la coque"
+
+[node name="SailsStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
+layout_mode = 2
+text = "Voiles rapides: niveau 0/3"
+autowrap_mode = 3
+
+[node name="SailsUpgradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
+layout_mode = 2
+text = "Améliorer les voiles"
+
+[node name="CannonsStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
+layout_mode = 2
+text = "Canons améliorés: niveau 0/3"
+autowrap_mode = 3
+
+[node name="CannonsUpgradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
+layout_mode = 2
+text = "Améliorer les canons"
 
 [node name="QuitButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
