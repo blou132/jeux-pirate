@@ -63,7 +63,7 @@ func _physics_process(delta: float) -> void:
 	_update_broadside_debug_lines(offset)
 
 	if distance_squared <= attack_range * attack_range:
-		var fire_direction: Vector3 = _get_broadside_fire_direction(offset)
+		var fire_direction: Vector3 = _get_ready_broadside_fire_direction(offset)
 		if fire_direction == Vector3.ZERO:
 			_maneuver_for_broadside(offset, distance_to_player, attack_range, delta)
 			return
@@ -127,6 +127,16 @@ func _get_confirmed_broadside_fire_direction(candidate_direction: Vector3) -> Ve
 		return Vector3.ZERO
 
 	return aligned_direction
+
+
+func _get_ready_broadside_fire_direction(offset_to_player: Vector3) -> Vector3:
+	var fire_direction: Vector3 = _get_broadside_fire_direction(offset_to_player)
+	if fire_direction == Vector3.ZERO:
+		return Vector3.ZERO
+	if not _is_broadside_aim_line_valid(fire_direction):
+		return Vector3.ZERO
+
+	return fire_direction
 
 
 func _is_broadside_aim_line_valid(fire_direction: Vector3) -> bool:
