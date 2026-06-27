@@ -26,6 +26,7 @@
 - Ajouter des zones de danger simples.
 - Correctif v0.3.2 : attaque ennemie, feedback de défaite joueur, variantes plus lisibles, nameplates, notifications de zone.
 - Correctif v0.3.3 : tirs ennemis visibles, feedback quand le joueur est touché, respawn avec `R` après destruction.
+- Correctif v0.3.4 : tirs ennemis limités aux bordées, tirs joueur désactivés après destruction, limites de carte et feedback de sortie.
 
 ## v0.4 - Îles explorables, coffres et trésors
 

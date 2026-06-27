@@ -86,6 +86,16 @@ Le combat doit montrer clairement quand un ennemi attaque et donner une sortie p
 - À 0 PV, le bateau reste détruit mais le joueur peut appuyer sur `R` pour réapparaître près du port.
 - Le respawn restaure les PV et le contrôle sans retirer les ressources du joueur.
 
+## Règles navales v0.3.4
+
+Les bateaux ennemis ne tirent plus dans toutes les directions. Ils doivent présenter un flanc au joueur avant de déclencher une bordée :
+
+- Un tir ennemi est autorisé seulement si le joueur est dans l'arc latéral gauche ou droit.
+- Si le joueur est devant ou derrière l'ennemi, l'IA manœuvre pour se réaligner.
+- Le joueur détruit ne peut plus tirer tant qu'il n'a pas réapparu.
+- Les limites de carte empêchent de quitter durablement la zone jouable.
+- Le HUD signale l'approche ou le dépassement des limites.
+
 ## Piliers a long terme
 
 - Navigation lisible : le joueur doit toujours comprendre son cap, sa vitesse et les menaces proches.

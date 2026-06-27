@@ -14,6 +14,8 @@ La v0.3.2 améliore la jouabilité de la v0.3 : attaque ennemie effective, feedb
 
 La v0.3.3 rend les attaques ennemies visibles avec des boulets dédiés, ajoute un feedback HUD quand le joueur est touché et permet de réapparaître au port avec `R` après destruction.
 
+La v0.3.4 améliore les règles de combat naval : tirs ennemis limités aux bordées, tirs joueur bloqués après destruction, limites de carte et feedback de sortie de zone jouable.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -64,6 +66,14 @@ La v0.3.3 rend les attaques ennemies visibles avec des boulets dédiés, ajoute 
 - Les ennemis tirent maintenant des boulets visibles vers le joueur.
 - Le HUD affiche `Touché ! -X PV` quand le joueur prend des dégâts.
 - Après destruction, le HUD affiche l'aide de reprise et `R` fait réapparaître le joueur près du port.
+
+## Correctifs v0.3.4
+
+- Les ennemis tirent seulement si le joueur est dans un arc latéral de bordée.
+- Si le joueur est devant ou derrière, l'ennemi manœuvre pour présenter son flanc.
+- Le joueur ne peut plus tirer après destruction.
+- `WorldBounds` limite la zone jouable, pousse le joueur vers l'intérieur et le ramène près du port en cas de sortie forte.
+- Le HUD affiche `Limite de la carte` ou `Retour dans la zone navigable` selon la situation.
 
 ## Lancement
 
