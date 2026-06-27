@@ -10,6 +10,8 @@ extends Node
 @export var broadside_preferred_distance_ratio: float = 0.78
 @export var broadside_distance_margin: float = 1.5
 @export var broadside_radial_weight: float = 0.55
+# Temporary v0.3.5 console helper to verify enemy broadside selection during tests.
+@export var debug_broadside_fire: bool = true
 
 @onready var ship: EnemyShip = get_parent() as EnemyShip
 
@@ -68,6 +70,7 @@ func _try_attack_player(fire_direction: Vector3) -> void:
 	if damage <= 0:
 		return
 
+	_show_broadside_debug(fire_direction)
 	_fire_projectile(damage, fire_direction)
 	_attack_cooldown_remaining = _get_attack_cooldown()
 
@@ -171,3 +174,15 @@ func _get_broadside_muzzle_position(fire_direction: Vector3) -> Vector3:
 	var side_direction: Vector3 = fire_direction.normalized()
 	side_direction.y = 0.0
 	return ship.global_position + (side_direction * broadside_muzzle_offset) + Vector3(0.0, broadside_muzzle_height, 0.0)
+
+
+func _show_broadside_debug(fire_direction: Vector3) -> void:
+	if not debug_broadside_fire:
+		return
+
+	var starboard_direction: Vector3 = ship.global_transform.basis.x.normalized()
+	var side_name: String = "tribord"
+	if fire_direction.normalized().dot(starboard_direction) < 0.0:
+		side_name = "babord"
+
+	print("Tir ennemi %s" % side_name)
