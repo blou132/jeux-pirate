@@ -14,11 +14,13 @@ extends Node
 @export var broadside_retreat_speed_scale: float = 0.6
 # Temporary v0.3.5 console helper to verify enemy broadside selection during tests.
 @export var debug_broadside_fire: bool = true
+@export var debug_broadside_fire_interval: float = 1.5
 
 @onready var ship: EnemyShip = get_parent() as EnemyShip
 
 var _player: Node3D
 var _attack_cooldown_remaining: float = 0.0
+var _debug_message_cooldown_remaining: float = 0.0
 
 
 func _physics_process(delta: float) -> void:
@@ -26,6 +28,7 @@ func _physics_process(delta: float) -> void:
 		return
 
 	_attack_cooldown_remaining = maxf(0.0, _attack_cooldown_remaining - delta)
+	_debug_message_cooldown_remaining = maxf(0.0, _debug_message_cooldown_remaining - delta)
 
 	if not is_instance_valid(_player):
 		_player = get_tree().get_first_node_in_group("player") as Node3D
@@ -214,6 +217,8 @@ func _get_broadside_muzzle_position(fire_direction: Vector3) -> Vector3:
 func _show_broadside_debug(fire_direction: Vector3) -> void:
 	if not debug_broadside_fire:
 		return
+	if _debug_message_cooldown_remaining > 0.0:
+		return
 
 	var starboard_direction: Vector3 = ship.global_transform.basis.x.normalized()
 	var side_name: String = "tribord"
@@ -221,3 +226,4 @@ func _show_broadside_debug(fire_direction: Vector3) -> void:
 		side_name = "babord"
 
 	print("Tir ennemi %s" % side_name)
+	_debug_message_cooldown_remaining = debug_broadside_fire_interval
