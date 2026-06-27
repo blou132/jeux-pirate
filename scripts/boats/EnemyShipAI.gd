@@ -5,6 +5,7 @@ extends Node
 @export var stop_distance: float = 7.0
 @export var projectile_speed: float = 13.0
 @export var broadside_fire_alignment_degrees: float = 25.0
+@export var broadside_line_tolerance: float = 1.2
 @export var broadside_muzzle_offset: float = 2.2
 @export var broadside_muzzle_height: float = 0.75
 @export var broadside_preferred_distance_ratio: float = 0.78
@@ -113,8 +114,31 @@ func _get_confirmed_broadside_fire_direction(candidate_direction: Vector3) -> Ve
 
 	if aligned_direction.normalized().dot(candidate_direction.normalized()) <= 0.0:
 		return Vector3.ZERO
+	if not _is_broadside_aim_line_valid(aligned_direction):
+		return Vector3.ZERO
 
 	return aligned_direction
+
+
+func _is_broadside_aim_line_valid(fire_direction: Vector3) -> bool:
+	if fire_direction.length_squared() < 0.01:
+		return false
+
+	var line_origin: Vector3 = _get_broadside_muzzle_position(fire_direction)
+	var line_direction: Vector3 = fire_direction.normalized()
+	line_direction.y = 0.0
+	if line_direction.length_squared() < 0.01:
+		return false
+
+	var target_position: Vector3 = _get_player_aim_position()
+	var to_target: Vector3 = target_position - line_origin
+	var parallel_distance: float = to_target.dot(line_direction)
+	if parallel_distance <= 0.0:
+		return false
+
+	var closest_point: Vector3 = line_origin + (line_direction * parallel_distance)
+	var perpendicular_distance: float = target_position.distance_to(closest_point)
+	return perpendicular_distance <= broadside_line_tolerance
 
 
 func _get_broadside_fire_direction(offset_to_player: Vector3) -> Vector3:
