@@ -4,7 +4,7 @@ extends Node
 @export var detection_range: float = 55.0
 @export var stop_distance: float = 7.0
 @export var projectile_speed: float = 13.0
-@export var broadside_tolerance_degrees: float = 60.0
+@export var broadside_fire_alignment_degrees: float = 25.0
 @export var broadside_muzzle_offset: float = 2.2
 @export var broadside_muzzle_height: float = 0.75
 @export var broadside_preferred_distance_ratio: float = 0.78
@@ -93,17 +93,17 @@ func _get_broadside_fire_direction(offset_to_player: Vector3) -> Vector3:
 	if offset_to_player.length_squared() < 0.01:
 		return Vector3.ZERO
 
-	var to_player := offset_to_player.normalized()
-	var port_direction := -ship.global_transform.basis.x
-	var starboard_direction := ship.global_transform.basis.x
+	var to_player: Vector3 = offset_to_player.normalized()
+	var port_direction: Vector3 = -ship.global_transform.basis.x
+	var starboard_direction: Vector3 = ship.global_transform.basis.x
 	port_direction.y = 0.0
 	starboard_direction.y = 0.0
 	port_direction = port_direction.normalized()
 	starboard_direction = starboard_direction.normalized()
 
-	var port_alignment := to_player.dot(port_direction)
-	var starboard_alignment := to_player.dot(starboard_direction)
-	var required_alignment := cos(deg_to_rad(broadside_tolerance_degrees))
+	var port_alignment: float = to_player.dot(port_direction)
+	var starboard_alignment: float = to_player.dot(starboard_direction)
+	var required_alignment: float = cos(deg_to_rad(broadside_fire_alignment_degrees))
 
 	if port_alignment >= starboard_alignment and port_alignment >= required_alignment:
 		return port_direction
