@@ -20,6 +20,8 @@ La v0.3.5 corrige les bordées ennemies : les boulets partent strictement vers b
 
 La v0.3.6 améliore le positionnement de bordée : les ennemis alignent davantage leur flanc avant de tirer, manœuvrent plus lentement à portée et ne tirent que lorsque le côté vise vraiment le joueur.
 
+La v0.3.7 fiabilise les points de visée et de tir : le joueur possède un vrai `AimPoint`, les ennemis ont des points de canon latéraux explicites, et l'alignement de bordée utilise les axes réels du bateau.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -93,6 +95,13 @@ La v0.3.6 améliore le positionnement de bordée : les ennemis alignent davantag
 - Le tir est revalidé juste avant le lancement du boulet.
 - Le debug console de bordée est limité par cooldown pour rester lisible.
 
+## Correctifs v0.3.7
+
+- Le bateau joueur expose un `AimPoint` utilisé par l'IA ennemie.
+- Les bateaux ennemis ont `LeftCannonPoint` et `RightCannonPoint` pour le départ des boulets.
+- L'alignement de bordée utilise l'axe réel entre les points de canon.
+- Des marqueurs debug temporaires rendent les points de visée et de tir visibles dans Godot.
+
 ## Lancement
 
 1. Installer Godot 4.x.
@@ -122,6 +131,8 @@ Outil temporaire pour tester les améliorations sans farmer les ressources :
 - `F2` : ajoute 100 bois
 
 Ces raccourcis sont activés via `DebugTools` et doivent rester identifiés comme aide de développement.
+
+Les marqueurs `AimPoint`, `LeftCannonPoint` et `RightCannonPoint` peuvent être affichés pendant les tests avec `debug_show_aim_points` sur les bateaux. Cette aide est temporaire pour vérifier l'alignement des bordées.
 
 ## Structure
 

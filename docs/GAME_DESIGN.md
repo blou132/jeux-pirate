@@ -114,6 +114,15 @@ L'ennemi doit se comporter davantage comme un navire qui prépare une bordée :
 - Pendant l'alignement, il avance moins vite pour éviter de dépasser ou coller le joueur.
 - Le tir est confirmé au dernier moment avant de créer le projectile.
 
+## Points de visée v0.3.7
+
+Les calculs de bordée ne doivent plus dépendre d'une origine invisible si elle ne correspond pas au centre perçu du bateau :
+
+- Le joueur possède un `AimPoint` placé au centre visuel du navire.
+- Les ennemis tirent depuis `LeftCannonPoint` ou `RightCannonPoint`.
+- L'axe tribord est calculé depuis les points de canon quand ils existent.
+- Des marqueurs debug temporaires permettent de vérifier les points dans Godot.
+
 ## Piliers a long terme
 
 - Navigation lisible : le joueur doit toujours comprendre son cap, sa vitesse et les menaces proches.

@@ -29,6 +29,7 @@
 - Correctif v0.3.4 : tirs ennemis limités aux bordées, tirs joueur désactivés après destruction, limites de carte et feedback de sortie.
 - Correctif v0.3.5 : direction des tirs ennemis corrigée, projectiles tirés depuis les côtés, manœuvre de flanc améliorée.
 - Correctif v0.3.6 : orientation ennemie avant tir améliorée, manœuvre de bordée ralentie, tir autorisé seulement avec un flanc bien aligné.
+- Correctif v0.3.7 : point de visée joueur, points de tir latéraux ennemis, alignement de bordée sur axes réels et debug visuel temporaire.
 
 ## v0.4 - Îles explorables, coffres et trésors
 
