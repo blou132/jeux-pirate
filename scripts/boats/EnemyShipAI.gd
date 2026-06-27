@@ -13,6 +13,7 @@ extends Node
 @export var broadside_radial_weight: float = 0.55
 @export var broadside_maneuver_speed_scale: float = 0.45
 @export var broadside_retreat_speed_scale: float = 0.6
+@export var broadside_line_correction_weight: float = 0.7
 # Temporary v0.3.5 console helper to verify enemy broadside selection during tests.
 @export var debug_broadside_fire: bool = true
 @export var debug_broadside_fire_interval: float = 1.5
@@ -205,6 +206,7 @@ func _maneuver_for_broadside(offset_to_player: Vector3, distance_to_player: floa
 		ship.brake(delta)
 		return
 
+	var preferred_fire_direction: Vector3 = _get_preferred_broadside_direction(offset_to_player)
 	var preferred_distance: float = attack_range * broadside_preferred_distance_ratio
 	var speed_scale: float = broadside_maneuver_speed_scale
 
@@ -213,6 +215,10 @@ func _maneuver_for_broadside(offset_to_player: Vector3, distance_to_player: floa
 		desired_forward = (desired_forward + (-to_player * broadside_radial_weight)).normalized()
 	elif distance_to_player > preferred_distance + broadside_distance_margin:
 		desired_forward = (desired_forward + (to_player * broadside_radial_weight)).normalized()
+
+	var line_error: Vector3 = _get_broadside_line_error(preferred_fire_direction)
+	if line_error.length_squared() > broadside_line_tolerance * broadside_line_tolerance:
+		desired_forward = (desired_forward + (line_error.normalized() * broadside_line_correction_weight)).normalized()
 
 	if ship.has_method("steer_along_direction_with_speed"):
 		ship.steer_along_direction_with_speed(desired_forward, delta, speed_scale)
@@ -230,6 +236,25 @@ func _get_player_aim_position() -> Vector3:
 		return _player.global_position
 
 	return ship.global_position
+
+
+func _get_broadside_line_error(fire_direction: Vector3) -> Vector3:
+	if fire_direction.length_squared() < 0.01:
+		return Vector3.ZERO
+
+	var line_origin: Vector3 = _get_broadside_muzzle_position(fire_direction)
+	var line_direction: Vector3 = fire_direction.normalized()
+	line_direction.y = 0.0
+	if line_direction.length_squared() < 0.01:
+		return Vector3.ZERO
+
+	var target_position: Vector3 = _get_player_aim_position()
+	var to_target: Vector3 = target_position - line_origin
+	var parallel_distance: float = maxf(0.0, to_target.dot(line_direction))
+	var closest_point: Vector3 = line_origin + (line_direction * parallel_distance)
+	var error: Vector3 = target_position - closest_point
+	error.y = 0.0
+	return error
 
 
 func _get_desired_broadside_forward(to_player: Vector3) -> Vector3:
