@@ -5,6 +5,8 @@ extends Node
 @export var stop_distance: float = 7.0
 @export var projectile_speed: float = 13.0
 @export var broadside_tolerance_degrees: float = 60.0
+@export var broadside_muzzle_offset: float = 2.2
+@export var broadside_muzzle_height: float = 0.75
 
 @onready var ship: EnemyShip = get_parent() as EnemyShip
 
@@ -138,8 +140,8 @@ func _fire_projectile(damage: int, fire_direction: Vector3) -> void:
 		return
 
 	var projectile_node := projectile as Node3D
-	var start_position := ship.global_position + (fire_direction.normalized() * 1.5) + Vector3(0.0, 0.7, 0.0)
-	var shot_direction := fire_direction.normalized()
+	var start_position: Vector3 = _get_broadside_muzzle_position(fire_direction)
+	var shot_direction: Vector3 = fire_direction.normalized()
 	shot_direction.y = 0.0
 
 	var parent := get_tree().current_scene
@@ -151,3 +153,9 @@ func _fire_projectile(damage: int, fire_direction: Vector3) -> void:
 
 	if projectile.has_method("launch"):
 		projectile.launch(shot_direction, ship, projectile_speed, damage)
+
+
+func _get_broadside_muzzle_position(fire_direction: Vector3) -> Vector3:
+	var side_direction: Vector3 = fire_direction.normalized()
+	side_direction.y = 0.0
+	return ship.global_position + (side_direction * broadside_muzzle_offset) + Vector3(0.0, broadside_muzzle_height, 0.0)
