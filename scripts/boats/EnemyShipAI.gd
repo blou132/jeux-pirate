@@ -22,6 +22,10 @@ func _physics_process(delta: float) -> void:
 		ship.brake(delta)
 		return
 
+	if _player.has_method("is_destroyed") and _player.is_destroyed():
+		ship.brake(delta)
+		return
+
 	var offset := _player.global_position - ship.global_position
 	offset.y = 0.0
 	var distance_squared := offset.length_squared()

@@ -3,6 +3,7 @@ extends CharacterBody3D
 
 signal health_changed(current_health: int, max_health: int)
 signal speed_changed(speed: float)
+signal destroyed
 
 @export var max_health: int = 100
 @export var max_forward_speed: float = 7.0
@@ -18,6 +19,7 @@ var health: int
 var current_speed: float = 0.0
 var _base_max_health: int
 var _base_max_forward_speed: float
+var _destroyed: bool = false
 
 
 func _ready() -> void:
@@ -31,6 +33,14 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if _destroyed:
+		current_speed = move_toward(current_speed, 0.0, drag * 2.0 * delta)
+		velocity = -global_transform.basis.z * current_speed
+		move_and_slide()
+		global_position.y = 0.0
+		speed_changed.emit(current_speed)
+		return
+
 	var throttle := _get_throttle()
 
 	if throttle > 0.0:
@@ -49,11 +59,14 @@ func _physics_process(delta: float) -> void:
 
 
 func take_damage(amount: int) -> void:
-	if health <= 0:
+	if _destroyed or health <= 0:
 		return
 
 	health = clampi(health - amount, 0, max_health)
 	health_changed.emit(health, max_health)
+
+	if health <= 0:
+		_handle_destroyed()
 
 
 func repair(amount: int) -> int:
@@ -62,6 +75,9 @@ func repair(amount: int) -> int:
 
 	var previous_health := health
 	health = clampi(health + amount, 0, max_health)
+	if health > 0:
+		_destroyed = false
+
 	health_changed.emit(health, max_health)
 	return health - previous_health
 
@@ -80,6 +96,10 @@ func get_max_health() -> int:
 
 func get_current_speed() -> float:
 	return current_speed
+
+
+func is_destroyed() -> bool:
+	return _destroyed
 
 
 func _get_throttle() -> float:
@@ -139,3 +159,21 @@ func _on_upgrades_changed(hull_level: int, sails_level: int, _cannons_level: int
 
 	health = clampi(health, 0, max_health)
 	health_changed.emit(health, max_health)
+
+
+func _handle_destroyed() -> void:
+	if _destroyed:
+		return
+
+	_destroyed = true
+	current_speed = 0.0
+	velocity = Vector3.ZERO
+	speed_changed.emit(current_speed)
+	destroyed.emit()
+	_show_destroyed_feedback()
+
+
+func _show_destroyed_feedback() -> void:
+	var hud := get_tree().get_first_node_in_group("hud")
+	if hud != null and hud.has_method("set_context_message"):
+		hud.set_context_message("Bateau détruit")
