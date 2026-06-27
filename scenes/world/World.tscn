@@ -1,3 +1,68 @@
-[gd_scene format=3 uid="uid://world_root_v01"]
+[gd_scene load_steps=12 format=3 uid="uid://world_root_v01"]
+
+[ext_resource type="Script" path="res://scripts/world/World.gd" id="1_world"]
+[ext_resource type="PackedScene" path="res://scenes/boats/PlayerBoat.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="3_hud"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ocean"]
+albedo_color = Color(0.02, 0.28, 0.45, 1)
+roughness = 0.72
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_ocean"]
+size = Vector2(220, 220)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_red"]
+albedo_color = Color(0.9, 0.12, 0.08, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_green"]
+albedo_color = Color(0.08, 0.55, 0.18, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gold"]
+albedo_color = Color(0.96, 0.68, 0.13, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rock"]
+albedo_color = Color(0.38, 0.40, 0.42, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_marker"]
+size = Vector3(1.2, 2.4, 1.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_island"]
+size = Vector3(4.5, 0.6, 4.5)
 
 [node name="World" type="Node3D"]
+script = ExtResource("1_world")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-55, -35, 0)
+light_energy = 1.4
+
+[node name="Ocean" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_ocean")
+material_override = SubResource("StandardMaterial3D_ocean")
+
+[node name="NavigationMarks" type="Node3D" parent="."]
+
+[node name="NorthBeacon" type="MeshInstance3D" parent="NavigationMarks"]
+position = Vector3(0, 1.2, -36)
+mesh = SubResource("BoxMesh_marker")
+material_override = SubResource("StandardMaterial3D_red")
+
+[node name="EastBeacon" type="MeshInstance3D" parent="NavigationMarks"]
+position = Vector3(36, 1.2, 0)
+mesh = SubResource("BoxMesh_marker")
+material_override = SubResource("StandardMaterial3D_green")
+
+[node name="TreasureRock" type="MeshInstance3D" parent="NavigationMarks"]
+position = Vector3(-30, 0.3, 24)
+mesh = SubResource("BoxMesh_island")
+material_override = SubResource("StandardMaterial3D_gold")
+
+[node name="RockShelf" type="MeshInstance3D" parent="NavigationMarks"]
+position = Vector3(22, 0.3, 30)
+mesh = SubResource("BoxMesh_island")
+material_override = SubResource("StandardMaterial3D_rock")
+
+[node name="PlayerBoat" parent="." instance=ExtResource("2_player")]
+position = Vector3(0, 0, 0)
+
+[node name="HUD" parent="." instance=ExtResource("3_hud")]
