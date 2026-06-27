@@ -31,6 +31,16 @@ Le joueur incarne le capitaine d'un petit navire independant qui construit progr
 5. Il dépense or et bois pour améliorer coque, voiles et canons.
 6. Le HUD confirme la progression du bateau.
 
+## Boucle de jeu v0.3
+
+1. Le joueur quitte la zone portuaire.
+2. Des ennemis apparaissent depuis plusieurs points de spawn.
+3. Le joueur combat des variantes de menace différente.
+4. Chaque ennemi détruit augmente le compteur global.
+5. Tous les 3 ennemis détruits, le niveau de danger augmente.
+6. Le danger et la zone influencent les ennemis qui apparaissent.
+7. Le HUD affiche danger, ennemis détruits et feedback de loot.
+
 ## Port et progression
 
 Le port sert de premier point sûr et de première interface de progression. Il ne contient pas encore de commerce avancé, de missions ou de PNJ, mais il établit le rythme attendu : partir en mer, obtenir des ressources, revenir au port, réparer et améliorer le bateau.
@@ -40,6 +50,22 @@ Les améliorations de v0.2 restent volontairement simples :
 - Coque renforcée : augmente les PV max.
 - Voiles rapides : augmente la vitesse max.
 - Canons améliorés : augmente les dégâts des boulets.
+
+## Ennemis et danger v0.3
+
+Trois variantes posent la base de difficulté :
+
+- Petit pirate : faible PV, rapide, dégâts faibles, loot faible.
+- Brigantin pirate : PV moyens, vitesse moyenne, dégâts moyens, loot moyen.
+- Patrouilleur lourd : beaucoup de PV, lent, dégâts élevés, loot meilleur.
+
+Les zones de danger structurent la carte de test :
+
+- Zone portuaire : danger faible, surtout petits pirates.
+- Zone d'archipel : danger moyen, petits pirates et brigantins.
+- Zone hostile : danger élevé, brigantins et patrouilleurs lourds.
+
+Le niveau de danger global démarre à 1 et augmente tous les 3 ennemis détruits. Il ne remplace pas les zones : il rend progressivement les spawns plus dangereux dans toutes les zones.
 
 ## Piliers a long terme
 
@@ -66,3 +92,12 @@ Les améliorations de v0.2 restent volontairement simples :
 - Îles explorables.
 - Missions.
 - Gestion de flotte.
+
+## Hors scope v0.3
+
+- Îles explorables.
+- Coffres et trésors.
+- Missions.
+- Alliés et flotte.
+- Abordage.
+- Sauvegarde persistante.

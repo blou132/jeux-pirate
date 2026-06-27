@@ -21,13 +21,16 @@
 
 - Faire réapparaître des ennemis après destruction.
 - Augmenter progressivement la difficulté.
-- Ajuster les récompenses selon le danger.
+- Ajouter des variantes d'ennemis.
+- Afficher danger et ennemis détruits dans le HUD.
+- Ajouter des zones de danger simples.
 
-## v0.4 - Îles explorables et coffres
+## v0.4 - Îles explorables, coffres et trésors
 
 - Ajouter une ou deux îles de test.
 - Ajouter des points d'interaction simples.
 - Ajouter des coffres avec ressources.
+- Ajouter des trésors simples à récupérer.
 
 ## v0.5 - Missions simples
 
@@ -46,6 +49,12 @@
 - Gerer plusieurs bateaux allies.
 - Ajouter une formation simple.
 - Eviter les collisions les plus visibles.
+
+## v0.8 - Abordage simple
+
+- Ajouter une action d'abordage à courte portée.
+- Récompenser l'abordage avec plus de ressources.
+- Poser une première base de risque/recompense.
 
 ## v1.0 - Demo jouable
 

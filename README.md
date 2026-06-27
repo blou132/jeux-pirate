@@ -8,6 +8,8 @@ La v0.1 a été testée manuellement par l'utilisateur dans Godot : scène World
 
 La v0.2 ajoute un port de test, une interaction au port, un menu, la réparation du bateau, trois améliorations et un HUD de progression.
 
+La v0.3 ajoute le spawn d'ennemis, le respawn après destruction, trois variantes d'ennemis, un niveau de danger global, des zones de danger simples et un feedback de victoire plus lisible.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -27,6 +29,17 @@ La v0.2 ajoute un port de test, une interaction au port, un menu, la réparation
 - Réparation au port : 1 bois répare 5 PV.
 - Améliorations niveau 0 à 3 : coque renforcée, voiles rapides, canons améliorés.
 - HUD étendu : PV, vitesse, or, bois et niveaux d'amélioration.
+
+## Etat v0.3
+
+- SpawnManager avec plusieurs points de spawn.
+- Respawn d'ennemis après destruction avec délai.
+- Variantes : Petit pirate, Brigantin pirate, Patrouilleur lourd.
+- Niveau de danger global et compteur d'ennemis détruits dans le HUD.
+- Zones de danger simples : portuaire, archipel, hostile.
+- Spawns pondérés par niveau de danger et zone.
+- Message HUD quand un ennemi est vaincu avec loot reçu.
+- Debug temporaire `F1`/`F2` encore présent pour tester les achats d'amélioration.
 
 ## Lancement
 
@@ -67,5 +80,6 @@ Ces raccourcis sont activés via `DebugTools` et doivent rester identifiés comm
 
 - `GameState` est configure en autoload pour suivre les ressources joueur.
 - `UpgradeSystem` est configure en autoload pour suivre les niveaux d'amélioration.
+- `SpawnManager` gère les ennemis actifs, le respawn et la sélection des variantes.
 - `World.tscn` est la scene de test jouable.
 - Les assets visuels de v0.1 sont des primitives Godot creees dans les scenes ou par script.
