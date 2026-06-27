@@ -65,6 +65,10 @@ func _try_attack_player(fire_direction: Vector3) -> void:
 	if _attack_cooldown_remaining > 0.0 or _player == null:
 		return
 
+	var confirmed_fire_direction: Vector3 = _get_confirmed_broadside_fire_direction(fire_direction)
+	if confirmed_fire_direction == Vector3.ZERO:
+		return
+
 	var damage := 0
 	if ship.has_method("get_contact_damage"):
 		damage = ship.get_contact_damage()
@@ -72,8 +76,8 @@ func _try_attack_player(fire_direction: Vector3) -> void:
 	if damage <= 0:
 		return
 
-	_show_broadside_debug(fire_direction)
-	_fire_projectile(damage, fire_direction)
+	_show_broadside_debug(confirmed_fire_direction)
+	_fire_projectile(damage, confirmed_fire_direction)
 	_attack_cooldown_remaining = _get_attack_cooldown()
 
 
@@ -89,6 +93,24 @@ func _get_attack_cooldown() -> float:
 		return ship.get_attack_cooldown()
 
 	return 2.0
+
+
+func _get_confirmed_broadside_fire_direction(candidate_direction: Vector3) -> Vector3:
+	if not is_instance_valid(_player):
+		return Vector3.ZERO
+	if candidate_direction.length_squared() < 0.01:
+		return Vector3.ZERO
+
+	var offset_to_player: Vector3 = _player.global_position - ship.global_position
+	offset_to_player.y = 0.0
+	var aligned_direction: Vector3 = _get_broadside_fire_direction(offset_to_player)
+	if aligned_direction == Vector3.ZERO:
+		return Vector3.ZERO
+
+	if aligned_direction.normalized().dot(candidate_direction.normalized()) <= 0.0:
+		return Vector3.ZERO
+
+	return aligned_direction
 
 
 func _get_broadside_fire_direction(offset_to_player: Vector3) -> Vector3:
