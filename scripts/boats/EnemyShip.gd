@@ -22,6 +22,7 @@ var _destroyed: bool = false
 func _ready() -> void:
 	health = max_health
 	add_to_group("enemy_ships")
+	_refresh_nameplate()
 	health_changed.emit(health, max_health)
 
 
@@ -55,11 +56,15 @@ func configure_variant(config: Dictionary) -> void:
 		_set_mesh_color("Visuals/Hull", config["hull_color"])
 	if config.has("sail_color"):
 		_set_mesh_color("Visuals/Sail", config["sail_color"])
+	if config.has("nameplate_height"):
+		_set_nameplate_height(float(config["nameplate_height"]))
 
 	_apply_visual_style(String(config.get("visual_style", "brigantine")))
+	_refresh_nameplate()
 
 	if is_inside_tree():
 		health = clampi(health, 1, max_health)
+		_refresh_nameplate()
 		health_changed.emit(health, max_health)
 
 
@@ -96,6 +101,7 @@ func take_damage(amount: int) -> void:
 		return
 
 	health = clampi(health - amount, 0, max_health)
+	_refresh_nameplate()
 	health_changed.emit(health, max_health)
 
 	if health <= 0:
@@ -210,3 +216,15 @@ func _show_defeat_feedback() -> void:
 		hud.show_temporary_context_message(message, 2.4)
 	elif hud.has_method("set_context_message"):
 		hud.set_context_message(message)
+
+
+func _refresh_nameplate() -> void:
+	var nameplate := get_node_or_null("Nameplate") as Label3D
+	if nameplate != null:
+		nameplate.text = "%s - %d PV" % [display_name, health]
+
+
+func _set_nameplate_height(height: float) -> void:
+	var nameplate := get_node_or_null("Nameplate") as Label3D
+	if nameplate != null:
+		nameplate.position.y = height

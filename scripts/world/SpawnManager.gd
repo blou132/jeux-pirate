@@ -166,6 +166,7 @@ func _get_enemy_variants() -> Array[Dictionary]:
 		"hull_color": Color(0.68, 0.23, 0.11, 1.0),
 		"sail_color": Color(0.78, 0.63, 0.36, 1.0),
 		"visual_style": "small",
+		"nameplate_height": 2.45,
 	})
 	variants.append({
 		"id": "brigantine",
@@ -186,6 +187,7 @@ func _get_enemy_variants() -> Array[Dictionary]:
 		"hull_color": Color(0.42, 0.08, 0.06, 1.0),
 		"sail_color": Color(0.12, 0.11, 0.10, 1.0),
 		"visual_style": "brigantine",
+		"nameplate_height": 3.1,
 	})
 	variants.append({
 		"id": "heavy_patrol",
@@ -206,6 +208,7 @@ func _get_enemy_variants() -> Array[Dictionary]:
 		"hull_color": Color(0.16, 0.18, 0.23, 1.0),
 		"sail_color": Color(0.28, 0.27, 0.24, 1.0),
 		"visual_style": "heavy",
+		"nameplate_height": 3.75,
 	})
 	return variants
 

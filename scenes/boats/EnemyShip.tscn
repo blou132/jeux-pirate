@@ -68,3 +68,9 @@ material_override = SubResource("StandardMaterial3D_deck")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 position = Vector3(0, 0.25, 0)
 shape = SubResource("BoxShape3D_collision")
+
+[node name="Nameplate" type="Label3D" parent="."]
+position = Vector3(0, 3.1, 0)
+billboard = 1
+text = "Brigantin pirate - 60 PV"
+font_size = 28
