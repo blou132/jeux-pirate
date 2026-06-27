@@ -17,6 +17,8 @@ signal destroyed(world_position: Vector3, gold_reward: int, wood_reward: int)
 @export var cannon_point_base_half_width: float = 1.35
 @export var cannon_point_height: float = 0.65
 @export var cannon_point_forward_offset: float = -0.25
+# Temporary v0.3.7 helper to inspect enemy broadside cannon points during tests.
+@export var debug_show_aim_points: bool = true
 
 var health: int
 var _destroyed: bool = false
@@ -25,6 +27,7 @@ var _destroyed: bool = false
 func _ready() -> void:
 	health = max_health
 	add_to_group("enemy_ships")
+	_refresh_debug_markers()
 	_refresh_nameplate()
 	health_changed.emit(health, max_health)
 
@@ -64,6 +67,7 @@ func configure_variant(config: Dictionary) -> void:
 
 	_apply_visual_style(String(config.get("visual_style", "brigantine")))
 	_refresh_cannon_points(visual_scale)
+	_refresh_debug_markers()
 	_refresh_nameplate()
 
 	if is_inside_tree():
@@ -308,3 +312,15 @@ func _get_broadside_cannon_point(fire_direction: Vector3) -> Node3D:
 		return get_node_or_null("RightCannonPoint") as Node3D
 
 	return get_node_or_null("LeftCannonPoint") as Node3D
+
+
+func _refresh_debug_markers() -> void:
+	var marker_paths: Array[NodePath] = [
+		NodePath("LeftCannonPoint/DebugMarker"),
+		NodePath("RightCannonPoint/DebugMarker"),
+	]
+
+	for marker_path in marker_paths:
+		var marker := get_node_or_null(marker_path) as Node3D
+		if marker != null:
+			marker.visible = debug_show_aim_points

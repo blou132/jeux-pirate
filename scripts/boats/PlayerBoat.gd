@@ -17,6 +17,8 @@ signal destroyed
 @export var hit_feedback_cooldown: float = 0.8
 @export var fallback_respawn_position: Vector3 = Vector3.ZERO
 @export var respawn_offset_from_port: Vector3 = Vector3(8.0, 0.0, -8.0)
+# Temporary v0.3.7 helper to inspect the real player aim point during tests.
+@export var debug_show_aim_points: bool = true
 
 var health: int
 var current_speed: float = 0.0
@@ -32,6 +34,7 @@ func _ready() -> void:
 	health = max_health
 	add_to_group("player")
 	_connect_upgrade_system()
+	_refresh_debug_markers()
 	health_changed.emit(health, max_health)
 	speed_changed.emit(current_speed)
 
@@ -252,6 +255,12 @@ func _get_respawn_position() -> Vector3:
 		return port.global_position + respawn_offset_from_port
 
 	return fallback_respawn_position
+
+
+func _refresh_debug_markers() -> void:
+	var marker := get_node_or_null("AimPoint/DebugMarker") as Node3D
+	if marker != null:
+		marker.visible = debug_show_aim_points
 
 
 func _show_hit_feedback(damage_taken: int) -> void:

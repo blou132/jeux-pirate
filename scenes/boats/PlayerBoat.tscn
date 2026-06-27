@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://player_boat_v01"]
+[gd_scene load_steps=14 format=3 uid="uid://player_boat_v01"]
 
 [ext_resource type="Script" path="res://scripts/boats/PlayerBoat.gd" id="1_player_boat"]
 [ext_resource type="Script" path="res://scripts/combat/CannonSystem.gd" id="2_cannon_system"]
@@ -14,6 +14,11 @@ albedo_color = Color(0.24, 0.12, 0.05, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sail"]
 albedo_color = Color(0.93, 0.88, 0.72, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_debug_aim"]
+albedo_color = Color(0.1, 0.9, 1, 1)
+emission_enabled = true
+emission = Color(0.1, 0.9, 1, 1)
 
 [sub_resource type="BoxMesh" id="BoxMesh_hull"]
 size = Vector3(2.4, 0.7, 4.8)
@@ -31,6 +36,10 @@ size = Vector3(1.7, 1.1, 0.08)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_collision"]
 size = Vector3(2.5, 1.0, 5.0)
+
+[sub_resource type="SphereMesh" id="SphereMesh_debug_point"]
+radius = 0.16
+height = 0.32
 
 [node name="PlayerBoat" type="CharacterBody3D"]
 script = ExtResource("1_player_boat")
@@ -68,6 +77,10 @@ shape = SubResource("BoxShape3D_collision")
 
 [node name="AimPoint" type="Marker3D" parent="."]
 position = Vector3(0, 0.55, -0.1)
+
+[node name="DebugMarker" type="MeshInstance3D" parent="AimPoint"]
+mesh = SubResource("SphereMesh_debug_point")
+material_override = SubResource("StandardMaterial3D_debug_aim")
 
 [node name="CannonSystem" type="Node3D" parent="."]
 script = ExtResource("2_cannon_system")
