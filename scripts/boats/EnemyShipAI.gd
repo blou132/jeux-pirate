@@ -209,6 +209,13 @@ func _fire_projectile(damage: int, fire_direction: Vector3) -> void:
 
 
 func _get_broadside_muzzle_position(fire_direction: Vector3) -> Vector3:
+	if ship.has_method("get_broadside_cannon_position"):
+		return ship.get_broadside_cannon_position(
+			fire_direction,
+			broadside_muzzle_offset,
+			broadside_muzzle_height
+		)
+
 	var side_direction: Vector3 = fire_direction.normalized()
 	side_direction.y = 0.0
 	return ship.global_position + (side_direction * broadside_muzzle_offset) + Vector3(0.0, broadside_muzzle_height, 0.0)

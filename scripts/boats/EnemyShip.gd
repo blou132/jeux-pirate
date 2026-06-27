@@ -14,6 +14,9 @@ signal destroyed(world_position: Vector3, gold_reward: int, wood_reward: int)
 @export var attack_cooldown: float = 2.2
 @export var reward_gold: int = 12
 @export var reward_wood: int = 8
+@export var cannon_point_base_half_width: float = 1.35
+@export var cannon_point_height: float = 0.65
+@export var cannon_point_forward_offset: float = -0.25
 
 var health: int
 var _destroyed: bool = false
@@ -60,6 +63,7 @@ func configure_variant(config: Dictionary) -> void:
 		_set_nameplate_height(float(config["nameplate_height"]))
 
 	_apply_visual_style(String(config.get("visual_style", "brigantine")))
+	_refresh_cannon_points(visual_scale)
 	_refresh_nameplate()
 
 	if is_inside_tree():
@@ -138,6 +142,16 @@ func get_attack_cooldown() -> float:
 
 func get_display_name() -> String:
 	return display_name
+
+
+func get_broadside_cannon_position(fire_direction: Vector3, fallback_offset: float, fallback_height: float) -> Vector3:
+	var cannon_point := _get_broadside_cannon_point(fire_direction)
+	if cannon_point != null:
+		return cannon_point.global_position
+
+	var side_direction: Vector3 = fire_direction.normalized()
+	side_direction.y = 0.0
+	return global_position + (side_direction * fallback_offset) + Vector3(0.0, fallback_height, 0.0)
 
 
 func _destroy() -> void:
@@ -244,3 +258,35 @@ func _set_nameplate_height(height: float) -> void:
 	var nameplate := get_node_or_null("Nameplate") as Label3D
 	if nameplate != null:
 		nameplate.position.y = height
+
+
+func _refresh_cannon_points(visual_scale: float) -> void:
+	var hull_scale := _get_node_scale("Visuals/Hull")
+	var half_width := cannon_point_base_half_width * visual_scale * hull_scale.x
+
+	var left_point := get_node_or_null("LeftCannonPoint") as Node3D
+	if left_point != null:
+		left_point.position = Vector3(-half_width, cannon_point_height, cannon_point_forward_offset)
+
+	var right_point := get_node_or_null("RightCannonPoint") as Node3D
+	if right_point != null:
+		right_point.position = Vector3(half_width, cannon_point_height, cannon_point_forward_offset)
+
+
+func _get_node_scale(node_path: NodePath) -> Vector3:
+	var node := get_node_or_null(node_path) as Node3D
+	if node != null:
+		return node.scale
+
+	return Vector3.ONE
+
+
+func _get_broadside_cannon_point(fire_direction: Vector3) -> Node3D:
+	if fire_direction.length_squared() < 0.01:
+		return null
+
+	var right_direction: Vector3 = global_transform.basis.x.normalized()
+	if fire_direction.normalized().dot(right_direction) >= 0.0:
+		return get_node_or_null("RightCannonPoint") as Node3D
+
+	return get_node_or_null("LeftCannonPoint") as Node3D
