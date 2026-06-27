@@ -48,6 +48,10 @@ func _spawn_enemy_if_possible() -> bool:
 		enemy.queue_free()
 		return false
 
+	var variant_config := _pick_enemy_variant()
+	if enemy.has_method("configure_variant"):
+		enemy.configure_variant(variant_config)
+
 	var enemy_node := enemy as Node3D
 	add_child(enemy_node)
 	enemy_node.global_position = spawn_point.global_position
@@ -119,3 +123,52 @@ func _cleanup_inactive_enemies() -> void:
 	_active_enemies = _active_enemies.filter(func(enemy: Node) -> bool:
 		return is_instance_valid(enemy)
 	)
+
+
+func _pick_enemy_variant() -> Dictionary:
+	var variants := _get_enemy_variants()
+	return variants.pick_random()
+
+
+func _get_enemy_variants() -> Array[Dictionary]:
+	var variants: Array[Dictionary] = []
+	variants.append({
+		"id": "small_pirate",
+		"display_name": "Petit pirate",
+		"max_health": 35,
+		"move_speed": 9.0,
+		"turn_speed": 1.45,
+		"contact_damage": 6,
+		"reward_gold": 8,
+		"reward_wood": 5,
+		"visual_scale": 0.82,
+		"hull_color": Color(0.55, 0.14, 0.08, 1.0),
+		"sail_color": Color(0.18, 0.16, 0.12, 1.0),
+	})
+	variants.append({
+		"id": "brigantine",
+		"display_name": "Brigantin pirate",
+		"max_health": 65,
+		"move_speed": 7.2,
+		"turn_speed": 1.15,
+		"contact_damage": 12,
+		"reward_gold": 16,
+		"reward_wood": 10,
+		"visual_scale": 1.0,
+		"hull_color": Color(0.42, 0.08, 0.06, 1.0),
+		"sail_color": Color(0.12, 0.11, 0.10, 1.0),
+	})
+	variants.append({
+		"id": "heavy_patrol",
+		"display_name": "Patrouilleur lourd",
+		"max_health": 115,
+		"move_speed": 5.2,
+		"turn_speed": 0.82,
+		"contact_damage": 22,
+		"reward_gold": 30,
+		"reward_wood": 18,
+		"visual_scale": 1.18,
+		"hull_color": Color(0.16, 0.18, 0.23, 1.0),
+		"sail_color": Color(0.28, 0.27, 0.24, 1.0),
+	})
+	return variants
