@@ -1,7 +1,9 @@
 extends Node
 
+@export var enemy_cannon_ball_scene: PackedScene = preload("res://scenes/projectiles/EnemyCannonBall.tscn")
 @export var detection_range: float = 55.0
 @export var stop_distance: float = 7.0
+@export var projectile_speed: float = 13.0
 
 @onready var ship: EnemyShip = get_parent() as EnemyShip
 
@@ -51,10 +53,10 @@ func _try_attack_player() -> void:
 	if ship.has_method("get_contact_damage"):
 		damage = ship.get_contact_damage()
 
-	if damage <= 0 or not _player.has_method("take_damage"):
+	if damage <= 0:
 		return
 
-	_player.take_damage(damage)
+	_fire_projectile(damage)
 	_attack_cooldown_remaining = _get_attack_cooldown()
 
 
@@ -70,3 +72,29 @@ func _get_attack_cooldown() -> float:
 		return ship.get_attack_cooldown()
 
 	return 2.0
+
+
+func _fire_projectile(damage: int) -> void:
+	if enemy_cannon_ball_scene == null or not is_instance_valid(_player):
+		return
+
+	var projectile := enemy_cannon_ball_scene.instantiate()
+	if not projectile is Node3D:
+		projectile.queue_free()
+		return
+
+	var projectile_node := projectile as Node3D
+	var start_position := ship.global_position + Vector3(0.0, 0.7, 0.0)
+	var target_position := _player.global_position + Vector3(0.0, 0.45, 0.0)
+	var direction := target_position - start_position
+	direction.y = clampf(direction.y, -0.2, 0.35)
+
+	var parent := get_tree().current_scene
+	if parent == null:
+		parent = get_tree().root
+	parent.add_child(projectile)
+
+	projectile_node.global_position = start_position
+
+	if projectile.has_method("launch"):
+		projectile.launch(direction, ship, projectile_speed, damage)
