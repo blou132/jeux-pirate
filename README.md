@@ -2,7 +2,11 @@
 
 Prototype Godot 4.x original pour un jeu d'aventure pirate.
 
-Le projet n'utilise aucun asset externe et ne reprend aucune marque, aucun nom, aucun modele et aucun contenu protege. La v0.1 pose une base jouable propre : bateau joueur, mer de test, combat basique, ennemi et loot simple.
+Le projet n'utilise aucun asset externe et ne reprend aucune marque, aucun nom, aucun modèle et aucun contenu protégé. La v0.1 pose une base jouable propre : bateau joueur, mer de test, combat basique, ennemi et loot simple.
+
+La v0.1 a été testée manuellement par l'utilisateur dans Godot : scène World lancée, bateau contrôlable, HUD visible, ennemi présent, combat fonctionnel et loot ajouté après destruction.
+
+La v0.2 ajoute un port de test, une interaction au port, un menu, la réparation du bateau, trois améliorations et un HUD de progression.
 
 ## Etat v0.1
 
@@ -15,11 +19,21 @@ Le projet n'utilise aucun asset externe et ne reprend aucune marque, aucun nom, 
 - Ennemi de test avec detection, poursuite et destruction.
 - Loot simple donnant or et bois.
 
+## Etat v0.2
+
+- Port proche du point de départ avec zone d'interaction.
+- Message contextuel quand le bateau est proche du port.
+- Menu "Port du Pavillon" ouvrable avec `E` et fermable avec `Échap` ou `Quitter`.
+- Réparation au port : 1 bois répare 5 PV.
+- Améliorations niveau 0 à 3 : coque renforcée, voiles rapides, canons améliorés.
+- HUD étendu : PV, vitesse, or, bois et niveaux d'amélioration.
+
 ## Lancement
 
 1. Installer Godot 4.x.
 2. Ouvrir le dossier du depot comme projet Godot.
-3. Lancer la scene principale `res://scenes/world/World.tscn` ou appuyer sur Play.
+3. Ouvrir la scène principale `res://scenes/world/World.tscn`.
+4. Appuyer sur Play.
 
 Godot n'est pas inclus dans ce depot.
 
@@ -29,8 +43,10 @@ Godot n'est pas inclus dans ce depot.
 - `S` : ralentir ou marche arriere legere
 - `Q` / `A` : tourner a gauche
 - `D` : tourner a droite
-- Clic gauche : tirer a gauche
-- Clic droit : tirer a droite
+- Clic gauche : canon gauche
+- Clic droit : canon droit
+- `E` : interagir avec le port
+- `Échap` : fermer le menu
 
 ## Structure
 
@@ -41,5 +57,6 @@ Godot n'est pas inclus dans ce depot.
 ## Notes techniques
 
 - `GameState` est configure en autoload pour suivre les ressources joueur.
+- `UpgradeSystem` est configure en autoload pour suivre les niveaux d'amélioration.
 - `World.tscn` est la scene de test jouable.
 - Les assets visuels de v0.1 sont des primitives Godot creees dans les scenes ou par script.

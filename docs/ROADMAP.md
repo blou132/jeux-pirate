@@ -9,41 +9,43 @@
 - Ennemi simple.
 - Loot et ressources simples.
 
-## v0.2 - Port et reparations
+## v0.2 - Port, réparations et améliorations
 
 - Ajouter un port de test.
 - Permettre au joueur de reparer le bateau contre du bois.
 - Ajouter une zone d'amarrage simple.
+- Ajouter trois améliorations : coque, voiles, canons.
+- Afficher la progression dans le HUD.
 
-## v0.3 - Ameliorations du bateau
+## v0.3 - Respawn ennemis et difficulté progressive
 
-- Ajouter des statistiques ameliorables : coque, vitesse, canons.
-- Depenser or et bois pour acheter les ameliorations.
-- Afficher les ameliorations dans une interface simple.
+- Faire réapparaître des ennemis après destruction.
+- Augmenter progressivement la difficulté.
+- Ajuster les récompenses selon le danger.
 
-## v0.4 - Iles explorables
+## v0.4 - Îles explorables et coffres
 
-- Ajouter une ou deux iles de test.
+- Ajouter une ou deux îles de test.
 - Ajouter des points d'interaction simples.
-- Poser une premiere structure d'exploration.
+- Ajouter des coffres avec ressources.
 
-## v0.5 - Premier bateau allie
+## v0.5 - Missions simples
 
-- Ajouter un bateau allie de base.
+- Ajouter un journal de mission minimal.
+- Créer une mission de livraison.
+- Créer une mission de combat.
+
+## v0.6 - Premier bateau allié
+
+- Ajouter un bateau allié de base.
 - Lui faire suivre le joueur.
-- Preparer les ordres simples.
+- Préparer les ordres simples.
 
-## v0.6 - Flotte basique
+## v0.7 - Flotte basique
 
 - Gerer plusieurs bateaux allies.
 - Ajouter une formation simple.
 - Eviter les collisions les plus visibles.
-
-## v0.7 - Missions
-
-- Ajouter un journal de mission minimal.
-- Creer une mission de livraison.
-- Creer une mission de combat.
 
 ## v1.0 - Demo jouable
 
