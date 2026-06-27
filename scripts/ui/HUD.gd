@@ -12,6 +12,9 @@ extends CanvasLayer
 var _player: Node
 var _game_state: Node
 var _upgrade_system: Node
+var _context_message: String = ""
+var _temporary_context_message: String = ""
+var _temporary_message_version: int = 0
 
 
 func _ready() -> void:
@@ -101,6 +104,30 @@ func _on_resources_changed(gold: int, wood: int) -> void:
 
 
 func set_context_message(message: String) -> void:
+	_context_message = message
+	_refresh_context_label()
+
+
+func show_temporary_context_message(message: String, duration: float = 1.6) -> void:
+	_temporary_message_version += 1
+	var message_version := _temporary_message_version
+	_temporary_context_message = message
+	_refresh_context_label()
+
+	await get_tree().create_timer(duration, true).timeout
+
+	if message_version != _temporary_message_version:
+		return
+
+	_temporary_context_message = ""
+	_refresh_context_label()
+
+
+func _refresh_context_label() -> void:
+	var message := _context_message
+	if not _temporary_context_message.is_empty():
+		message = _temporary_context_message
+
 	context_label.text = message
 	context_label.visible = not message.is_empty()
 
