@@ -139,9 +139,8 @@ func _fire_projectile(damage: int, fire_direction: Vector3) -> void:
 
 	var projectile_node := projectile as Node3D
 	var start_position := ship.global_position + (fire_direction.normalized() * 1.5) + Vector3(0.0, 0.7, 0.0)
-	var target_position := _player.global_position + Vector3(0.0, 0.45, 0.0)
-	var direction := target_position - start_position
-	direction.y = clampf(direction.y, -0.2, 0.35)
+	var shot_direction := fire_direction.normalized()
+	shot_direction.y = 0.0
 
 	var parent := get_tree().current_scene
 	if parent == null:
@@ -151,4 +150,4 @@ func _fire_projectile(damage: int, fire_direction: Vector3) -> void:
 	projectile_node.global_position = start_position
 
 	if projectile.has_method("launch"):
-		projectile.launch(direction, ship, projectile_speed, damage)
+		projectile.launch(shot_direction, ship, projectile_speed, damage)
