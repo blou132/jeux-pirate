@@ -2,18 +2,23 @@ extends CanvasLayer
 
 @onready var speed_label: Label = $MarginContainer/PanelContainer/VBoxContainer/SpeedLabel
 @onready var health_label: Label = $MarginContainer/PanelContainer/VBoxContainer/HealthLabel
-@onready var resources_label: Label = $MarginContainer/PanelContainer/VBoxContainer/ResourcesLabel
+@onready var gold_label: Label = $MarginContainer/PanelContainer/VBoxContainer/GoldLabel
+@onready var wood_label: Label = $MarginContainer/PanelContainer/VBoxContainer/WoodLabel
+@onready var hull_level_label: Label = $MarginContainer/PanelContainer/VBoxContainer/HullLevelLabel
+@onready var sails_level_label: Label = $MarginContainer/PanelContainer/VBoxContainer/SailsLevelLabel
+@onready var cannons_level_label: Label = $MarginContainer/PanelContainer/VBoxContainer/CannonsLevelLabel
 @onready var context_label: Label = $MarginContainer/PanelContainer/VBoxContainer/ContextLabel
 
 var _player: Node
 var _game_state: Node
+var _upgrade_system: Node
 
 
 func _ready() -> void:
 	add_to_group("hud")
-	resources_label.visible = false
 	context_label.visible = false
 	_connect_game_state()
+	_connect_upgrade_system()
 	call_deferred("_bind_player_from_tree")
 
 
@@ -82,8 +87,6 @@ func _connect_game_state() -> void:
 	if _game_state == null:
 		return
 
-	resources_label.visible = true
-
 	var resources_callback := Callable(self, "_on_resources_changed")
 	if _game_state.has_signal("resources_changed") and not _game_state.is_connected("resources_changed", resources_callback):
 		_game_state.connect("resources_changed", resources_callback)
@@ -93,9 +96,33 @@ func _connect_game_state() -> void:
 
 
 func _on_resources_changed(gold: int, wood: int) -> void:
-	resources_label.text = "Or: %d  Bois: %d" % [gold, wood]
+	gold_label.text = "Or: %d" % gold
+	wood_label.text = "Bois: %d" % wood
 
 
 func set_context_message(message: String) -> void:
 	context_label.text = message
 	context_label.visible = not message.is_empty()
+
+
+func _connect_upgrade_system() -> void:
+	_upgrade_system = get_node_or_null("/root/UpgradeSystem")
+	if _upgrade_system == null:
+		return
+
+	var upgrades_callback := Callable(self, "_on_upgrades_changed")
+	if _upgrade_system.has_signal("upgrades_changed") and not _upgrade_system.is_connected("upgrades_changed", upgrades_callback):
+		_upgrade_system.connect("upgrades_changed", upgrades_callback)
+
+	if _upgrade_system.has_method("get_hull_level") and _upgrade_system.has_method("get_sails_level") and _upgrade_system.has_method("get_cannons_level"):
+		_on_upgrades_changed(
+			_upgrade_system.get_hull_level(),
+			_upgrade_system.get_sails_level(),
+			_upgrade_system.get_cannons_level()
+		)
+
+
+func _on_upgrades_changed(hull_level: int, sails_level: int, cannons_level: int) -> void:
+	hull_level_label.text = "Coque: niv. %d/3" % hull_level
+	sails_level_label.text = "Voiles: niv. %d/3" % sails_level
+	cannons_level_label.text = "Canons: niv. %d/3" % cannons_level
