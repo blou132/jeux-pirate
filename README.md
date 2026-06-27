@@ -16,6 +16,8 @@ La v0.3.3 rend les attaques ennemies visibles avec des boulets dédiés, ajoute 
 
 La v0.3.4 améliore les règles de combat naval : tirs ennemis limités aux bordées, tirs joueur bloqués après destruction, limites de carte et feedback de sortie de zone jouable.
 
+La v0.3.5 corrige les bordées ennemies : les boulets partent strictement vers bâbord ou tribord, depuis le côté de la coque, avec une manœuvre ennemie plus lisible pour présenter le flanc.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -74,6 +76,13 @@ La v0.3.4 améliore les règles de combat naval : tirs ennemis limités aux bord
 - Le joueur ne peut plus tirer après destruction.
 - `WorldBounds` limite la zone jouable, pousse le joueur vers l'intérieur et le ramène près du port en cas de sortie forte.
 - Le HUD affiche `Limite de la carte` ou `Retour dans la zone navigable` selon la situation.
+
+## Correctifs v0.3.5
+
+- Les boulets ennemis n'utilisent plus la position exacte du joueur comme direction de tir.
+- Le côté bâbord ou tribord est choisi selon la position relative du joueur.
+- Les projectiles ennemis apparaissent depuis le côté de la coque avec un offset vertical.
+- Les ennemis manœuvrent à portée pour mieux présenter leur flanc avant de tirer.
 
 ## Lancement
 

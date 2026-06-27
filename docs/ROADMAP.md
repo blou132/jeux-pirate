@@ -27,6 +27,7 @@
 - Correctif v0.3.2 : attaque ennemie, feedback de défaite joueur, variantes plus lisibles, nameplates, notifications de zone.
 - Correctif v0.3.3 : tirs ennemis visibles, feedback quand le joueur est touché, respawn avec `R` après destruction.
 - Correctif v0.3.4 : tirs ennemis limités aux bordées, tirs joueur désactivés après destruction, limites de carte et feedback de sortie.
+- Correctif v0.3.5 : direction des tirs ennemis corrigée, projectiles tirés depuis les côtés, manœuvre de flanc améliorée.
 
 ## v0.4 - Îles explorables, coffres et trésors
 

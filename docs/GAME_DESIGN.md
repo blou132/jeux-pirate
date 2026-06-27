@@ -96,6 +96,15 @@ Les bateaux ennemis ne tirent plus dans toutes les directions. Ils doivent prés
 - Les limites de carte empêchent de quitter durablement la zone jouable.
 - Le HUD signale l'approche ou le dépassement des limites.
 
+## Bordées ennemies v0.3.5
+
+La direction du joueur sert seulement à choisir le côté de tir. Le projectile ennemi part ensuite dans l'axe latéral du bateau, comme un canon de bordée :
+
+- Bâbord : le boulet part vers la gauche locale du bateau.
+- Tribord : le boulet part vers la droite locale du bateau.
+- Le boulet apparaît sur le côté de la coque, pas au centre.
+- À portée d'attaque, l'ennemi orbite et corrige sa distance pour placer le joueur dans un arc latéral.
+
 ## Piliers a long terme
 
 - Navigation lisible : le joueur doit toujours comprendre son cap, sa vitesse et les menaces proches.
