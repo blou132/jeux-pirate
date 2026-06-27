@@ -1,9 +1,10 @@
-[gd_scene load_steps=13 format=3 uid="uid://world_root_v01"]
+[gd_scene load_steps=14 format=3 uid="uid://world_root_v01"]
 
 [ext_resource type="Script" path="res://scripts/world/World.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/boats/PlayerBoat.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://scenes/ui/HUD.tscn" id="3_hud"]
 [ext_resource type="PackedScene" path="res://scenes/boats/EnemyShip.tscn" id="4_enemy"]
+[ext_resource type="Script" path="res://scripts/world/LootSystem.gd" id="5_loot_system"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ocean"]
 albedo_color = Color(0.02, 0.28, 0.45, 1)
@@ -62,6 +63,9 @@ material_override = SubResource("StandardMaterial3D_gold")
 position = Vector3(22, 0.3, 30)
 mesh = SubResource("BoxMesh_island")
 material_override = SubResource("StandardMaterial3D_rock")
+
+[node name="LootSystem" type="Node3D" parent="."]
+script = ExtResource("5_loot_system")
 
 [node name="PlayerBoat" parent="." instance=ExtResource("2_player")]
 position = Vector3(0, 0, 0)

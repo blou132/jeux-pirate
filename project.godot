@@ -10,6 +10,10 @@ config/description="Original pirate adventure prototype built with primitive God
 run/main_scene="res://scenes/world/World.tscn"
 config/features=PackedStringArray("4.2", "Forward Plus")
 
+[autoload]
+
+GameState="*res://scripts/world/GameState.gd"
+
 [display]
 
 window/size/viewport_width=1280

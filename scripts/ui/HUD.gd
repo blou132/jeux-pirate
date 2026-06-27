@@ -5,10 +5,12 @@ extends CanvasLayer
 @onready var resources_label: Label = $MarginContainer/PanelContainer/VBoxContainer/ResourcesLabel
 
 var _player: Node
+var _game_state: Node
 
 
 func _ready() -> void:
 	resources_label.visible = false
+	_connect_game_state()
 	call_deferred("_bind_player_from_tree")
 
 
@@ -70,3 +72,22 @@ func _on_health_changed(current_health: int, max_health: int) -> void:
 
 func _on_speed_changed(speed: float) -> void:
 	speed_label.text = "Vitesse: %.1f nd" % absf(speed)
+
+
+func _connect_game_state() -> void:
+	_game_state = get_node_or_null("/root/GameState")
+	if _game_state == null:
+		return
+
+	resources_label.visible = true
+
+	var resources_callback := Callable(self, "_on_resources_changed")
+	if _game_state.has_signal("resources_changed") and not _game_state.is_connected("resources_changed", resources_callback):
+		_game_state.connect("resources_changed", resources_callback)
+
+	if _game_state.has_method("get_gold") and _game_state.has_method("get_wood"):
+		_on_resources_changed(_game_state.get_gold(), _game_state.get_wood())
+
+
+func _on_resources_changed(gold: int, wood: int) -> void:
+	resources_label.text = "Or: %d  Bois: %d" % [gold, wood]

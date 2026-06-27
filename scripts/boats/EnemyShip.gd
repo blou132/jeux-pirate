@@ -61,5 +61,10 @@ func take_damage(amount: int) -> void:
 
 func _destroy() -> void:
 	_destroyed = true
-	destroyed.emit(global_position, reward_gold, reward_wood)
+	var sink_position := global_position
+	var loot_system := get_tree().get_first_node_in_group("loot_system")
+	if loot_system != null and loot_system.has_method("drop_from_ship"):
+		loot_system.drop_from_ship(sink_position, reward_gold, reward_wood)
+
+	destroyed.emit(sink_position, reward_gold, reward_wood)
 	queue_free()
