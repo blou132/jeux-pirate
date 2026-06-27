@@ -49,6 +49,20 @@ func take_damage(amount: int) -> void:
 	health_changed.emit(health, max_health)
 
 
+func repair(amount: int) -> int:
+	if amount <= 0 or health >= max_health:
+		return 0
+
+	var previous_health := health
+	health = clampi(health + amount, 0, max_health)
+	health_changed.emit(health, max_health)
+	return health - previous_health
+
+
+func is_at_max_health() -> bool:
+	return health >= max_health
+
+
 func get_health() -> int:
 	return health
 
