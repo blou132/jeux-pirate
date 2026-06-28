@@ -68,6 +68,13 @@ func get_fleet_manager() -> Node:
 	return fleet_manager
 
 
+func set_fleet_order(order_id: String) -> String:
+	if fleet_manager == null:
+		return "Ordre de flotte indisponible"
+
+	return fleet_manager.set_order(order_id)
+
+
 func _connect_island(island: Node) -> void:
 	if not island.has_signal("interaction_requested"):
 		return

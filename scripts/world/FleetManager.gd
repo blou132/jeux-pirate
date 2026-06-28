@@ -106,6 +106,19 @@ func set_order(order_id: String) -> String:
 	return message
 
 
+func get_available_order_views() -> Array:
+	return [
+		_build_order_view(ORDER_FOLLOW, "F"),
+		_build_order_view(ORDER_ATTACK, "G"),
+		_build_order_view(ORDER_PROTECT, "H"),
+		_build_order_view(ORDER_FLEE, "J"),
+	]
+
+
+func get_order_label(order_id: String) -> String:
+	return String(ORDER_LABELS.get(order_id, ""))
+
+
 func get_current_order() -> String:
 	return _current_order
 
@@ -454,3 +467,12 @@ func _get_game_state() -> Node:
 func _show_hud_message(message: String, duration: float) -> void:
 	if _hud != null and _hud.has_method("show_temporary_context_message"):
 		_hud.show_temporary_context_message(message, duration)
+
+
+func _build_order_view(order_id: String, shortcut: String) -> Dictionary:
+	return {
+		"id": order_id,
+		"label": get_order_label(order_id),
+		"shortcut": shortcut,
+		"active": order_id == _current_order,
+	}
