@@ -11,8 +11,10 @@ extends Node
 @export var broadside_preferred_distance_ratio: float = 0.78
 @export var broadside_distance_margin: float = 1.5
 @export var broadside_radial_weight: float = 0.55
-@export var broadside_maneuver_speed_scale: float = 0.45
-@export var broadside_retreat_speed_scale: float = 0.6
+@export var broadside_maneuver_speed_scale: float = 0.58
+@export var broadside_retreat_speed_scale: float = 0.55
+@export var broadside_turn_slowdown: float = 0.2
+@export var broadside_min_maneuver_speed_scale: float = 0.35
 @export var broadside_line_correction_weight: float = 0.7
 # Temporary v0.3.5 console helper to verify enemy broadside selection during tests.
 @export var debug_broadside_fire: bool = true
@@ -220,6 +222,8 @@ func _maneuver_for_broadside(offset_to_player: Vector3, distance_to_player: floa
 	if line_error.length_squared() > broadside_line_tolerance * broadside_line_tolerance:
 		desired_forward = (desired_forward + (line_error.normalized() * broadside_line_correction_weight)).normalized()
 
+	speed_scale = _apply_broadside_turn_slowdown(speed_scale)
+
 	if ship.has_method("steer_along_direction_with_speed"):
 		ship.steer_along_direction_with_speed(desired_forward, delta, speed_scale)
 	elif ship.has_method("steer_along_direction"):
@@ -236,6 +240,15 @@ func _get_player_aim_position() -> Vector3:
 		return _player.global_position
 
 	return ship.global_position
+
+
+func _apply_broadside_turn_slowdown(speed_scale: float) -> float:
+	var turn_load: float = 0.0
+	if ship.has_method("get_turn_load"):
+		turn_load = float(ship.get_turn_load())
+
+	var slowed_speed: float = speed_scale - (turn_load * broadside_turn_slowdown)
+	return clampf(slowed_speed, broadside_min_maneuver_speed_scale, 1.0)
 
 
 func _get_broadside_line_error(fire_direction: Vector3) -> Vector3:

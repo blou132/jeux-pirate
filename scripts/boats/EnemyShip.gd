@@ -175,6 +175,13 @@ func get_attack_cooldown() -> float:
 	return attack_cooldown
 
 
+func get_turn_load() -> float:
+	if turn_speed <= 0.0:
+		return 0.0
+
+	return clampf(absf(angular_velocity) / turn_speed, 0.0, 1.0)
+
+
 func get_display_name() -> String:
 	return display_name
 
