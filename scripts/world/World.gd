@@ -3,6 +3,7 @@ extends Node3D
 @onready var player: Node = $PlayerBoat
 @onready var hud: CanvasLayer = $HUD
 @onready var port_menu: CanvasLayer = $PortMenu
+@onready var island_exploration_menu: CanvasLayer = $IslandExplorationMenu
 
 
 func _ready() -> void:
@@ -11,6 +12,9 @@ func _ready() -> void:
 
 	for port in get_tree().get_nodes_in_group("ports"):
 		_connect_port(port)
+
+	for island in get_tree().get_nodes_in_group("islands"):
+		_connect_island(island)
 
 
 func _connect_port(port: Node) -> void:
@@ -28,3 +32,20 @@ func _on_port_interaction_requested(port: Node) -> void:
 
 	if port_menu.has_method("open"):
 		port_menu.open(player)
+
+
+func _connect_island(island: Node) -> void:
+	if not island.has_signal("interaction_requested"):
+		return
+
+	var callback := Callable(self, "_on_island_interaction_requested")
+	if not island.is_connected("interaction_requested", callback):
+		island.connect("interaction_requested", callback)
+
+
+func _on_island_interaction_requested(island: Node) -> void:
+	if island.has_method("is_player_in_range") and not island.is_player_in_range():
+		return
+
+	if island_exploration_menu.has_method("open"):
+		island_exploration_menu.open(island)

@@ -38,6 +38,10 @@ func get_island_name() -> String:
 	return island_name
 
 
+func explore() -> String:
+	return "Rien à fouiller pour l'instant"
+
+
 func _refresh_label() -> void:
 	if name_label != null:
 		name_label.text = island_name

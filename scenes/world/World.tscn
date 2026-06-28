@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3 uid="uid://world_root_v01"]
+[gd_scene load_steps=31 format=3 uid="uid://world_root_v01"]
 
 [ext_resource type="Script" path="res://scripts/world/World.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/boats/PlayerBoat.tscn" id="2_player"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" path="res://scripts/world/DangerZone.gd" id="10_danger_zone"]
 [ext_resource type="Script" path="res://scripts/world/WorldBounds.gd" id="11_world_bounds"]
 [ext_resource type="PackedScene" path="res://scenes/world/Island.tscn" id="12_island"]
+[ext_resource type="PackedScene" path="res://scenes/ui/IslandExplorationMenu.tscn" id="13_island_menu"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ocean"]
 albedo_color = Color(0.02, 0.28, 0.45, 1)
@@ -229,3 +230,5 @@ position = Vector3(0, 0, 0)
 [node name="HUD" parent="." instance=ExtResource("3_hud")]
 
 [node name="PortMenu" parent="." instance=ExtResource("7_port_menu")]
+
+[node name="IslandExplorationMenu" parent="." instance=ExtResource("13_island_menu")]
