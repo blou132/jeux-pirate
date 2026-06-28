@@ -67,6 +67,8 @@ func spawn_objective_for_quest(quest_id: String) -> void:
 
 	objective_node.set("island_name", String(config["name"]))
 	objective_node.set("chest_id", String(config["chest_id"]))
+	objective_node.set("is_quest_objective", true)
+	objective_node.set("quest_id", quest_id)
 	objective_node.set("reward_gold", int(config["reward_gold"]))
 	objective_node.set("reward_wood", int(config["reward_wood"]))
 	objective_node.set("reward_map_fragments", int(config["reward_map_fragments"]))

@@ -158,6 +158,19 @@ func record_treasure_resources_gained(map_fragment_amount: int, ancient_relic_am
 		_progress_active_objective(OBJECTIVE_ANCIENT_RELICS, ancient_relic_amount)
 
 
+func record_quest_objective_collected(quest_id: String) -> void:
+	if not active_quest_ids.has(quest_id):
+		return
+
+	var quest: Dictionary = _get_quest_config(quest_id)
+	var objective_type := String(quest.get("objective_type", ""))
+	match objective_type:
+		OBJECTIVE_MAP_FRAGMENTS, OBJECTIVE_ANCIENT_RELICS:
+			_progress_quest_objective(quest_id, objective_type, 1)
+		OBJECTIVE_CHEST_THEN_PORT:
+			_mark_chest_step_done(quest_id)
+
+
 func record_chest_opened(_chest_id: String = "") -> void:
 	for quest_id in active_quest_ids.duplicate():
 		var quest: Dictionary = _get_quest_config(quest_id)
@@ -166,9 +179,7 @@ func record_chest_opened(_chest_id: String = "") -> void:
 
 		var state: Dictionary = _get_quest_state(quest_id)
 		if int(state.get("progress", 0)) < 1:
-			state["progress"] = 1
-			_quest_states[quest_id] = state
-			_emit_progress(quest_id)
+			_mark_chest_step_done(quest_id)
 
 
 func record_port_visit() -> void:
@@ -260,23 +271,41 @@ func _progress_active_objective(objective_type: String, amount: int) -> void:
 		return
 
 	for quest_id in active_quest_ids.duplicate():
-		var quest: Dictionary = _get_quest_config(quest_id)
-		if String(quest.get("objective_type", "")) != objective_type:
-			continue
+		_progress_quest_objective(quest_id, objective_type, amount)
 
-		var state: Dictionary = _get_quest_state(quest_id)
-		if bool(state.get("completed", false)):
-			continue
 
-		var target: int = int(quest.get("target", 1))
-		var progress: int = clampi(int(state.get("progress", 0)) + amount, 0, target)
-		state["progress"] = progress
+func _progress_quest_objective(quest_id: String, objective_type: String, amount: int) -> void:
+	if amount <= 0:
+		return
+
+	var quest: Dictionary = _get_quest_config(quest_id)
+	if String(quest.get("objective_type", "")) != objective_type:
+		return
+
+	var state: Dictionary = _get_quest_state(quest_id)
+	if bool(state.get("completed", false)):
+		return
+
+	var target: int = int(quest.get("target", 1))
+	var progress: int = clampi(int(state.get("progress", 0)) + amount, 0, target)
+	state["progress"] = progress
+	_quest_states[quest_id] = state
+
+	if progress >= target:
+		_complete_quest(quest_id)
+	else:
+		_emit_progress(quest_id)
+
+
+func _mark_chest_step_done(quest_id: String) -> void:
+	var state: Dictionary = _get_quest_state(quest_id)
+	if bool(state.get("completed", false)):
+		return
+
+	if int(state.get("progress", 0)) < 1:
+		state["progress"] = 1
 		_quest_states[quest_id] = state
-
-		if progress >= target:
-			_complete_quest(quest_id)
-		else:
-			_emit_progress(quest_id)
+		_emit_progress(quest_id)
 
 
 func _complete_quest(quest_id: String) -> void:

@@ -12,6 +12,8 @@ signal player_exited(island: Island)
 @export var reward_wood: int = 0
 @export var reward_map_fragments: int = 0
 @export var reward_ancient_relics: int = 0
+@export var is_quest_objective: bool = false
+@export var quest_id: String = ""
 
 @onready var interaction_area: Area3D = $InteractionArea
 @onready var name_label: Label3D = $NameLabel
@@ -56,6 +58,7 @@ func explore() -> Dictionary:
 	_mark_chest_opened()
 	_refresh_chest_visual()
 	_grant_treasure_rewards()
+	_record_quest_objective_opened()
 	return _make_exploration_result(_build_treasure_messages())
 
 
@@ -78,7 +81,7 @@ func _grant_treasure_rewards() -> void:
 		game_state.add_resources(reward_gold, reward_wood)
 
 	if game_state.has_method("add_treasure_resources"):
-		game_state.add_treasure_resources(reward_map_fragments, reward_ancient_relics)
+		game_state.add_treasure_resources(reward_map_fragments, reward_ancient_relics, false)
 
 
 func _build_treasure_messages() -> Array:
@@ -120,6 +123,8 @@ func _get_game_state() -> Node:
 func _is_chest_opened() -> bool:
 	if _chest_opened:
 		return true
+	if is_quest_objective:
+		return false
 
 	var game_state := _get_game_state()
 	if game_state != null and game_state.has_method("is_island_chest_opened"):
@@ -130,10 +135,21 @@ func _is_chest_opened() -> bool:
 
 func _mark_chest_opened() -> void:
 	_chest_opened = true
+	if is_quest_objective:
+		return
 
 	var game_state := _get_game_state()
 	if game_state != null and game_state.has_method("mark_island_chest_opened"):
 		game_state.mark_island_chest_opened(_get_chest_key())
+
+
+func _record_quest_objective_opened() -> void:
+	if not is_quest_objective:
+		return
+
+	var quest_system := get_node_or_null("/root/QuestSystem")
+	if quest_system != null and quest_system.has_method("record_quest_objective_collected"):
+		quest_system.record_quest_objective_collected(quest_id)
 
 
 func _get_chest_key() -> String:
