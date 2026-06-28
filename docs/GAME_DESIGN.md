@@ -54,10 +54,11 @@ Le joueur incarne le capitaine d'un petit navire independant qui construit progr
 
 1. Le joueur revient au port.
 2. Il ouvre la section `Missions`.
-3. Il accepte une mission simple.
-4. La progression se fait par combat, exploration ou retour au port.
-5. Le HUD affiche la mission active.
-6. Une mission terminée demande de revenir au port pour récupérer sa récompense.
+3. Il accepte une ou plusieurs missions simples.
+4. Les missions de trésor créent leur propre objectif temporaire en mer.
+5. La progression se fait par combat, objectif de quête ou retour au port.
+6. Le HUD affiche les missions actives.
+7. Une mission terminée demande de revenir au port pour récupérer sa récompense.
 
 ## Port et progression
 
@@ -174,10 +175,12 @@ Les îles posent une première base d'exploration sans quitter le bateau :
 Les missions donnent un premier cadre aux actions déjà jouables sans créer de système narratif complexe :
 
 - Chasse pirate : détruire 3 ennemis.
-- Premier fragment : obtenir 1 fragment de carte.
-- Relique ancienne : obtenir 1 relique ancienne.
-- Retour au port : ouvrir un coffre puis revenir au port.
-- Une seule mission peut être active à la fois pour garder le prototype lisible.
+- Premier fragment : fouiller un coffre de quête dédié.
+- Relique ancienne : fouiller un coffre de quête dédié.
+- Retour au port : ouvrir une cargaison de quête puis revenir au port.
+- Jusqu'à trois missions peuvent être actives à la fois.
+- Les objectifs de quête sont générés à l'acceptation pour ne pas dépendre des coffres permanents déjà ouverts.
+- Les objectifs temporaires sont nettoyés après récupération de la récompense.
 - Les récompenses se récupèrent au port et ne peuvent pas être réclamées plusieurs fois.
 
 ## Piliers a long terme

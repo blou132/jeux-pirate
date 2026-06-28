@@ -46,8 +46,9 @@
 - Ajouter un système de missions simple.
 - Ajouter une section `Missions` au port.
 - Ajouter des missions de combat, exploration, relique et retour au port.
-- Afficher la mission active dans le HUD.
+- Afficher les missions actives dans le HUD.
 - Ajouter des récompenses de missions récupérables au port.
+- Correctif v0.5.1 : plusieurs missions actives, objectifs de quête générés à l'acceptation, coffres de quête indépendants et nettoyage des objectifs terminés.
 
 ## v0.6 - Premier bateau allié
 

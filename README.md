@@ -30,6 +30,8 @@ La v0.4 ajoute trois îles explorables, une interaction d'exploration avec `E`, 
 
 La v0.5 ajoute un système de missions simples au port, une progression visible dans le HUD et des récompenses de mission récupérables au port.
 
+La v0.5.1 rend les missions plus robustes : plusieurs missions peuvent être actives en même temps, les objectifs de trésor sont générés à l'acceptation et les coffres de quête ne dépendent plus des coffres permanents des îles.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -137,10 +139,13 @@ La v0.5 ajoute un système de missions simples au port, une progression visible 
 
 - Système de missions en session, sans sauvegarde disque.
 - Section `Missions` dans le menu du port.
-- Une seule mission active à la fois.
+- Jusqu'à trois missions actives à la fois.
 - Missions de départ : Chasse pirate, Premier fragment, Relique ancienne, Retour au port.
-- Progression courte affichée dans le HUD.
+- Progression courte affichée dans le HUD pour les missions actives.
 - Récompenses de missions récupérables au port, sans double paiement.
+- Objectifs temporaires créés à l'acceptation pour les missions de fragment, relique et retour au port.
+- Coffres de quête séparés des coffres permanents des îles pour éviter les missions impossibles après exploration.
+- Nettoyage des objectifs temporaires après récupération de la récompense.
 
 ## Lancement
 
@@ -187,6 +192,7 @@ Les lignes de bordée ennemies peuvent être affichées avec `debug_show_broadsi
 - `GameState` est configure en autoload pour suivre les ressources joueur.
 - `UpgradeSystem` est configure en autoload pour suivre les niveaux d'amélioration.
 - `QuestSystem` est configure en autoload pour suivre les missions actives et les récompenses.
+- `QuestObjectiveSpawner` crée les objectifs temporaires de mission dans la scène jouable.
 - `SpawnManager` gère les ennemis actifs, le respawn et la sélection des variantes.
 - `World.tscn` est la scene de test jouable.
 - Les assets visuels de v0.1 sont des primitives Godot creees dans les scenes ou par script.
