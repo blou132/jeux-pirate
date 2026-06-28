@@ -121,6 +121,19 @@ text = "Accepter"
 layout_mode = 2
 text = "Récupérer la récompense"
 
+[node name="PirateStatusButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Statut pirate"
+
+[node name="PirateStatusContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="PirateStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/PirateStatusContainer"]
+layout_mode = 2
+text = "Titre : Loup de mer\nRéputation : Inconnu\nPoints : 0\nProchain rang : Recherché\nProgression : 0 / 100"
+autowrap_mode = 3
+
 [node name="RecruitAllyButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
 text = "Recruter un allié"

@@ -23,6 +23,9 @@ const REPAIR_HEALTH_PER_WOOD := 5
 @onready var mission_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/MissionStatusLabel
 @onready var accept_mission_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/AcceptMissionButton
 @onready var claim_mission_reward_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/ClaimMissionRewardButton
+@onready var pirate_status_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/PirateStatusButton
+@onready var pirate_status_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/PirateStatusContainer
+@onready var pirate_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/PirateStatusContainer/PirateStatusLabel
 @onready var recruit_ally_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/RecruitAllyButton
 @onready var quit_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/QuitButton
 
@@ -37,6 +40,7 @@ func _ready() -> void:
 	root_control.visible = false
 	upgrades_container.visible = false
 	missions_container.visible = false
+	pirate_status_container.visible = false
 	repair_button.pressed.connect(_on_repair_pressed)
 	repair_ally_button.pressed.connect(_on_repair_ally_pressed)
 	upgrades_button.pressed.connect(_on_upgrades_pressed)
@@ -47,6 +51,7 @@ func _ready() -> void:
 	mission_list.item_selected.connect(_on_mission_selected)
 	accept_mission_button.pressed.connect(_on_accept_mission_pressed)
 	claim_mission_reward_button.pressed.connect(_on_claim_mission_reward_pressed)
+	pirate_status_button.pressed.connect(_on_pirate_status_pressed)
 	recruit_ally_button.pressed.connect(_on_recruit_ally_pressed)
 	quit_button.pressed.connect(close)
 
@@ -65,11 +70,13 @@ func open(player: Node) -> void:
 	status_label.text = ""
 	upgrades_container.visible = false
 	missions_container.visible = false
+	pirate_status_container.visible = false
 	_refresh_repair_button()
 	_refresh_ally_repair_button()
 	_refresh_recruit_ally_button()
 	_refresh_upgrade_rows()
 	_refresh_mission_rows()
+	_refresh_pirate_status_panel()
 	root_control.visible = true
 	_previous_pause_state = get_tree().paused
 	get_tree().paused = true
@@ -187,6 +194,7 @@ func _on_upgrades_pressed() -> void:
 	upgrades_container.visible = not upgrades_container.visible
 	if upgrades_container.visible:
 		missions_container.visible = false
+		pirate_status_container.visible = false
 		status_label.text = "Choisis une amélioration"
 		_refresh_upgrade_rows()
 	else:
@@ -203,6 +211,10 @@ func _get_upgrade_system() -> Node:
 
 func _get_quest_system() -> Node:
 	return get_node_or_null("/root/QuestSystem")
+
+
+func _get_reputation_system() -> Node:
+	return get_node_or_null("/root/ReputationSystem")
 
 
 func _get_ally_ship() -> Node:
@@ -375,10 +387,38 @@ func _on_missions_pressed() -> void:
 	missions_container.visible = not missions_container.visible
 	if missions_container.visible:
 		upgrades_container.visible = false
+		pirate_status_container.visible = false
 		status_label.text = "Choisis une mission"
 		_refresh_mission_rows()
 	else:
 		status_label.text = ""
+
+
+func _on_pirate_status_pressed() -> void:
+	pirate_status_container.visible = not pirate_status_container.visible
+	if pirate_status_container.visible:
+		upgrades_container.visible = false
+		missions_container.visible = false
+		status_label.text = "Statut pirate"
+		_refresh_pirate_status_panel()
+	else:
+		status_label.text = ""
+
+
+func _refresh_pirate_status_panel() -> void:
+	var reputation_system := _get_reputation_system()
+	if reputation_system == null or not reputation_system.has_method("get_reputation_view"):
+		pirate_status_label.text = "Statut pirate indisponible"
+		return
+
+	var view: Dictionary = reputation_system.get_reputation_view()
+	pirate_status_label.text = "Titre : %s\nRéputation : %s\nPoints : %d\nProchain rang : %s\nProgression : %s" % [
+		String(view.get("title_name", "Loup de mer")),
+		String(view.get("rank_name", "Inconnu")),
+		int(view.get("points", 0)),
+		String(view.get("next_rank_name", "Rang maximum")),
+		String(view.get("progress_text", "0 / 100")),
+	]
 
 
 func _on_mission_selected(index: int) -> void:
