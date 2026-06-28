@@ -109,6 +109,7 @@ func accept_quest(quest_id: String) -> String:
 		return "Trop de missions actives"
 
 	active_quest_ids.append(quest_id)
+	_spawn_quest_objective(quest_id)
 	active_quest_changed.emit(quest_id)
 	active_quests_changed.emit(active_quest_ids)
 	quests_changed.emit()
@@ -415,6 +416,12 @@ func _build_status_text(quest_id: String) -> String:
 
 func _get_game_state() -> Node:
 	return get_node_or_null("/root/GameState")
+
+
+func _spawn_quest_objective(quest_id: String) -> void:
+	var spawner := get_tree().get_first_node_in_group("quest_objective_spawner")
+	if spawner != null and spawner.has_method("spawn_objective_for_quest"):
+		spawner.spawn_objective_for_quest(quest_id)
 
 
 func _show_hud_message(message: String, duration: float) -> void:
