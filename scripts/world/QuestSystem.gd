@@ -328,6 +328,7 @@ func _complete_quest(quest_id: String) -> void:
 	state["progress"] = int(quest.get("target", 1))
 	state["completed"] = true
 	_quest_states[quest_id] = state
+	_record_mission_reputation(quest_id)
 	quest_completed.emit(quest_id, _get_quest_name(quest_id))
 	quests_changed.emit()
 	_show_hud_message(
@@ -478,6 +479,12 @@ func _build_status_text(quest_id: String) -> String:
 
 func _get_game_state() -> Node:
 	return get_node_or_null("/root/GameState")
+
+
+func _record_mission_reputation(quest_id: String) -> void:
+	var reputation_system := get_node_or_null("/root/ReputationSystem")
+	if reputation_system != null and reputation_system.has_method("record_mission_completed"):
+		reputation_system.record_mission_completed(quest_id)
 
 
 func _spawn_quest_objective(quest_id: String) -> void:

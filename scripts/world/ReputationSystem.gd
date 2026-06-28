@@ -14,8 +14,23 @@ const REPUTATION_RANKS: Array[Dictionary] = [
 	{"name": "Roi des pirates", "threshold": 3500},
 ]
 
+const ENEMY_REPUTATION_REWARDS := {
+	"small_pirate": 10,
+	"brigantine": 25,
+	"heavy_patrol": 50,
+}
+
+const DEFAULT_ENEMY_REPUTATION := 25
+const MISSION_COMPLETED_REPUTATION := 40
+const PERMANENT_CHEST_REPUTATION := 10
+const QUEST_CHEST_REPUTATION := 15
+const ANCIENT_RELIC_REPUTATION := 75
+const ALLY_RECRUITED_REPUTATION := 20
+const FULL_FLEET_REPUTATION := 100
+
 var reputation_points: int = 0
 var _current_rank_index: int = 0
+var _full_fleet_bonus_awarded: bool = false
 
 
 func _ready() -> void:
@@ -36,6 +51,41 @@ func add_reputation(amount: int, _reason: String = "") -> void:
 
 	if _current_rank_index != previous_rank_index:
 		reputation_rank_changed.emit(get_current_rank_name(), reputation_points)
+
+
+func record_enemy_destroyed(enemy_type_id: String) -> void:
+	var reward := DEFAULT_ENEMY_REPUTATION
+	if ENEMY_REPUTATION_REWARDS.has(enemy_type_id):
+		reward = int(ENEMY_REPUTATION_REWARDS[enemy_type_id])
+
+	add_reputation(reward, "enemy_destroyed")
+
+
+func record_mission_completed(_quest_id: String) -> void:
+	add_reputation(MISSION_COMPLETED_REPUTATION, "mission_completed")
+
+
+func record_chest_opened(is_quest_objective: bool) -> void:
+	if is_quest_objective:
+		add_reputation(QUEST_CHEST_REPUTATION, "quest_chest_opened")
+	else:
+		add_reputation(PERMANENT_CHEST_REPUTATION, "chest_opened")
+
+
+func record_ancient_relic_found(amount: int = 1) -> void:
+	amount = maxi(0, amount)
+	if amount <= 0:
+		return
+
+	add_reputation(ANCIENT_RELIC_REPUTATION * amount, "ancient_relic_found")
+
+
+func record_ally_recruited(fleet_count: int, max_allies: int) -> void:
+	add_reputation(ALLY_RECRUITED_REPUTATION, "ally_recruited")
+
+	if not _full_fleet_bonus_awarded and max_allies > 0 and fleet_count >= max_allies:
+		_full_fleet_bonus_awarded = true
+		add_reputation(FULL_FLEET_REPUTATION, "full_fleet")
 
 
 func get_reputation_points() -> int:
@@ -91,6 +141,7 @@ func get_reputation_view() -> Dictionary:
 
 func reset_reputation() -> void:
 	reputation_points = 0
+	_full_fleet_bonus_awarded = false
 	_refresh_rank()
 	_emit_reputation_changed()
 

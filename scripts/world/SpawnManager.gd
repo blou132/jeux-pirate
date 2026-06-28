@@ -99,6 +99,7 @@ func _on_enemy_destroyed(_world_position: Vector3, _gold_reward: int, _wood_rewa
 	var game_state := get_node_or_null("/root/GameState")
 	if game_state != null and game_state.has_method("record_enemy_destroyed"):
 		game_state.record_enemy_destroyed()
+	_record_enemy_reputation(enemy)
 	_schedule_spawn_retry()
 
 
@@ -126,6 +127,18 @@ func _cleanup_inactive_enemies() -> void:
 	_active_enemies = _active_enemies.filter(func(enemy: Node) -> bool:
 		return is_instance_valid(enemy)
 	)
+
+
+func _record_enemy_reputation(enemy: Node) -> void:
+	var reputation_system := get_node_or_null("/root/ReputationSystem")
+	if reputation_system == null or not reputation_system.has_method("record_enemy_destroyed"):
+		return
+
+	var enemy_type_id := ""
+	if enemy != null and enemy.has_method("get_enemy_type_id"):
+		enemy_type_id = String(enemy.get_enemy_type_id())
+
+	reputation_system.record_enemy_destroyed(enemy_type_id)
 
 
 func _pick_enemy_variant(danger_zone: String) -> Dictionary:

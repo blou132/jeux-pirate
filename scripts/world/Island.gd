@@ -58,6 +58,7 @@ func explore() -> Dictionary:
 	_mark_chest_opened()
 	_refresh_chest_visual()
 	_grant_treasure_rewards()
+	_record_reputation_for_chest_opened()
 	_record_quest_objective_opened()
 	return _make_exploration_result(_build_treasure_messages())
 
@@ -150,6 +151,17 @@ func _record_quest_objective_opened() -> void:
 	var quest_system := get_node_or_null("/root/QuestSystem")
 	if quest_system != null and quest_system.has_method("record_quest_objective_collected"):
 		quest_system.record_quest_objective_collected(quest_id)
+
+
+func _record_reputation_for_chest_opened() -> void:
+	var reputation_system := get_node_or_null("/root/ReputationSystem")
+	if reputation_system == null:
+		return
+
+	if reputation_system.has_method("record_chest_opened"):
+		reputation_system.record_chest_opened(is_quest_objective)
+	if reward_ancient_relics > 0 and reputation_system.has_method("record_ancient_relic_found"):
+		reputation_system.record_ancient_relic_found(reward_ancient_relics)
 
 
 func _get_chest_key() -> String:

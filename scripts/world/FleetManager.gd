@@ -88,6 +88,7 @@ func recruit_ally() -> String:
 	_register_ally(ally_node)
 
 	var ally_number := _allies.find(ally_node) + 1
+	_record_recruit_reputation()
 	var message := "Sloop allié %d recruté" % ally_number
 	_show_hud_message(message, 2.0)
 	return message
@@ -476,6 +477,12 @@ func _get_spawn_parent() -> Node:
 
 func _get_game_state() -> Node:
 	return get_node_or_null("/root/GameState")
+
+
+func _record_recruit_reputation() -> void:
+	var reputation_system := get_node_or_null("/root/ReputationSystem")
+	if reputation_system != null and reputation_system.has_method("record_ally_recruited"):
+		reputation_system.record_ally_recruited(get_fleet_count(), MAX_ALLIES)
 
 
 func _show_hud_message(message: String, duration: float) -> void:

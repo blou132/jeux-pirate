@@ -188,6 +188,10 @@ func get_display_name() -> String:
 	return display_name
 
 
+func get_enemy_type_id() -> String:
+	return enemy_type_id
+
+
 func is_destroyed() -> bool:
 	return _destroyed
 
