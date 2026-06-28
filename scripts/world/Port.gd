@@ -36,6 +36,7 @@ func _on_body_entered(body: Node) -> void:
 
 	_player_in_range = true
 	_set_hud_message(prompt_message)
+	_record_port_visit()
 	player_entered.emit(self)
 
 
@@ -52,3 +53,9 @@ func _set_hud_message(message: String) -> void:
 	var hud := get_tree().get_first_node_in_group("hud")
 	if hud != null and hud.has_method("set_context_message"):
 		hud.set_context_message(message)
+
+
+func _record_port_visit() -> void:
+	var quest_system := get_node_or_null("/root/QuestSystem")
+	if quest_system != null and quest_system.has_method("record_port_visit"):
+		quest_system.record_port_visit()

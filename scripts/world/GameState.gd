@@ -25,6 +25,9 @@ func add_treasure_resources(map_fragment_amount: int, ancient_relic_amount: int)
 	map_fragments += max(0, map_fragment_amount)
 	ancient_relics += max(0, ancient_relic_amount)
 	treasure_resources_changed.emit(map_fragments, ancient_relics)
+	var quest_system := _get_quest_system()
+	if quest_system != null and quest_system.has_method("record_treasure_resources_gained"):
+		quest_system.record_treasure_resources_gained(map_fragment_amount, ancient_relic_amount)
 
 
 func can_afford(gold_cost: int, wood_cost: int) -> bool:
@@ -57,6 +60,9 @@ func record_enemy_destroyed() -> void:
 	enemies_defeated += 1
 	danger_level = 1 + int(enemies_defeated / ENEMIES_PER_DANGER_LEVEL)
 	danger_changed.emit(danger_level, enemies_defeated)
+	var quest_system := _get_quest_system()
+	if quest_system != null and quest_system.has_method("record_enemy_destroyed"):
+		quest_system.record_enemy_destroyed()
 
 
 func is_island_chest_opened(chest_id: String) -> bool:
@@ -71,6 +77,9 @@ func mark_island_chest_opened(chest_id: String) -> void:
 		return
 
 	opened_island_chests[chest_id] = true
+	var quest_system := _get_quest_system()
+	if quest_system != null and quest_system.has_method("record_chest_opened"):
+		quest_system.record_chest_opened(chest_id)
 
 
 func reset_island_chests() -> void:
@@ -99,3 +108,7 @@ func get_map_fragments() -> int:
 
 func get_ancient_relics() -> int:
 	return ancient_relics
+
+
+func _get_quest_system() -> Node:
+	return get_node_or_null("/root/QuestSystem")
