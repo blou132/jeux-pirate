@@ -33,7 +33,16 @@ func _on_body_entered(body: Node) -> void:
 		return
 	if not body.is_in_group("enemy_ships"):
 		return
+	if body.has_method("is_destroyed") and body.is_destroyed():
+		return
 
 	if body.has_method("take_damage"):
 		body.take_damage(damage)
+		_show_hit_feedback(damage)
 		queue_free()
+
+
+func _show_hit_feedback(hit_damage: int) -> void:
+	var hud := get_tree().get_first_node_in_group("hud")
+	if hud != null and hud.has_method("show_temporary_context_message"):
+		hud.show_temporary_context_message("Allié a touché : -%d PV" % hit_damage, 0.9)
