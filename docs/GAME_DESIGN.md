@@ -50,6 +50,15 @@ Le joueur incarne le capitaine d'un petit navire independant qui construit progr
 5. Le coffre donne son trésor une seule fois pendant la session.
 6. Le HUD confirme or, bois, fragments de carte et reliques anciennes.
 
+## Boucle de jeu v0.5
+
+1. Le joueur revient au port.
+2. Il ouvre la section `Missions`.
+3. Il accepte une mission simple.
+4. La progression se fait par combat, exploration ou retour au port.
+5. Le HUD affiche la mission active.
+6. Une mission terminée demande de revenir au port pour récupérer sa récompense.
+
 ## Port et progression
 
 Le port sert de premier point sûr et de première interface de progression. Il ne contient pas encore de commerce avancé, de missions ou de PNJ, mais il établit le rythme attendu : partir en mer, obtenir des ressources, revenir au port, réparer et améliorer le bateau.
@@ -160,6 +169,17 @@ Les îles posent une première base d'exploration sans quitter le bateau :
 - Les coffres sont uniques pendant la session : une île déjà fouillée ne redonne pas sa récompense.
 - Les fragments de carte et reliques anciennes préparent une progression d'exploration future sans lancer les missions complexes.
 
+## Missions simples v0.5
+
+Les missions donnent un premier cadre aux actions déjà jouables sans créer de système narratif complexe :
+
+- Chasse pirate : détruire 3 ennemis.
+- Premier fragment : obtenir 1 fragment de carte.
+- Relique ancienne : obtenir 1 relique ancienne.
+- Retour au port : ouvrir un coffre puis revenir au port.
+- Une seule mission peut être active à la fois pour garder le prototype lisible.
+- Les récompenses se récupèrent au port et ne peuvent pas être réclamées plusieurs fois.
+
 ## Piliers a long terme
 
 - Navigation lisible : le joueur doit toujours comprendre son cap, sa vitesse et les menaces proches.
@@ -202,3 +222,11 @@ Les îles posent une première base d'exploration sans quitter le bateau :
 - Missions narratives.
 - Carte du monde complète.
 - Sauvegarde disque persistante.
+
+## Hors scope v0.5
+
+- Missions longues ou scénarisées.
+- PNJ de quête.
+- Flotte alliée.
+- Abordage.
+- Sauvegarde persistante des missions.

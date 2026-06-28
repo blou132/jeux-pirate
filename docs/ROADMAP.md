@@ -43,9 +43,11 @@
 
 ## v0.5 - Missions simples
 
-- Ajouter un journal de mission minimal.
-- Créer une mission de livraison.
-- Créer une mission de combat.
+- Ajouter un système de missions simple.
+- Ajouter une section `Missions` au port.
+- Ajouter des missions de combat, exploration, relique et retour au port.
+- Afficher la mission active dans le HUD.
+- Ajouter des récompenses de missions récupérables au port.
 
 ## v0.6 - Premier bateau allié
 
