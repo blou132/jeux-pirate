@@ -2,10 +2,12 @@ extends Node
 
 signal quests_changed
 signal active_quest_changed(quest_id: String)
+signal active_quests_changed(quest_ids: Array[String])
 signal quest_progress_changed(quest_id: String, progress: int, target: int)
 signal quest_completed(quest_id: String, quest_name: String)
 signal quest_reward_claimed(quest_id: String, quest_name: String)
 
+const MAX_ACTIVE_QUESTS := 3
 const OBJECTIVE_ENEMY_DESTROYED := "enemy_destroyed"
 const OBJECTIVE_MAP_FRAGMENTS := "map_fragments"
 const OBJECTIVE_ANCIENT_RELICS := "ancient_relics"
@@ -50,7 +52,7 @@ const STARTER_QUESTS: Array[Dictionary] = [
 	},
 ]
 
-var active_quest_id: String = ""
+var active_quest_ids: Array[String] = []
 var _quest_order: Array[String] = []
 var _quest_configs: Dictionary = {}
 var _quest_states: Dictionary = {}
@@ -82,12 +84,13 @@ func register_quest(config: Dictionary) -> void:
 
 
 func clear_quests() -> void:
-	active_quest_id = ""
+	active_quest_ids.clear()
 	_quest_order.clear()
 	_quest_configs.clear()
 	_quest_states.clear()
 	quests_changed.emit()
-	active_quest_changed.emit(active_quest_id)
+	active_quest_changed.emit("")
+	active_quests_changed.emit(active_quest_ids)
 
 
 func accept_quest(quest_id: String) -> String:
@@ -99,11 +102,15 @@ func accept_quest(quest_id: String) -> String:
 		return "Récompense récupérée"
 	if bool(state.get("completed", false)):
 		return "Mission terminée"
-	if not active_quest_id.is_empty() and active_quest_id != quest_id:
-		return "Une mission est déjà active"
+	if active_quest_ids.has(quest_id):
+		return "Mission déjà active"
+	if active_quest_ids.size() >= MAX_ACTIVE_QUESTS:
+		_show_hud_message("Trop de missions actives", 1.8)
+		return "Trop de missions actives"
 
-	active_quest_id = quest_id
-	active_quest_changed.emit(active_quest_id)
+	active_quest_ids.append(quest_id)
+	active_quest_changed.emit(quest_id)
+	active_quests_changed.emit(active_quest_ids)
 	quests_changed.emit()
 	_show_hud_message("Mission acceptée : %s" % _get_quest_name(quest_id), 2.0)
 	return "Mission acceptée"
@@ -124,9 +131,10 @@ func claim_reward(quest_id: String) -> String:
 
 	state["reward_claimed"] = true
 	_quest_states[quest_id] = state
-	if active_quest_id == quest_id:
-		active_quest_id = ""
-		active_quest_changed.emit(active_quest_id)
+	if active_quest_ids.has(quest_id):
+		active_quest_ids.erase(quest_id)
+		active_quest_changed.emit(quest_id)
+		active_quests_changed.emit(active_quest_ids)
 
 	quest_reward_claimed.emit(quest_id, _get_quest_name(quest_id))
 	quests_changed.emit()
@@ -150,31 +158,27 @@ func record_treasure_resources_gained(map_fragment_amount: int, ancient_relic_am
 
 
 func record_chest_opened(_chest_id: String = "") -> void:
-	if active_quest_id.is_empty():
-		return
+	for quest_id in active_quest_ids.duplicate():
+		var quest: Dictionary = _get_quest_config(quest_id)
+		if String(quest.get("objective_type", "")) != OBJECTIVE_CHEST_THEN_PORT:
+			continue
 
-	var quest: Dictionary = _get_quest_config(active_quest_id)
-	if String(quest.get("objective_type", "")) != OBJECTIVE_CHEST_THEN_PORT:
-		return
-
-	var state: Dictionary = _get_quest_state(active_quest_id)
-	if int(state.get("progress", 0)) < 1:
-		state["progress"] = 1
-		_quest_states[active_quest_id] = state
-		_emit_progress(active_quest_id)
+		var state: Dictionary = _get_quest_state(quest_id)
+		if int(state.get("progress", 0)) < 1:
+			state["progress"] = 1
+			_quest_states[quest_id] = state
+			_emit_progress(quest_id)
 
 
 func record_port_visit() -> void:
-	if active_quest_id.is_empty():
-		return
+	for quest_id in active_quest_ids.duplicate():
+		var quest: Dictionary = _get_quest_config(quest_id)
+		if String(quest.get("objective_type", "")) != OBJECTIVE_CHEST_THEN_PORT:
+			continue
 
-	var quest: Dictionary = _get_quest_config(active_quest_id)
-	if String(quest.get("objective_type", "")) != OBJECTIVE_CHEST_THEN_PORT:
-		return
-
-	var state: Dictionary = _get_quest_state(active_quest_id)
-	if int(state.get("progress", 0)) >= 1:
-		_complete_quest(active_quest_id)
+		var state: Dictionary = _get_quest_state(quest_id)
+		if int(state.get("progress", 0)) >= 1:
+			_complete_quest(quest_id)
 
 
 func get_all_quest_views() -> Array[Dictionary]:
@@ -193,7 +197,7 @@ func get_quest_view(quest_id: String) -> Dictionary:
 	view["target"] = int(quest.get("target", 1))
 	view["completed"] = bool(state.get("completed", false))
 	view["reward_claimed"] = bool(state.get("reward_claimed", false))
-	view["active"] = active_quest_id == quest_id
+	view["active"] = active_quest_ids.has(quest_id)
 	view["progress_text"] = _build_progress_text(quest_id)
 	view["reward_text"] = _build_reward_text(quest_id)
 	view["status_text"] = _build_status_text(quest_id)
@@ -203,20 +207,39 @@ func get_quest_view(quest_id: String) -> Dictionary:
 
 
 func get_active_quest_summary() -> String:
-	if active_quest_id.is_empty():
+	var summaries := get_active_quest_summaries()
+	if summaries.is_empty():
 		return ""
 
-	var state: Dictionary = _get_quest_state(active_quest_id)
-	if bool(state.get("completed", false)):
-		return "Mission terminée : %s" % _get_quest_name(active_quest_id)
+	var summary := ""
+	for line in summaries:
+		if not summary.is_empty():
+			summary += "\n"
+		summary += line
+	return summary
 
-	return "Mission : %s - %s" % [_get_quest_name(active_quest_id), _build_progress_text(active_quest_id)]
+
+func get_active_quest_summaries(limit: int = MAX_ACTIVE_QUESTS) -> Array[String]:
+	var summaries: Array[String] = []
+	for quest_id in active_quest_ids:
+		if summaries.size() >= limit:
+			break
+
+		var state: Dictionary = _get_quest_state(quest_id)
+		if bool(state.get("completed", false)):
+			summaries.append("Mission terminée : %s" % _get_quest_name(quest_id))
+		else:
+			summaries.append("%s : %s" % [_get_quest_name(quest_id), _build_short_progress_text(quest_id)])
+
+	return summaries
 
 
 func can_accept_quest(quest_id: String) -> bool:
 	if not _quest_configs.has(quest_id):
 		return false
-	if not active_quest_id.is_empty() and active_quest_id != quest_id:
+	if active_quest_ids.has(quest_id):
+		return false
+	if active_quest_ids.size() >= MAX_ACTIVE_QUESTS:
 		return false
 
 	var state: Dictionary = _get_quest_state(quest_id)
@@ -232,26 +255,27 @@ func can_claim_reward(quest_id: String) -> bool:
 
 
 func _progress_active_objective(objective_type: String, amount: int) -> void:
-	if active_quest_id.is_empty() or amount <= 0:
+	if active_quest_ids.is_empty() or amount <= 0:
 		return
 
-	var quest: Dictionary = _get_quest_config(active_quest_id)
-	if String(quest.get("objective_type", "")) != objective_type:
-		return
+	for quest_id in active_quest_ids.duplicate():
+		var quest: Dictionary = _get_quest_config(quest_id)
+		if String(quest.get("objective_type", "")) != objective_type:
+			continue
 
-	var state: Dictionary = _get_quest_state(active_quest_id)
-	if bool(state.get("completed", false)):
-		return
+		var state: Dictionary = _get_quest_state(quest_id)
+		if bool(state.get("completed", false)):
+			continue
 
-	var target: int = int(quest.get("target", 1))
-	var progress: int = clampi(int(state.get("progress", 0)) + amount, 0, target)
-	state["progress"] = progress
-	_quest_states[active_quest_id] = state
+		var target: int = int(quest.get("target", 1))
+		var progress: int = clampi(int(state.get("progress", 0)) + amount, 0, target)
+		state["progress"] = progress
+		_quest_states[quest_id] = state
 
-	if progress >= target:
-		_complete_quest(active_quest_id)
-	else:
-		_emit_progress(active_quest_id)
+		if progress >= target:
+			_complete_quest(quest_id)
+		else:
+			_emit_progress(quest_id)
 
 
 func _complete_quest(quest_id: String) -> void:
@@ -333,6 +357,23 @@ func _build_progress_text(quest_id: String) -> String:
 	return "%d/%d" % [progress, target]
 
 
+func _build_short_progress_text(quest_id: String) -> String:
+	var quest: Dictionary = _get_quest_config(quest_id)
+	var state: Dictionary = _get_quest_state(quest_id)
+	var progress: int = int(state.get("progress", 0))
+	var target: int = int(quest.get("target", 1))
+
+	match String(quest.get("objective_type", "")):
+		OBJECTIVE_CHEST_THEN_PORT:
+			if progress <= 0:
+				return "coffre"
+			if progress < target:
+				return "retour port"
+			return "terminée"
+
+	return "%d/%d" % [progress, target]
+
+
 func _build_reward_text(quest_id: String) -> String:
 	var quest: Dictionary = _get_quest_config(quest_id)
 	var reward_parts: Array[String] = []
@@ -367,7 +408,7 @@ func _build_status_text(quest_id: String) -> String:
 		return "Récompense récupérée"
 	if bool(state.get("completed", false)):
 		return "Terminée"
-	if active_quest_id == quest_id:
+	if active_quest_ids.has(quest_id):
 		return "Active"
 	return "Disponible"
 
