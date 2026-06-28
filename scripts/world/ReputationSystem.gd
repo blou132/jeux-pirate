@@ -76,6 +76,12 @@ func add_reputation(amount: int, _reason: String = "") -> void:
 	if _current_title_index != previous_title_index:
 		pirate_title_changed.emit(get_current_pirate_title(), get_title_score())
 
+	_show_reputation_feedback(
+		amount,
+		_current_rank_index != previous_rank_index,
+		_current_title_index != previous_title_index
+	)
+
 
 func record_enemy_destroyed(enemy_type_id: String) -> void:
 	_enemies_destroyed += 1
@@ -238,6 +244,39 @@ func _refresh_title() -> void:
 
 func _calculate_title_score() -> int:
 	return reputation_points + (_missions_completed * 20) + (_enemies_destroyed * 5) + (_treasures_found * 10) + (_max_fleet_size_reached * 20)
+
+
+func _show_reputation_feedback(amount: int, rank_changed: bool, title_changed: bool) -> void:
+	var messages: Array[String] = ["+%d réputation" % amount]
+	if rank_changed:
+		messages.append("Réputation augmentée : %s" % get_current_rank_name())
+	if title_changed:
+		messages.append("Nouveau titre : %s" % get_current_pirate_title())
+
+	var duration := 1.5
+	if messages.size() > 1:
+		duration = 2.5
+
+	_show_hud_message(_join_messages(messages), duration)
+
+
+func _join_messages(messages: Array[String]) -> String:
+	var text := ""
+	for message in messages:
+		if not text.is_empty():
+			text += "\n"
+		text += message
+
+	return text
+
+
+func _show_hud_message(message: String, duration: float) -> void:
+	if message.is_empty():
+		return
+
+	var hud := get_tree().get_first_node_in_group("hud")
+	if hud != null and hud.has_method("show_temporary_context_message"):
+		hud.show_temporary_context_message(message, duration)
 
 
 func _emit_reputation_changed() -> void:
