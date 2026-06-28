@@ -1,6 +1,7 @@
-[gd_scene load_steps=13 format=3 uid="uid://ally_ship_v06"]
+[gd_scene load_steps=14 format=3 uid="uid://ally_ship_v06"]
 
 [ext_resource type="Script" path="res://scripts/boats/AllyShip.gd" id="1_ally_ship"]
+[ext_resource type="Script" path="res://scripts/boats/AllyShipAI.gd" id="2_ally_ai"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hull"]
 albedo_color = Color(0.08, 0.38, 0.48, 1)
@@ -43,6 +44,9 @@ height = 0.24
 
 [node name="AllyShip" type="CharacterBody3D"]
 script = ExtResource("1_ally_ship")
+
+[node name="AllyShipAI" type="Node" parent="."]
+script = ExtResource("2_ally_ai")
 
 [node name="Visuals" type="Node3D" parent="."]
 
