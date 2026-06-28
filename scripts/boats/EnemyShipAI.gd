@@ -46,16 +46,9 @@ func _physics_process(delta: float) -> void:
 	_debug_message_cooldown_remaining = maxf(0.0, _debug_message_cooldown_remaining - delta)
 	_side_lock_remaining = maxf(0.0, _side_lock_remaining - delta)
 
-	if not is_instance_valid(_player):
-		_player = get_tree().get_first_node_in_group("player") as Node3D
+	_player = _get_closest_hostile_target()
 
 	if _player == null:
-		_clear_broadside_debug_lines()
-		_clear_broadside_side_lock()
-		ship.brake(delta)
-		return
-
-	if _player.has_method("is_destroyed") and _player.is_destroyed():
 		_clear_broadside_debug_lines()
 		_clear_broadside_side_lock()
 		ship.brake(delta)
@@ -122,6 +115,42 @@ func _get_attack_cooldown() -> float:
 		return ship.get_attack_cooldown()
 
 	return 2.0
+
+
+func _get_closest_hostile_target() -> Node3D:
+	var closest_target: Node3D
+	var closest_distance_squared := detection_range * detection_range
+
+	var player := get_tree().get_first_node_in_group("player") as Node3D
+	if _is_valid_hostile_target(player):
+		closest_target = player
+		closest_distance_squared = ship.global_position.distance_squared_to(player.global_position)
+
+	for ally in get_tree().get_nodes_in_group("ally_ships"):
+		if not ally is Node3D:
+			continue
+		if not _is_valid_hostile_target(ally):
+			continue
+
+		var ally_node := ally as Node3D
+		var distance_squared := ship.global_position.distance_squared_to(ally_node.global_position)
+		if distance_squared <= closest_distance_squared:
+			closest_distance_squared = distance_squared
+			closest_target = ally_node
+
+	return closest_target
+
+
+func _is_valid_hostile_target(target: Node) -> bool:
+	if target == null or not is_instance_valid(target):
+		return false
+	if target.has_method("is_destroyed") and target.is_destroyed():
+		return false
+	if not target is Node3D:
+		return false
+
+	var target_node := target as Node3D
+	return ship.global_position.distance_squared_to(target_node.global_position) <= detection_range * detection_range
 
 
 func _get_confirmed_broadside_fire_direction(candidate_direction: Vector3) -> Vector3:

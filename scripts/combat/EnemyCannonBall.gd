@@ -32,7 +32,7 @@ func _on_body_entered(body: Node) -> void:
 	if body == _source:
 		return
 
-	if not body.is_in_group("player"):
+	if not body.is_in_group("player") and not body.is_in_group("ally_ships"):
 		return
 
 	if body.has_method("take_damage"):

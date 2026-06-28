@@ -15,6 +15,7 @@ signal destroyed
 @export var cannon_point_base_half_width: float = 1.05
 @export var cannon_point_height: float = 0.58
 @export var cannon_point_forward_offset: float = -0.2
+@export var debug_show_aim_points: bool = true
 
 var health: int
 var angular_velocity: float = 0.0
@@ -27,6 +28,7 @@ func _ready() -> void:
 	health = max_health
 	add_to_group("ally_ships")
 	_refresh_cannon_points()
+	_refresh_debug_markers()
 	_refresh_nameplate()
 	health_changed.emit(health, max_health)
 
@@ -141,6 +143,14 @@ func get_hud_name() -> String:
 	return hud_name
 
 
+func get_aim_position() -> Vector3:
+	var aim_point := get_node_or_null("AimPoint") as Node3D
+	if aim_point != null:
+		return aim_point.global_position
+
+	return global_position
+
+
 func is_destroyed() -> bool:
 	return _destroyed
 
@@ -201,6 +211,17 @@ func _refresh_cannon_points() -> void:
 	var right_point := get_node_or_null("RightCannonPoint") as Node3D
 	if right_point != null:
 		right_point.position = Vector3(cannon_point_base_half_width, cannon_point_height, cannon_point_forward_offset)
+
+
+func _refresh_debug_markers() -> void:
+	var marker_paths: Array[NodePath] = [
+		NodePath("AimPoint/DebugMarker"),
+	]
+
+	for marker_path in marker_paths:
+		var marker := get_node_or_null(marker_path) as Node3D
+		if marker != null:
+			marker.visible = debug_show_aim_points
 
 
 func _get_broadside_cannon_point(fire_direction: Vector3) -> Node3D:
