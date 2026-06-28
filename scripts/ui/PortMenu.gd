@@ -64,6 +64,7 @@ func open(player: Node) -> void:
 	status_label.text = ""
 	upgrades_container.visible = false
 	missions_container.visible = false
+	_refresh_repair_button()
 	_refresh_upgrade_rows()
 	_refresh_mission_rows()
 	root_control.visible = true
@@ -88,33 +89,41 @@ func is_open() -> bool:
 func _on_repair_pressed() -> void:
 	if _player == null or not _player.has_method("get_health") or not _player.has_method("get_max_health"):
 		status_label.text = "Bateau indisponible"
-		return
-
-	if _player.has_method("is_at_max_health") and _player.is_at_max_health():
-		status_label.text = "Coque déjà intacte"
-		return
-
-	var game_state := _get_game_state()
-	if game_state == null or not game_state.has_method("get_wood") or game_state.get_wood() <= 0:
-		status_label.text = "Pas assez de bois"
+		_refresh_repair_button()
 		return
 
 	var missing_health: int = _player.get_max_health() - _player.get_health()
-	var required_wood := ceili(float(missing_health) / float(REPAIR_HEALTH_PER_WOOD))
-	var wood_to_spend: int = mini(required_wood, game_state.get_wood())
+	if missing_health <= 0:
+		status_label.text = "Coque déjà intacte"
+		_refresh_repair_button()
+		return
 
-	if not game_state.has_method("spend_resources") or not game_state.spend_resources(0, wood_to_spend):
+	var game_state := _get_game_state()
+	if game_state == null or not game_state.has_method("get_wood"):
 		status_label.text = "Pas assez de bois"
+		_refresh_repair_button()
+		return
+
+	var required_wood := ceili(float(missing_health) / float(REPAIR_HEALTH_PER_WOOD))
+	if game_state.get_wood() < required_wood:
+		status_label.text = "Pas assez de bois"
+		_refresh_repair_button()
+		return
+
+	if not game_state.has_method("spend_resources") or not game_state.spend_resources(0, required_wood):
+		status_label.text = "Pas assez de bois"
+		_refresh_repair_button()
 		return
 
 	var repaired_health := 0
 	if _player.has_method("repair"):
-		repaired_health = _player.repair(wood_to_spend * REPAIR_HEALTH_PER_WOOD)
+		repaired_health = _player.repair(required_wood * REPAIR_HEALTH_PER_WOOD)
 
 	if repaired_health > 0:
 		status_label.text = "Bateau réparé"
 	else:
 		status_label.text = "Coque déjà intacte"
+	_refresh_repair_button()
 
 
 func _on_upgrades_pressed() -> void:
@@ -139,6 +148,26 @@ func _get_quest_system() -> Node:
 	return get_node_or_null("/root/QuestSystem")
 
 
+func _refresh_repair_button() -> void:
+	if _player == null or not _player.has_method("get_health") or not _player.has_method("get_max_health"):
+		repair_button.text = "Réparer le bateau"
+		repair_button.disabled = true
+		return
+
+	var missing_health: int = max(0, int(_player.get_max_health()) - int(_player.get_health()))
+	if missing_health <= 0:
+		repair_button.text = "Coque déjà intacte"
+		repair_button.disabled = true
+		return
+
+	var required_wood := ceili(float(missing_health) / float(REPAIR_HEALTH_PER_WOOD))
+	repair_button.text = "Réparer : %d PV manquants — coût : %d bois" % [
+		missing_health,
+		required_wood,
+	]
+	repair_button.disabled = false
+
+
 func _on_hull_upgrade_pressed() -> void:
 	_purchase_upgrade("hull")
 
@@ -158,6 +187,7 @@ func _purchase_upgrade(upgrade_id: String) -> void:
 		return
 
 	status_label.text = upgrade_system.purchase_upgrade(upgrade_id)
+	_refresh_repair_button()
 	_refresh_upgrade_rows()
 
 
