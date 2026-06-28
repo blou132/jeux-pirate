@@ -73,6 +73,8 @@ func recruit_ally_ship() -> String:
 	ally_node.global_rotation = _get_ally_spawn_rotation()
 	_ally_ship = ally_node
 
+	if hud.has_method("set_ally_ship"):
+		hud.set_ally_ship(ally_node)
 	_show_hud_message("Sloop allié recruté", 2.0)
 	return "Sloop allié recruté"
 

@@ -5,6 +5,7 @@ signal health_changed(current_health: int, max_health: int)
 signal destroyed
 
 @export var display_name: String = "Sloop allié"
+@export var hud_name: String = "Sloop"
 @export var max_health: int = 80
 @export var move_speed: float = 6.2
 @export var acceleration: float = 8.0
@@ -118,6 +119,10 @@ func get_max_health() -> int:
 
 func get_display_name() -> String:
 	return display_name
+
+
+func get_hud_name() -> String:
+	return hud_name
 
 
 func is_destroyed() -> bool:

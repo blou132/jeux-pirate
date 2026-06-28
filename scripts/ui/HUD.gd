@@ -11,11 +11,13 @@ extends CanvasLayer
 @onready var cannons_level_label: Label = $MarginContainer/PanelContainer/VBoxContainer/CannonsLevelLabel
 @onready var danger_label: Label = $MarginContainer/PanelContainer/VBoxContainer/DangerLabel
 @onready var enemies_defeated_label: Label = $MarginContainer/PanelContainer/VBoxContainer/EnemiesDefeatedLabel
+@onready var ally_label: Label = $MarginContainer/PanelContainer/VBoxContainer/AllyLabel
 @onready var quest_label: Label = $MarginContainer/PanelContainer/VBoxContainer/QuestLabel
 @onready var context_label: Label = $MarginContainer/PanelContainer/VBoxContainer/ContextLabel
 @onready var zone_notification_label: Label = $ZoneNotificationContainer/ZoneNotificationLabel
 
 var _player: Node
+var _ally_ship: Node
 var _game_state: Node
 var _upgrade_system: Node
 var _quest_system: Node
@@ -34,6 +36,7 @@ func _ready() -> void:
 	_connect_upgrade_system()
 	_connect_quest_system()
 	call_deferred("_bind_player_from_tree")
+	call_deferred("_bind_ally_from_tree")
 
 
 func set_player(player: Node) -> void:
@@ -50,6 +53,11 @@ func _bind_player_from_tree() -> void:
 	var player := get_tree().get_first_node_in_group("player")
 	if player != null:
 		set_player(player)
+
+
+func _bind_ally_from_tree() -> void:
+	var ally_ship := get_tree().get_first_node_in_group("ally_ships")
+	set_ally_ship(ally_ship)
 
 
 func _connect_player() -> void:
@@ -86,6 +94,73 @@ func _refresh_player_values() -> void:
 		_on_health_changed(_player.get_health(), _player.get_max_health())
 	if _player.has_method("get_current_speed"):
 		_on_speed_changed(_player.get_current_speed())
+
+
+func set_ally_ship(ally_ship: Node) -> void:
+	if _ally_ship == ally_ship:
+		_refresh_ally_status()
+		return
+
+	_disconnect_ally()
+	_ally_ship = ally_ship
+	_connect_ally()
+	_refresh_ally_status()
+
+
+func _connect_ally() -> void:
+	if _ally_ship == null:
+		return
+
+	var health_callback := Callable(self, "_on_ally_health_changed")
+	if _ally_ship.has_signal("health_changed") and not _ally_ship.is_connected("health_changed", health_callback):
+		_ally_ship.connect("health_changed", health_callback)
+
+	var destroyed_callback := Callable(self, "_on_ally_destroyed")
+	if _ally_ship.has_signal("destroyed") and not _ally_ship.is_connected("destroyed", destroyed_callback):
+		_ally_ship.connect("destroyed", destroyed_callback)
+
+
+func _disconnect_ally() -> void:
+	if _ally_ship == null or not is_instance_valid(_ally_ship):
+		return
+
+	var health_callback := Callable(self, "_on_ally_health_changed")
+	if _ally_ship.has_signal("health_changed") and _ally_ship.is_connected("health_changed", health_callback):
+		_ally_ship.disconnect("health_changed", health_callback)
+
+	var destroyed_callback := Callable(self, "_on_ally_destroyed")
+	if _ally_ship.has_signal("destroyed") and _ally_ship.is_connected("destroyed", destroyed_callback):
+		_ally_ship.disconnect("destroyed", destroyed_callback)
+
+
+func _on_ally_health_changed(_current_health: int, _max_health: int) -> void:
+	_refresh_ally_status()
+
+
+func _on_ally_destroyed() -> void:
+	_ally_ship = null
+	_refresh_ally_status()
+
+
+func _refresh_ally_status() -> void:
+	if _ally_ship == null or not is_instance_valid(_ally_ship):
+		ally_label.text = "Allié : aucun"
+		return
+	if _ally_ship.has_method("is_destroyed") and _ally_ship.is_destroyed():
+		ally_label.text = "Allié : aucun"
+		return
+
+	var ally_name := "Sloop"
+	if _ally_ship.has_method("get_hud_name"):
+		ally_name = String(_ally_ship.get_hud_name())
+	elif _ally_ship.has_method("get_display_name"):
+		ally_name = String(_ally_ship.get_display_name())
+
+	var current_health := 0
+	if _ally_ship.has_method("get_health"):
+		current_health = int(_ally_ship.get_health())
+
+	ally_label.text = "Allié : %s - %d PV" % [ally_name, current_health]
 
 
 func _on_health_changed(current_health: int, max_health: int) -> void:
