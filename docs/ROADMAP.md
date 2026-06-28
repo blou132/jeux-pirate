@@ -35,10 +35,11 @@
 
 ## v0.4 - Îles explorables, coffres et trésors
 
-- Ajouter une ou deux îles de test.
-- Ajouter des points d'interaction simples.
-- Ajouter des coffres avec ressources.
-- Ajouter des trésors simples à récupérer.
+- Ajouter trois îles explorables.
+- Ajouter une interaction avec `E` près du rivage.
+- Ajouter un menu simple de fouille.
+- Ajouter un coffre unique par île.
+- Ajouter fragments de carte et reliques anciennes.
 
 ## v0.5 - Missions simples
 
@@ -63,6 +64,12 @@
 - Ajouter une action d'abordage à courte portée.
 - Récompenser l'abordage avec plus de ressources.
 - Poser une première base de risque/recompense.
+
+## v0.9 - Carte du monde
+
+- Préparer une carte simple des zones découvertes.
+- Utiliser les fragments de carte comme première ressource d'exploration.
+- Afficher les îles connues et les zones dangereuses.
 
 ## v1.0 - Demo jouable
 

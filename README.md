@@ -26,6 +26,8 @@ La v0.3.8 ajoute une validation de bordée par distance à la ligne de tir : l'e
 
 La v0.3.9 améliore la manœuvre ennemie : rotation progressive avec inertie, vitesses de rotation par type, ralentissement de bordée plus naturel et verrouillage temporaire du côté de tir.
 
+La v0.4 ajoute trois îles explorables, une interaction d'exploration avec `E`, des coffres uniques, des trésors, des fragments de carte et des reliques anciennes.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -120,6 +122,15 @@ La v0.3.9 améliore la manœuvre ennemie : rotation progressive avec inertie, vi
 - La manœuvre de bordée ralentit légèrement pendant les virages forts pour donner plus de poids aux bateaux.
 - Le côté bâbord/tribord est verrouillé brièvement pour éviter les changements de bordée trop rapides.
 
+## Etat v0.4
+
+- Trois îles explorables : Île du Naufrage, Île des Rochers, Îlot Maudit.
+- Interaction avec `E` près du rivage pour ouvrir le panneau d'exploration.
+- Action `Fouiller l'île` dans un menu simple, sans personnage à pied pour l'instant.
+- Un coffre unique par île, ouvert une seule fois pendant la session.
+- Récompenses : or, bois, fragments de carte et reliques anciennes.
+- HUD étendu avec `Fragments` et `Reliques`.
+
 ## Lancement
 
 1. Installer Godot 4.x.
@@ -137,7 +148,7 @@ Godot n'est pas inclus dans ce depot.
 - `D` : tourner a droite
 - Clic gauche : canon gauche
 - Clic droit : canon droit
-- `E` : interagir avec le port
+- `E` : interagir avec le port ou explorer une île selon la zone
 - `Échap` : fermer le menu
 - `R` : réapparaître au port après destruction
 

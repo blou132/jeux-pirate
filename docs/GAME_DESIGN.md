@@ -41,6 +41,15 @@ Le joueur incarne le capitaine d'un petit navire independant qui construit progr
 6. Le danger et la zone influencent les ennemis qui apparaissent.
 7. Le HUD affiche danger, ennemis détruits et feedback de loot.
 
+## Boucle de jeu v0.4
+
+1. Le joueur navigue jusqu'à une île.
+2. Le HUD indique quand `E` permet d'explorer.
+3. Un panneau simple affiche le nom de l'île.
+4. Le joueur fouille l'île depuis le menu.
+5. Le coffre donne son trésor une seule fois pendant la session.
+6. Le HUD confirme or, bois, fragments de carte et reliques anciennes.
+
 ## Port et progression
 
 Le port sert de premier point sûr et de première interface de progression. Il ne contient pas encore de commerce avancé, de missions ou de PNJ, mais il établit le rythme attendu : partir en mer, obtenir des ressources, revenir au port, réparer et améliorer le bateau.
@@ -141,6 +150,16 @@ Les ennemis doivent tourner comme des bateaux lourds plutôt que pivoter directe
 - En bordée, la vitesse avance moins fort quand le bateau tourne déjà beaucoup.
 - Le choix bâbord/tribord reste verrouillé pendant un court délai pour limiter les oscillations.
 
+## Îles et trésors v0.4
+
+Les îles posent une première base d'exploration sans quitter le bateau :
+
+- Île du Naufrage : petite île proche avec coffre facile.
+- Île des Rochers : île moyenne avec coffre donnant aussi un fragment de carte.
+- Îlot Maudit : île plus dangereuse avec coffre rare et relique ancienne.
+- Les coffres sont uniques pendant la session : une île déjà fouillée ne redonne pas sa récompense.
+- Les fragments de carte et reliques anciennes préparent une progression d'exploration future sans lancer les missions complexes.
+
 ## Piliers a long terme
 
 - Navigation lisible : le joueur doit toujours comprendre son cap, sa vitesse et les menaces proches.
@@ -175,3 +194,11 @@ Les ennemis doivent tourner comme des bateaux lourds plutôt que pivoter directe
 - Alliés et flotte.
 - Abordage.
 - Sauvegarde persistante.
+
+## Hors scope v0.4
+
+- Déplacement à pied sur les îles.
+- Donjons, PNJ ou énigmes.
+- Missions narratives.
+- Carte du monde complète.
+- Sauvegarde disque persistante.
