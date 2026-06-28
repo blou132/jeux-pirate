@@ -24,6 +24,7 @@ config/features=PackedStringArray("4.6", "Forward Plus")
 GameState="*res://scripts/world/GameState.gd"
 UpgradeSystem="*res://scripts/world/UpgradeSystem.gd"
 QuestSystem="*res://scripts/world/QuestSystem.gd"
+ReputationSystem="*res://scripts/world/ReputationSystem.gd"
 
 [display]
 
