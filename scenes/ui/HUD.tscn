@@ -9,7 +9,7 @@ script = ExtResource("1_hud")
 offset_left = 16.0
 offset_top = 16.0
 offset_right = 286.0
-offset_bottom = 330.0
+offset_bottom = 360.0
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
@@ -65,6 +65,11 @@ text = "Danger: 1"
 [node name="EnemiesDefeatedLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
 text = "Ennemis détruits: 0"
+
+[node name="QuestLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Mission : Chasse pirate - 0/3 ennemis"
+autowrap_mode = 3
 
 [node name="ContextLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2

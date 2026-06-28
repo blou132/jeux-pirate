@@ -11,12 +11,14 @@ extends CanvasLayer
 @onready var cannons_level_label: Label = $MarginContainer/PanelContainer/VBoxContainer/CannonsLevelLabel
 @onready var danger_label: Label = $MarginContainer/PanelContainer/VBoxContainer/DangerLabel
 @onready var enemies_defeated_label: Label = $MarginContainer/PanelContainer/VBoxContainer/EnemiesDefeatedLabel
+@onready var quest_label: Label = $MarginContainer/PanelContainer/VBoxContainer/QuestLabel
 @onready var context_label: Label = $MarginContainer/PanelContainer/VBoxContainer/ContextLabel
 @onready var zone_notification_label: Label = $ZoneNotificationContainer/ZoneNotificationLabel
 
 var _player: Node
 var _game_state: Node
 var _upgrade_system: Node
+var _quest_system: Node
 var _context_message: String = ""
 var _temporary_context_message: String = ""
 var _temporary_message_version: int = 0
@@ -30,6 +32,7 @@ func _ready() -> void:
 	zone_notification_label.visible = false
 	_connect_game_state()
 	_connect_upgrade_system()
+	_connect_quest_system()
 	call_deferred("_bind_player_from_tree")
 
 
@@ -204,3 +207,62 @@ func _on_upgrades_changed(hull_level: int, sails_level: int, cannons_level: int)
 	hull_level_label.text = "Coque: niv. %d/3" % hull_level
 	sails_level_label.text = "Voiles: niv. %d/3" % sails_level
 	cannons_level_label.text = "Canons: niv. %d/3" % cannons_level
+
+
+func _connect_quest_system() -> void:
+	_quest_system = get_node_or_null("/root/QuestSystem")
+	if _quest_system == null:
+		quest_label.visible = false
+		return
+
+	var quests_callback := Callable(self, "_on_quests_changed")
+	if _quest_system.has_signal("quests_changed") and not _quest_system.is_connected("quests_changed", quests_callback):
+		_quest_system.connect("quests_changed", quests_callback)
+
+	var active_callback := Callable(self, "_on_active_quest_changed")
+	if _quest_system.has_signal("active_quest_changed") and not _quest_system.is_connected("active_quest_changed", active_callback):
+		_quest_system.connect("active_quest_changed", active_callback)
+
+	var progress_callback := Callable(self, "_on_quest_progress_changed")
+	if _quest_system.has_signal("quest_progress_changed") and not _quest_system.is_connected("quest_progress_changed", progress_callback):
+		_quest_system.connect("quest_progress_changed", progress_callback)
+
+	var completed_callback := Callable(self, "_on_quest_completed")
+	if _quest_system.has_signal("quest_completed") and not _quest_system.is_connected("quest_completed", completed_callback):
+		_quest_system.connect("quest_completed", completed_callback)
+
+	var claimed_callback := Callable(self, "_on_quest_reward_claimed")
+	if _quest_system.has_signal("quest_reward_claimed") and not _quest_system.is_connected("quest_reward_claimed", claimed_callback):
+		_quest_system.connect("quest_reward_claimed", claimed_callback)
+
+	_refresh_quest_label()
+
+
+func _on_quests_changed() -> void:
+	_refresh_quest_label()
+
+
+func _on_active_quest_changed(_quest_id: String) -> void:
+	_refresh_quest_label()
+
+
+func _on_quest_progress_changed(_quest_id: String, _progress: int, _target: int) -> void:
+	_refresh_quest_label()
+
+
+func _on_quest_completed(_quest_id: String, _quest_name: String) -> void:
+	_refresh_quest_label()
+
+
+func _on_quest_reward_claimed(_quest_id: String, _quest_name: String) -> void:
+	_refresh_quest_label()
+
+
+func _refresh_quest_label() -> void:
+	if _quest_system == null or not _quest_system.has_method("get_active_quest_summary"):
+		quest_label.visible = false
+		return
+
+	var quest_summary: String = _quest_system.get_active_quest_summary()
+	quest_label.text = quest_summary
+	quest_label.visible = not quest_summary.is_empty()
