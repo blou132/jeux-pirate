@@ -41,6 +41,8 @@ func configure_variant(config: Dictionary) -> void:
 	max_health = int(config.get("max_health", max_health))
 	move_speed = float(config.get("move_speed", move_speed))
 	turn_speed = float(config.get("turn_speed", turn_speed))
+	turn_acceleration = float(config.get("turn_acceleration", turn_acceleration))
+	turn_deceleration = float(config.get("turn_deceleration", turn_deceleration))
 	contact_damage = int(config.get("contact_damage", contact_damage))
 	attack_range = float(config.get("attack_range", attack_range))
 	attack_cooldown = float(config.get("attack_cooldown", attack_cooldown))
