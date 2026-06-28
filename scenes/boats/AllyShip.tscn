@@ -1,0 +1,94 @@
+[gd_scene load_steps=13 format=3 uid="uid://ally_ship_v06"]
+
+[ext_resource type="Script" path="res://scripts/boats/AllyShip.gd" id="1_ally_ship"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hull"]
+albedo_color = Color(0.08, 0.38, 0.48, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_deck"]
+albedo_color = Color(0.44, 0.29, 0.14, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mast"]
+albedo_color = Color(0.22, 0.12, 0.05, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sail"]
+albedo_color = Color(0.72, 0.88, 0.90, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_marker"]
+albedo_color = Color(0.20, 0.72, 0.88, 1)
+emission_enabled = true
+emission = Color(0.20, 0.72, 0.88, 1)
+emission_energy_multiplier = 0.25
+
+[sub_resource type="BoxMesh" id="BoxMesh_hull"]
+size = Vector3(1.8, 0.55, 3.5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_deck"]
+size = Vector3(1.25, 0.16, 2.2)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_mast"]
+top_radius = 0.06
+bottom_radius = 0.06
+height = 1.8
+
+[sub_resource type="BoxMesh" id="BoxMesh_sail"]
+size = Vector3(1.18, 0.82, 0.08)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_collision"]
+size = Vector3(1.9, 0.9, 3.7)
+
+[sub_resource type="SphereMesh" id="SphereMesh_marker"]
+radius = 0.12
+height = 0.24
+
+[node name="AllyShip" type="CharacterBody3D"]
+script = ExtResource("1_ally_ship")
+
+[node name="Visuals" type="Node3D" parent="."]
+
+[node name="Hull" type="MeshInstance3D" parent="Visuals"]
+mesh = SubResource("BoxMesh_hull")
+material_override = SubResource("StandardMaterial3D_hull")
+
+[node name="Deck" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 0.36, 0)
+mesh = SubResource("BoxMesh_deck")
+material_override = SubResource("StandardMaterial3D_deck")
+
+[node name="Mast" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 1.12, -0.08)
+mesh = SubResource("CylinderMesh_mast")
+material_override = SubResource("StandardMaterial3D_mast")
+
+[node name="Sail" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 1.18, -0.14)
+mesh = SubResource("BoxMesh_sail")
+material_override = SubResource("StandardMaterial3D_sail")
+
+[node name="BowMarker" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 0.42, -1.85)
+scale = Vector3(0.34, 0.2, 0.22)
+mesh = SubResource("BoxMesh_deck")
+material_override = SubResource("StandardMaterial3D_sail")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.22, 0)
+shape = SubResource("BoxShape3D_collision")
+
+[node name="LeftCannonPoint" type="Marker3D" parent="."]
+position = Vector3(-1.05, 0.58, -0.2)
+
+[node name="RightCannonPoint" type="Marker3D" parent="."]
+position = Vector3(1.05, 0.58, -0.2)
+
+[node name="WakeMarker" type="MeshInstance3D" parent="."]
+position = Vector3(0, 0.12, 1.92)
+scale = Vector3(1.0, 0.15, 0.35)
+mesh = SubResource("SphereMesh_marker")
+material_override = SubResource("StandardMaterial3D_marker")
+
+[node name="Nameplate" type="Label3D" parent="."]
+position = Vector3(0, 2.45, 0)
+billboard = 1
+text = "Allié : Sloop"
+font_size = 26
