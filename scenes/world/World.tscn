@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://world_root_v01"]
+[gd_scene load_steps=33 format=3 uid="uid://world_root_v01"]
 
 [ext_resource type="Script" path="res://scripts/world/World.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/boats/PlayerBoat.tscn" id="2_player"]
@@ -14,6 +14,7 @@
 [ext_resource type="PackedScene" path="res://scenes/world/Island.tscn" id="12_island"]
 [ext_resource type="PackedScene" path="res://scenes/ui/IslandExplorationMenu.tscn" id="13_island_menu"]
 [ext_resource type="Script" path="res://scripts/world/QuestObjectiveSpawner.gd" id="14_quest_objective_spawner"]
+[ext_resource type="Script" path="res://scripts/world/FleetManager.gd" id="15_fleet_manager"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ocean"]
 albedo_color = Color(0.02, 0.28, 0.45, 1)
@@ -170,6 +171,9 @@ script = ExtResource("11_world_bounds")
 
 [node name="QuestObjectiveSpawner" type="Node3D" parent="."]
 script = ExtResource("14_quest_objective_spawner")
+
+[node name="FleetManager" type="Node" parent="."]
+script = ExtResource("15_fleet_manager")
 
 [node name="SpawnManager" type="Node3D" parent="."]
 script = ExtResource("4_spawn_manager")
