@@ -25,6 +25,7 @@ signal destroyed(world_position: Vector3, gold_reward: int, wood_reward: int)
 var health: int
 var angular_velocity: float = 0.0
 var _destroyed: bool = false
+var _last_damage_source: Node
 
 
 func _ready() -> void:
@@ -151,10 +152,11 @@ func brake(delta: float) -> void:
 	global_position.y = 0.0
 
 
-func take_damage(amount: int) -> void:
+func take_damage(amount: int, source: Node = null) -> void:
 	if _destroyed:
 		return
 
+	_last_damage_source = source
 	health = clampi(health - amount, 0, max_health)
 	_refresh_nameplate()
 	health_changed.emit(health, max_health)
@@ -312,6 +314,9 @@ func _show_defeat_feedback() -> void:
 		return
 
 	var message := "%s vaincu : +%d or, +%d bois" % [display_name, reward_gold, reward_wood]
+	if _last_damage_source != null and is_instance_valid(_last_damage_source) and _last_damage_source.is_in_group("ally_ships"):
+		message = "Allié a coulé %s : +%d or, +%d bois" % [display_name, reward_gold, reward_wood]
+
 	if hud.has_method("show_temporary_context_message"):
 		hud.show_temporary_context_message(message, 2.4)
 	elif hud.has_method("set_context_message"):
