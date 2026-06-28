@@ -132,6 +132,15 @@ Une bordée ennemie doit être validée comme une vraie ligne de tir :
 - Le tir est autorisé seulement si le `AimPoint` du joueur est devant la ligne et assez proche d'elle.
 - Une ligne debug temporaire montre le rayon de bordée et l'écart au point de visée.
 
+## Manœuvre ennemie v0.3.9
+
+Les ennemis doivent tourner comme des bateaux lourds plutôt que pivoter directement vers leur objectif :
+
+- La rotation utilise une vitesse angulaire avec accélération et décélération.
+- Chaque type a son poids de manœuvre : petit pirate nerveux, brigantin moyen, patrouilleur lourd lent.
+- En bordée, la vitesse avance moins fort quand le bateau tourne déjà beaucoup.
+- Le choix bâbord/tribord reste verrouillé pendant un court délai pour limiter les oscillations.
+
 ## Piliers a long terme
 
 - Navigation lisible : le joueur doit toujours comprendre son cap, sa vitesse et les menaces proches.

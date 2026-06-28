@@ -24,6 +24,8 @@ La v0.3.7 fiabilise les points de visée et de tir : le joueur possède un vrai 
 
 La v0.3.8 ajoute une validation de bordée par distance à la ligne de tir : l'ennemi ne tire que si la ligne issue du canon latéral passe près du `AimPoint` du joueur.
 
+La v0.3.9 améliore la manœuvre ennemie : rotation progressive avec inertie, vitesses de rotation par type, ralentissement de bordée plus naturel et verrouillage temporaire du côté de tir.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -110,6 +112,13 @@ La v0.3.8 ajoute une validation de bordée par distance à la ligne de tir : l'e
 - Si la ligne passe trop loin du joueur ou part dans le mauvais sens, l'ennemi ne tire pas.
 - Les lignes debug de bordée montrent le rayon latéral et l'écart jusqu'au `AimPoint`.
 - La manœuvre ennemie corrige légèrement sa trajectoire quand la ligne de tir passe à côté.
+
+## Correctifs v0.3.9
+
+- Les ennemis utilisent une vitesse angulaire avec accélération et décélération au lieu d'une rotation directe.
+- Petit pirate, Brigantin pirate et Patrouilleur lourd ont des vitesses et accélérations de rotation distinctes.
+- La manœuvre de bordée ralentit légèrement pendant les virages forts pour donner plus de poids aux bateaux.
+- Le côté bâbord/tribord est verrouillé brièvement pour éviter les changements de bordée trop rapides.
 
 ## Lancement
 
