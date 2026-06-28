@@ -26,7 +26,7 @@ const STARTER_QUESTS: Array[Dictionary] = [
 	{
 		"id": "first_map_fragment",
 		"name": "Premier fragment",
-		"objective": "Obtenir 1 fragment de carte",
+		"objective": "Fouiller le coffre de l'île du Fragment",
 		"objective_type": OBJECTIVE_MAP_FRAGMENTS,
 		"target": 1,
 		"reward_gold": 80,
@@ -35,7 +35,7 @@ const STARTER_QUESTS: Array[Dictionary] = [
 	{
 		"id": "ancient_relic",
 		"name": "Relique ancienne",
-		"objective": "Obtenir 1 relique ancienne",
+		"objective": "Fouiller le coffre du Sanctuaire englouti",
 		"objective_type": OBJECTIVE_ANCIENT_RELICS,
 		"target": 1,
 		"reward_gold": 150,
@@ -44,7 +44,7 @@ const STARTER_QUESTS: Array[Dictionary] = [
 	{
 		"id": "return_to_port",
 		"name": "Retour au port",
-		"objective": "Ouvrir 1 coffre puis revenir au port",
+		"objective": "Ouvrir la cargaison perdue puis revenir au port",
 		"objective_type": OBJECTIVE_CHEST_THEN_PORT,
 		"target": 2,
 		"reward_gold": 60,
@@ -109,6 +109,7 @@ func accept_quest(quest_id: String) -> String:
 		_show_hud_message("Trop de missions actives", 1.8)
 		return "Trop de missions actives"
 
+	_prepare_quest_for_acceptance(quest_id)
 	active_quest_ids.append(quest_id)
 	_spawn_quest_objective(quest_id)
 	active_quest_changed.emit(quest_id)
@@ -333,6 +334,28 @@ func _complete_quest(quest_id: String) -> void:
 		"Mission terminée : %s\nRetour au port pour la récompense" % _get_quest_name(quest_id),
 		2.8
 	)
+
+
+func _prepare_quest_for_acceptance(quest_id: String) -> void:
+	if not _quest_uses_spawned_objective(quest_id):
+		return
+
+	var state: Dictionary = _get_quest_state(quest_id)
+	if bool(state.get("completed", false)) or bool(state.get("reward_claimed", false)):
+		return
+
+	# Treasure missions must start from their temporary objective, not from old island loot history.
+	state["progress"] = 0
+	_quest_states[quest_id] = state
+
+
+func _quest_uses_spawned_objective(quest_id: String) -> bool:
+	var quest: Dictionary = _get_quest_config(quest_id)
+	match String(quest.get("objective_type", "")):
+		OBJECTIVE_MAP_FRAGMENTS, OBJECTIVE_ANCIENT_RELICS, OBJECTIVE_CHEST_THEN_PORT:
+			return true
+
+	return false
 
 
 func _emit_progress(quest_id: String) -> void:

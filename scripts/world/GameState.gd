@@ -21,7 +21,7 @@ func add_resources(gold_amount: int, wood_amount: int) -> void:
 	resources_changed.emit(gold, wood)
 
 
-func add_treasure_resources(map_fragment_amount: int, ancient_relic_amount: int, track_quests: bool = true) -> void:
+func add_treasure_resources(map_fragment_amount: int, ancient_relic_amount: int, track_quests: bool = false) -> void:
 	map_fragments += max(0, map_fragment_amount)
 	ancient_relics += max(0, ancient_relic_amount)
 	treasure_resources_changed.emit(map_fragments, ancient_relics)
