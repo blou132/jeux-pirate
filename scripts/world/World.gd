@@ -72,6 +72,8 @@ func recruit_ally_ship() -> String:
 	ally_node.global_position = _get_ally_spawn_position()
 	ally_node.global_rotation = _get_ally_spawn_rotation()
 	_ally_ship = ally_node
+	if ally.has_signal("destroyed"):
+		ally.connect("destroyed", Callable(self, "_on_ally_ship_destroyed").bind(ally_node))
 
 	if hud.has_method("set_ally_ship"):
 		hud.set_ally_ship(ally_node)
@@ -99,6 +101,15 @@ func _on_island_interaction_requested(island: Node) -> void:
 func _cleanup_ally_reference() -> void:
 	if _ally_ship != null and not is_instance_valid(_ally_ship):
 		_ally_ship = null
+
+
+func _on_ally_ship_destroyed(ally_ship: Node) -> void:
+	if _ally_ship == ally_ship:
+		_ally_ship = null
+
+	if hud.has_method("set_ally_ship"):
+		hud.set_ally_ship(null)
+	_show_hud_message("Allié détruit", 2.2)
 
 
 func _get_ally_spawn_position() -> Vector3:
