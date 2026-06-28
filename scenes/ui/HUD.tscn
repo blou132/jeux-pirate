@@ -9,7 +9,7 @@ script = ExtResource("1_hud")
 offset_left = 16.0
 offset_top = 16.0
 offset_right = 342.0
-offset_bottom = 470.0
+offset_bottom = 510.0
 theme_override_constants/margin_left = 10
 theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
@@ -70,6 +70,14 @@ text = "Ennemis détruits: 0"
 layout_mode = 2
 text = "Flotte : 0/3"
 autowrap_mode = 3
+
+[node name="ReputationLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Réputation : Inconnu (0)"
+
+[node name="PirateTitleLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Titre : Loup de mer"
 
 [node name="QuestLabel" type="Label" parent="MarginContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2

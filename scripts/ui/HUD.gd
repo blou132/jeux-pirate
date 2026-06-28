@@ -12,6 +12,8 @@ extends CanvasLayer
 @onready var danger_label: Label = $MarginContainer/PanelContainer/VBoxContainer/DangerLabel
 @onready var enemies_defeated_label: Label = $MarginContainer/PanelContainer/VBoxContainer/EnemiesDefeatedLabel
 @onready var ally_label: Label = $MarginContainer/PanelContainer/VBoxContainer/AllyLabel
+@onready var reputation_label: Label = $MarginContainer/PanelContainer/VBoxContainer/ReputationLabel
+@onready var pirate_title_label: Label = $MarginContainer/PanelContainer/VBoxContainer/PirateTitleLabel
 @onready var quest_label: Label = $MarginContainer/PanelContainer/VBoxContainer/QuestLabel
 @onready var context_label: Label = $MarginContainer/PanelContainer/VBoxContainer/ContextLabel
 @onready var zone_notification_label: Label = $ZoneNotificationContainer/ZoneNotificationLabel
@@ -22,6 +24,7 @@ var _fleet_manager: Node
 var _game_state: Node
 var _upgrade_system: Node
 var _quest_system: Node
+var _reputation_system: Node
 var _context_message: String = ""
 var _temporary_context_message: String = ""
 var _temporary_message_version: int = 0
@@ -36,6 +39,7 @@ func _ready() -> void:
 	_connect_game_state()
 	_connect_upgrade_system()
 	_connect_quest_system()
+	_connect_reputation_system()
 	call_deferred("_bind_player_from_tree")
 	call_deferred("_bind_fleet_from_tree")
 
@@ -288,6 +292,61 @@ func _on_treasure_resources_changed(map_fragments: int, ancient_relics: int) -> 
 func _on_danger_changed(danger_level: int, enemies_defeated: int) -> void:
 	danger_label.text = "Danger: %d" % danger_level
 	enemies_defeated_label.text = "Ennemis détruits: %d" % enemies_defeated
+
+
+func _connect_reputation_system() -> void:
+	_reputation_system = get_node_or_null("/root/ReputationSystem")
+	if _reputation_system == null:
+		reputation_label.visible = false
+		pirate_title_label.visible = false
+		return
+
+	var reputation_callback := Callable(self, "_on_reputation_changed")
+	if _reputation_system.has_signal("reputation_changed") and not _reputation_system.is_connected("reputation_changed", reputation_callback):
+		_reputation_system.connect("reputation_changed", reputation_callback)
+
+	var rank_callback := Callable(self, "_on_reputation_rank_changed")
+	if _reputation_system.has_signal("reputation_rank_changed") and not _reputation_system.is_connected("reputation_rank_changed", rank_callback):
+		_reputation_system.connect("reputation_rank_changed", rank_callback)
+
+	var title_callback := Callable(self, "_on_pirate_title_changed")
+	if _reputation_system.has_signal("pirate_title_changed") and not _reputation_system.is_connected("pirate_title_changed", title_callback):
+		_reputation_system.connect("pirate_title_changed", title_callback)
+
+	_refresh_reputation_labels()
+
+
+func _on_reputation_changed(_points: int, _rank_name: String, _next_rank_name: String, _current_threshold: int, _next_threshold: int) -> void:
+	_refresh_reputation_labels()
+
+
+func _on_reputation_rank_changed(_rank_name: String, _points: int) -> void:
+	_refresh_reputation_labels()
+
+
+func _on_pirate_title_changed(_title_name: String, _title_score: int) -> void:
+	_refresh_reputation_labels()
+
+
+func _refresh_reputation_labels() -> void:
+	if _reputation_system == null:
+		reputation_label.visible = false
+		pirate_title_label.visible = false
+		return
+
+	if not _reputation_system.has_method("get_reputation_view"):
+		reputation_label.visible = false
+		pirate_title_label.visible = false
+		return
+
+	var view: Dictionary = _reputation_system.get_reputation_view()
+	reputation_label.text = "Réputation : %s (%d)" % [
+		String(view.get("rank_name", "Inconnu")),
+		int(view.get("points", 0)),
+	]
+	pirate_title_label.text = "Titre : %s" % String(view.get("title_name", "Loup de mer"))
+	reputation_label.visible = true
+	pirate_title_label.visible = true
 
 
 func set_context_message(message: String) -> void:
