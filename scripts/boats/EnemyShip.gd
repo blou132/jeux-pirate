@@ -9,6 +9,8 @@ signal destroyed(world_position: Vector3, gold_reward: int, wood_reward: int)
 @export var max_health: int = 60
 @export var move_speed: float = 7.0
 @export var turn_speed: float = 1.15
+@export var turn_acceleration: float = 2.8
+@export var turn_deceleration: float = 3.2
 @export var contact_damage: int = 12
 @export var attack_range: float = 20.0
 @export var attack_cooldown: float = 2.2
@@ -21,6 +23,7 @@ signal destroyed(world_position: Vector3, gold_reward: int, wood_reward: int)
 @export var debug_show_aim_points: bool = true
 
 var health: int
+var angular_velocity: float = 0.0
 var _destroyed: bool = false
 
 
@@ -103,9 +106,34 @@ func steer_along_direction_with_speed(desired_forward: Vector3, delta: float, sp
 
 	desired_forward.y = 0.0
 	desired_forward = desired_forward.normalized()
-	var current_forward := -global_transform.basis.z
-	var signed_angle := current_forward.signed_angle_to(desired_forward, Vector3.UP)
-	var turn_amount := clampf(signed_angle, -turn_speed * delta, turn_speed * delta)
+	var current_forward: Vector3 = -global_transform.basis.z
+	current_forward.y = 0.0
+	if current_forward.length_squared() < 0.01:
+		brake(delta)
+		return
+
+	current_forward = current_forward.normalized()
+	var signed_angle: float = current_forward.signed_angle_to(desired_forward, Vector3.UP)
+	var max_turn_rate: float = maxf(0.0, turn_speed)
+	var target_angular_velocity: float = clampf(
+		signed_angle * turn_acceleration,
+		-max_turn_rate,
+		max_turn_rate
+	)
+	angular_velocity = move_toward(
+		angular_velocity,
+		target_angular_velocity,
+		turn_acceleration * delta
+	)
+
+	if absf(signed_angle) < 0.02:
+		angular_velocity = move_toward(angular_velocity, 0.0, turn_deceleration * delta)
+
+	var turn_amount: float = angular_velocity * delta
+	if absf(turn_amount) > absf(signed_angle):
+		turn_amount = signed_angle
+		angular_velocity = 0.0
+
 	var clamped_speed_scale: float = clampf(speed_scale, 0.0, 1.0)
 
 	rotate_y(turn_amount)
@@ -115,6 +143,7 @@ func steer_along_direction_with_speed(desired_forward: Vector3, delta: float, sp
 
 
 func brake(delta: float) -> void:
+	angular_velocity = move_toward(angular_velocity, 0.0, turn_deceleration * delta)
 	velocity = velocity.move_toward(Vector3.ZERO, move_speed * delta)
 	move_and_slide()
 	global_position.y = 0.0
@@ -178,6 +207,8 @@ func get_port_axis() -> Vector3:
 
 func _destroy() -> void:
 	_destroyed = true
+	angular_velocity = 0.0
+	velocity = Vector3.ZERO
 	var sink_position := global_position
 	var loot_system := get_tree().get_first_node_in_group("loot_system")
 	if loot_system != null and loot_system.has_method("drop_from_ship"):
