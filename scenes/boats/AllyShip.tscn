@@ -94,5 +94,5 @@ material_override = SubResource("StandardMaterial3D_marker")
 [node name="Nameplate" type="Label3D" parent="."]
 position = Vector3(0, 2.45, 0)
 billboard = 1
-text = "Allié : Sloop"
+text = "Allié : Sloop - 80 PV"
 font_size = 26

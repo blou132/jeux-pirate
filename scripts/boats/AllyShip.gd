@@ -104,6 +104,7 @@ func take_damage(amount: int) -> void:
 		return
 
 	health = clampi(health - amount, 0, max_health)
+	_refresh_nameplate()
 	health_changed.emit(health, max_health)
 	if health <= 0:
 		_destroy()
@@ -115,6 +116,7 @@ func repair(amount: int) -> int:
 
 	var previous_health := health
 	health = clampi(health + amount, 0, max_health)
+	_refresh_nameplate()
 	health_changed.emit(health, max_health)
 	return health - previous_health
 
@@ -172,10 +174,15 @@ func get_broadside_cannon_position(fire_direction: Vector3, fallback_offset: flo
 
 
 func _destroy() -> void:
+	if _destroyed:
+		return
+
 	_destroyed = true
+	health = 0
 	angular_velocity = 0.0
 	_current_speed = 0.0
 	velocity = Vector3.ZERO
+	health_changed.emit(health, max_health)
 	destroyed.emit()
 	queue_free()
 
@@ -183,7 +190,7 @@ func _destroy() -> void:
 func _refresh_nameplate() -> void:
 	var nameplate := get_node_or_null("Nameplate") as Label3D
 	if nameplate != null:
-		nameplate.text = "Allié : Sloop"
+		nameplate.text = "Allié : Sloop - %d PV" % health
 
 
 func _refresh_cannon_points() -> void:
