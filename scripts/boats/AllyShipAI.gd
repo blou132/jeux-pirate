@@ -1,5 +1,10 @@
 extends Node
 
+const ORDER_FOLLOW := "follow"
+const ORDER_ATTACK := "attack"
+const ORDER_PROTECT := "protect"
+const ORDER_FLEE := "flee"
+
 @export var ally_cannon_ball_scene: PackedScene = preload("res://scenes/projectiles/AllyCannonBall.tscn")
 @export var follow_rear_offset: float = 12.0
 @export var follow_side_offset: float = 6.0
@@ -22,6 +27,10 @@ extends Node
 @export var broadside_line_correction_weight: float = 0.65
 @export var ally_separation_distance: float = 5.0
 @export var ally_separation_weight: float = 1.15
+@export var follow_defense_range: float = 13.0
+@export var protect_detection_range: float = 28.0
+@export var flee_enemy_avoidance_weight: float = 1.25
+@export var flee_slot_tolerance: float = 3.0
 
 @onready var ship: AllyShip = get_parent() as AllyShip
 
@@ -49,12 +58,17 @@ func _physics_process(delta: float) -> void:
 	var ship_position := ship.global_position
 	ship_position.y = 0.0
 
+	var fleet_order := _get_current_order()
+	if fleet_order == ORDER_FLEE:
+		_handle_flee_order(ship_position, delta)
+		return
+
 	var distance_to_player := ship_position.distance_to(player_position)
 	if distance_to_player < too_close_distance:
 		_move_away_from_player(player_position, ship_position, delta)
 		return
 
-	if _try_combat_support(delta):
+	if _try_combat_support(delta, fleet_order):
 		return
 
 	var follow_slot := _get_follow_slot()
@@ -128,6 +142,14 @@ func _get_fleet_manager() -> Node:
 	return _fleet_manager
 
 
+func _get_current_order() -> String:
+	var fleet_manager := _get_fleet_manager()
+	if fleet_manager != null and fleet_manager.has_method("get_current_order"):
+		return String(fleet_manager.get_current_order())
+
+	return ORDER_FOLLOW
+
+
 func _get_follow_speed_scale(distance_to_slot: float) -> float:
 	if distance_to_slot > too_far_distance:
 		return catch_up_speed_scale
@@ -173,15 +195,45 @@ func _get_ally_separation_direction() -> Vector3:
 	return separation.normalized()
 
 
-func _try_combat_support(delta: float) -> bool:
-	var target := _get_closest_enemy()
+func _handle_flee_order(ship_position: Vector3, delta: float) -> void:
+	var fleet_manager := _get_fleet_manager()
+	var safe_slot: Vector3 = ship_position
+	if fleet_manager != null and fleet_manager.has_method("get_safe_slot_for_ally"):
+		safe_slot = fleet_manager.get_safe_slot_for_ally(ship)
+	else:
+		safe_slot = _get_follow_slot()
+
+	var desired_direction := safe_slot - ship_position
+	desired_direction.y = 0.0
+	var closest_enemy := _get_closest_enemy(attack_detection_range)
+	if closest_enemy != null:
+		var away_from_enemy := ship_position - closest_enemy.global_position
+		away_from_enemy.y = 0.0
+		if away_from_enemy.length_squared() > 0.01:
+			if desired_direction.length_squared() > 0.01:
+				desired_direction = desired_direction.normalized()
+			desired_direction += away_from_enemy.normalized() * flee_enemy_avoidance_weight
+
+	if ship_position.distance_to(safe_slot) <= flee_slot_tolerance and closest_enemy == null:
+		ship.brake(delta)
+		return
+
+	if desired_direction.length_squared() < 0.01:
+		ship.brake(delta)
+	else:
+		ship.steer_along_direction_with_speed(desired_direction.normalized(), delta, catch_up_speed_scale)
+
+
+func _try_combat_support(delta: float, fleet_order: String) -> bool:
+	var target := _get_target_for_order(fleet_order)
 	if target == null:
 		return false
 
 	var target_aim_position := _get_target_aim_position(target)
 	var offset := target_aim_position - ship.global_position
 	offset.y = 0.0
-	if offset.length_squared() > attack_detection_range * attack_detection_range:
+	var support_range := _get_support_range_for_order(fleet_order)
+	if offset.length_squared() > support_range * support_range:
 		return false
 
 	var fire_direction := _get_ready_fire_direction(target)
@@ -194,9 +246,33 @@ func _try_combat_support(delta: float) -> bool:
 	return true
 
 
-func _get_closest_enemy() -> Node3D:
+func _get_target_for_order(fleet_order: String) -> Node3D:
+	match fleet_order:
+		ORDER_ATTACK:
+			return _get_closest_enemy(attack_detection_range)
+		ORDER_PROTECT:
+			return _get_closest_enemy_near_protected_ship()
+		ORDER_FOLLOW:
+			return _get_closest_enemy(follow_defense_range)
+
+	return null
+
+
+func _get_support_range_for_order(fleet_order: String) -> float:
+	match fleet_order:
+		ORDER_ATTACK:
+			return attack_detection_range
+		ORDER_PROTECT:
+			return protect_detection_range
+		ORDER_FOLLOW:
+			return follow_defense_range
+
+	return 0.0
+
+
+func _get_closest_enemy(max_range: float) -> Node3D:
 	var closest_enemy: Node3D
-	var closest_distance_squared := attack_detection_range * attack_detection_range
+	var closest_distance_squared := max_range * max_range
 
 	for enemy in get_tree().get_nodes_in_group("enemy_ships"):
 		if not enemy is Node3D:
@@ -211,6 +287,46 @@ func _get_closest_enemy() -> Node3D:
 			closest_enemy = enemy_node
 
 	return closest_enemy
+
+
+func _get_closest_enemy_near_protected_ship() -> Node3D:
+	var closest_enemy: Node3D
+	var closest_distance_squared := protect_detection_range * protect_detection_range
+
+	for enemy in get_tree().get_nodes_in_group("enemy_ships"):
+		if not enemy is Node3D:
+			continue
+		if enemy.has_method("is_destroyed") and enemy.is_destroyed():
+			continue
+
+		var enemy_node := enemy as Node3D
+		if not _is_enemy_near_protected_ship(enemy_node):
+			continue
+
+		var distance_squared := ship.global_position.distance_squared_to(enemy_node.global_position)
+		if distance_squared <= closest_distance_squared:
+			closest_distance_squared = distance_squared
+			closest_enemy = enemy_node
+
+	return closest_enemy
+
+
+func _is_enemy_near_protected_ship(enemy: Node3D) -> bool:
+	if _player != null and is_instance_valid(_player):
+		if enemy.global_position.distance_squared_to(_player.global_position) <= protect_detection_range * protect_detection_range:
+			return true
+
+	for ally in get_tree().get_nodes_in_group("ally_ships"):
+		if not ally is Node3D:
+			continue
+		if ally.has_method("is_destroyed") and ally.is_destroyed():
+			continue
+
+		var ally_node := ally as Node3D
+		if enemy.global_position.distance_squared_to(ally_node.global_position) <= protect_detection_range * protect_detection_range:
+			return true
+
+	return false
 
 
 func _get_ready_fire_direction(target: Node3D) -> Vector3:
