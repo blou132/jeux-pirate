@@ -16,17 +16,24 @@ extends Node
 @export var broadside_turn_slowdown: float = 0.2
 @export var broadside_min_maneuver_speed_scale: float = 0.35
 @export var broadside_line_correction_weight: float = 0.7
+@export var broadside_side_lock_duration: float = 1.5
 # Temporary v0.3.5 console helper to verify enemy broadside selection during tests.
 @export var debug_broadside_fire: bool = true
 @export var debug_broadside_fire_interval: float = 1.5
 @export var debug_show_broadside_lines: bool = true
 @export var debug_broadside_line_length: float = 28.0
 
+const BROADSIDE_SIDE_NONE := 0
+const BROADSIDE_SIDE_PORT := -1
+const BROADSIDE_SIDE_STARBOARD := 1
+
 @onready var ship: EnemyShip = get_parent() as EnemyShip
 
 var _player: Node3D
 var _attack_cooldown_remaining: float = 0.0
 var _debug_message_cooldown_remaining: float = 0.0
+var _locked_broadside_side: int = BROADSIDE_SIDE_NONE
+var _side_lock_remaining: float = 0.0
 var _debug_line_instance: MeshInstance3D
 var _debug_line_material: StandardMaterial3D
 
@@ -37,17 +44,20 @@ func _physics_process(delta: float) -> void:
 
 	_attack_cooldown_remaining = maxf(0.0, _attack_cooldown_remaining - delta)
 	_debug_message_cooldown_remaining = maxf(0.0, _debug_message_cooldown_remaining - delta)
+	_side_lock_remaining = maxf(0.0, _side_lock_remaining - delta)
 
 	if not is_instance_valid(_player):
 		_player = get_tree().get_first_node_in_group("player") as Node3D
 
 	if _player == null:
 		_clear_broadside_debug_lines()
+		_clear_broadside_side_lock()
 		ship.brake(delta)
 		return
 
 	if _player.has_method("is_destroyed") and _player.is_destroyed():
 		_clear_broadside_debug_lines()
+		_clear_broadside_side_lock()
 		ship.brake(delta)
 		return
 
@@ -60,6 +70,7 @@ func _physics_process(delta: float) -> void:
 
 	if distance_squared > detection_range * detection_range:
 		_clear_broadside_debug_lines()
+		_clear_broadside_side_lock()
 		ship.brake(delta)
 		return
 
@@ -75,6 +86,7 @@ func _physics_process(delta: float) -> void:
 		_try_attack_player(fire_direction)
 		return
 
+	_clear_broadside_side_lock()
 	ship.steer_toward(player_aim_position, delta)
 
 
@@ -168,33 +180,55 @@ func _get_broadside_fire_direction(offset_to_player: Vector3) -> Vector3:
 		return Vector3.ZERO
 
 	var to_player: Vector3 = offset_to_player.normalized()
-	var port_direction: Vector3 = _get_port_axis()
-	var starboard_direction: Vector3 = _get_starboard_axis()
+	var preferred_side: int = _get_preferred_broadside_side(offset_to_player, true)
+	var fire_direction: Vector3 = _get_broadside_axis_for_side(preferred_side)
+	if fire_direction == Vector3.ZERO:
+		return Vector3.ZERO
 
-	var port_alignment: float = to_player.dot(port_direction)
-	var starboard_alignment: float = to_player.dot(starboard_direction)
+	var fire_alignment: float = to_player.dot(fire_direction)
 	var required_alignment: float = cos(deg_to_rad(broadside_fire_alignment_degrees))
 
-	if port_alignment >= starboard_alignment and port_alignment >= required_alignment:
-		return port_direction
-	if starboard_alignment >= required_alignment:
-		return starboard_direction
+	if fire_alignment >= required_alignment:
+		return fire_direction
 
 	return Vector3.ZERO
 
 
-func _get_preferred_broadside_direction(offset_to_player: Vector3) -> Vector3:
+func _get_preferred_broadside_direction(offset_to_player: Vector3, lock_side: bool = true) -> Vector3:
+	var preferred_side: int = _get_preferred_broadside_side(offset_to_player, lock_side)
+	return _get_broadside_axis_for_side(preferred_side)
+
+
+func _get_preferred_broadside_side(offset_to_player: Vector3, lock_side: bool) -> int:
 	if offset_to_player.length_squared() < 0.01:
-		return Vector3.ZERO
+		return BROADSIDE_SIDE_NONE
+
+	if _side_lock_remaining > 0.0 and _locked_broadside_side != BROADSIDE_SIDE_NONE:
+		return _locked_broadside_side
 
 	var to_player: Vector3 = offset_to_player.normalized()
 	var port_direction: Vector3 = _get_port_axis()
 	var starboard_direction: Vector3 = _get_starboard_axis()
 
+	var preferred_side := BROADSIDE_SIDE_STARBOARD
 	if to_player.dot(port_direction) >= to_player.dot(starboard_direction):
-		return port_direction
+		preferred_side = BROADSIDE_SIDE_PORT
 
-	return starboard_direction
+	if lock_side:
+		_locked_broadside_side = preferred_side
+		_side_lock_remaining = broadside_side_lock_duration
+
+	return preferred_side
+
+
+func _get_broadside_axis_for_side(side: int) -> Vector3:
+	match side:
+		BROADSIDE_SIDE_PORT:
+			return _get_port_axis()
+		BROADSIDE_SIDE_STARBOARD:
+			return _get_starboard_axis()
+
+	return Vector3.ZERO
 
 
 func _maneuver_for_broadside(offset_to_player: Vector3, distance_to_player: float, attack_range: float, delta: float) -> void:
@@ -361,7 +395,7 @@ func _update_broadside_debug_lines(offset_to_player: Vector3) -> void:
 		_clear_broadside_debug_lines()
 		return
 
-	var fire_direction: Vector3 = _get_preferred_broadside_direction(offset_to_player)
+	var fire_direction: Vector3 = _get_preferred_broadside_direction(offset_to_player, false)
 	if fire_direction == Vector3.ZERO:
 		_clear_broadside_debug_lines()
 		return
@@ -401,6 +435,11 @@ func _update_broadside_debug_lines(offset_to_player: Vector3) -> void:
 func _clear_broadside_debug_lines() -> void:
 	if _debug_line_instance != null and is_instance_valid(_debug_line_instance):
 		_debug_line_instance.visible = false
+
+
+func _clear_broadside_side_lock() -> void:
+	_locked_broadside_side = BROADSIDE_SIDE_NONE
+	_side_lock_remaining = 0.0
 
 
 func _get_debug_line_instance() -> MeshInstance3D:
