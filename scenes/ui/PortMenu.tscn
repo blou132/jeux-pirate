@@ -117,6 +117,10 @@ text = "Accepter"
 layout_mode = 2
 text = "Récupérer la récompense"
 
+[node name="RecruitAllyButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Recruter un allié"
+
 [node name="QuitButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
 text = "Quitter"

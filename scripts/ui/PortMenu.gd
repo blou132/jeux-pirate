@@ -22,6 +22,7 @@ const REPAIR_HEALTH_PER_WOOD := 5
 @onready var mission_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/MissionStatusLabel
 @onready var accept_mission_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/AcceptMissionButton
 @onready var claim_mission_reward_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/ClaimMissionRewardButton
+@onready var recruit_ally_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/RecruitAllyButton
 @onready var quit_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/QuitButton
 
 var _player: Node
@@ -44,6 +45,7 @@ func _ready() -> void:
 	mission_list.item_selected.connect(_on_mission_selected)
 	accept_mission_button.pressed.connect(_on_accept_mission_pressed)
 	claim_mission_reward_button.pressed.connect(_on_claim_mission_reward_pressed)
+	recruit_ally_button.pressed.connect(_on_recruit_ally_pressed)
 	quit_button.pressed.connect(close)
 
 
@@ -215,6 +217,15 @@ func _on_claim_mission_reward_pressed() -> void:
 
 	status_label.text = quest_system.claim_reward(_selected_mission_id)
 	_refresh_mission_rows()
+
+
+func _on_recruit_ally_pressed() -> void:
+	var world := get_tree().current_scene
+	if world == null or not world.has_method("recruit_ally_ship"):
+		status_label.text = "Recrutement indisponible"
+		return
+
+	status_label.text = world.recruit_ally_ship()
 
 
 func _refresh_mission_rows() -> void:
