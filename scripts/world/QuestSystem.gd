@@ -11,6 +11,45 @@ const OBJECTIVE_MAP_FRAGMENTS := "map_fragments"
 const OBJECTIVE_ANCIENT_RELICS := "ancient_relics"
 const OBJECTIVE_CHEST_THEN_PORT := "chest_then_port"
 
+const STARTER_QUESTS: Array[Dictionary] = [
+	{
+		"id": "pirate_hunt",
+		"name": "Chasse pirate",
+		"objective": "Détruire 3 ennemis",
+		"objective_type": OBJECTIVE_ENEMY_DESTROYED,
+		"target": 3,
+		"reward_gold": 100,
+		"reward_wood": 40,
+	},
+	{
+		"id": "first_map_fragment",
+		"name": "Premier fragment",
+		"objective": "Obtenir 1 fragment de carte",
+		"objective_type": OBJECTIVE_MAP_FRAGMENTS,
+		"target": 1,
+		"reward_gold": 80,
+		"reward_wood": 0,
+	},
+	{
+		"id": "ancient_relic",
+		"name": "Relique ancienne",
+		"objective": "Obtenir 1 relique ancienne",
+		"objective_type": OBJECTIVE_ANCIENT_RELICS,
+		"target": 1,
+		"reward_gold": 150,
+		"reward_wood": 50,
+	},
+	{
+		"id": "return_to_port",
+		"name": "Retour au port",
+		"objective": "Ouvrir 1 coffre puis revenir au port",
+		"objective_type": OBJECTIVE_CHEST_THEN_PORT,
+		"target": 2,
+		"reward_gold": 60,
+		"reward_wood": 20,
+	},
+]
+
 var active_quest_id: String = ""
 var _quest_order: Array[String] = []
 var _quest_configs: Dictionary = {}
@@ -19,6 +58,12 @@ var _quest_states: Dictionary = {}
 
 func _ready() -> void:
 	add_to_group("quest_system")
+	_register_starter_quests()
+
+
+func _register_starter_quests() -> void:
+	for quest in STARTER_QUESTS:
+		register_quest(quest)
 
 
 func register_quest(config: Dictionary) -> void:
