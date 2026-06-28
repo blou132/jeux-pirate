@@ -18,6 +18,7 @@ extends CanvasLayer
 
 var _player: Node
 var _ally_ship: Node
+var _fleet_manager: Node
 var _game_state: Node
 var _upgrade_system: Node
 var _quest_system: Node
@@ -36,7 +37,7 @@ func _ready() -> void:
 	_connect_upgrade_system()
 	_connect_quest_system()
 	call_deferred("_bind_player_from_tree")
-	call_deferred("_bind_ally_from_tree")
+	call_deferred("_bind_fleet_from_tree")
 
 
 func set_player(player: Node) -> void:
@@ -56,8 +57,25 @@ func _bind_player_from_tree() -> void:
 
 
 func _bind_ally_from_tree() -> void:
+	if _fleet_manager != null and is_instance_valid(_fleet_manager):
+		return
+
 	var ally_ship := get_tree().get_first_node_in_group("ally_ships")
 	set_ally_ship(ally_ship)
+
+
+func _bind_fleet_from_tree() -> void:
+	var fleet_manager: Node
+	var world := get_tree().current_scene
+	if world != null and world.has_method("get_fleet_manager"):
+		fleet_manager = world.get_fleet_manager()
+	if fleet_manager == null:
+		fleet_manager = get_tree().get_first_node_in_group("fleet_manager")
+
+	if fleet_manager != null:
+		set_fleet_manager(fleet_manager)
+	else:
+		_bind_ally_from_tree()
 
 
 func _connect_player() -> void:
@@ -97,6 +115,10 @@ func _refresh_player_values() -> void:
 
 
 func set_ally_ship(ally_ship: Node) -> void:
+	if _fleet_manager != null and is_instance_valid(_fleet_manager):
+		_refresh_ally_status()
+		return
+
 	if _ally_ship == ally_ship:
 		_refresh_ally_status()
 		return
@@ -104,6 +126,17 @@ func set_ally_ship(ally_ship: Node) -> void:
 	_disconnect_ally()
 	_ally_ship = ally_ship
 	_connect_ally()
+	_refresh_ally_status()
+
+
+func set_fleet_manager(fleet_manager: Node) -> void:
+	if _fleet_manager == fleet_manager:
+		_refresh_ally_status()
+		return
+
+	_disconnect_fleet_manager()
+	_fleet_manager = fleet_manager
+	_connect_fleet_manager()
 	_refresh_ally_status()
 
 
@@ -133,6 +166,40 @@ func _disconnect_ally() -> void:
 		_ally_ship.disconnect("destroyed", destroyed_callback)
 
 
+func _connect_fleet_manager() -> void:
+	if _fleet_manager == null:
+		return
+
+	var fleet_callback := Callable(self, "_on_fleet_changed")
+	if _fleet_manager.has_signal("fleet_changed") and not _fleet_manager.is_connected("fleet_changed", fleet_callback):
+		_fleet_manager.connect("fleet_changed", fleet_callback)
+
+	var order_callback := Callable(self, "_on_fleet_order_changed")
+	if _fleet_manager.has_signal("fleet_order_changed") and not _fleet_manager.is_connected("fleet_order_changed", order_callback):
+		_fleet_manager.connect("fleet_order_changed", order_callback)
+
+
+func _disconnect_fleet_manager() -> void:
+	if _fleet_manager == null or not is_instance_valid(_fleet_manager):
+		return
+
+	var fleet_callback := Callable(self, "_on_fleet_changed")
+	if _fleet_manager.has_signal("fleet_changed") and _fleet_manager.is_connected("fleet_changed", fleet_callback):
+		_fleet_manager.disconnect("fleet_changed", fleet_callback)
+
+	var order_callback := Callable(self, "_on_fleet_order_changed")
+	if _fleet_manager.has_signal("fleet_order_changed") and _fleet_manager.is_connected("fleet_order_changed", order_callback):
+		_fleet_manager.disconnect("fleet_order_changed", order_callback)
+
+
+func _on_fleet_changed() -> void:
+	_refresh_ally_status()
+
+
+func _on_fleet_order_changed(_order_id: String, _order_label: String) -> void:
+	_refresh_ally_status()
+
+
 func _on_ally_health_changed(_current_health: int, _max_health: int) -> void:
 	_refresh_ally_status()
 
@@ -143,6 +210,12 @@ func _on_ally_destroyed() -> void:
 
 
 func _refresh_ally_status() -> void:
+	if _fleet_manager != null and is_instance_valid(_fleet_manager):
+		if _fleet_manager.has_method("get_fleet_status_lines"):
+			var fleet_lines: Array = _fleet_manager.get_fleet_status_lines(3)
+			ally_label.text = _join_quest_lines(fleet_lines)
+			return
+
 	if _ally_ship == null or not is_instance_valid(_ally_ship):
 		ally_label.text = "Allié : aucun"
 		return
