@@ -131,6 +131,13 @@ func _on_repair_pressed() -> void:
 
 
 func _on_repair_ally_pressed() -> void:
+	var fleet_manager := _get_fleet_manager()
+	if fleet_manager != null and fleet_manager.has_method("repair_fleet"):
+		status_label.text = fleet_manager.repair_fleet()
+		_refresh_ally_repair_button()
+		_refresh_repair_button()
+		return
+
 	var ally_ship := _get_ally_ship()
 	if ally_ship == null:
 		status_label.text = "Aucun allié à réparer"
@@ -235,6 +242,10 @@ func _refresh_repair_button() -> void:
 
 
 func _refresh_ally_repair_button() -> void:
+	var fleet_manager := _get_fleet_manager()
+	if fleet_manager != null and _refresh_fleet_repair_button(fleet_manager):
+		return
+
 	var ally_ship := _get_ally_ship()
 	if ally_ship == null or not ally_ship.has_method("get_health") or not ally_ship.has_method("get_max_health"):
 		repair_ally_button.text = "Aucun allié à réparer"
@@ -253,6 +264,34 @@ func _refresh_ally_repair_button() -> void:
 		required_wood,
 	]
 	repair_ally_button.disabled = false
+
+
+func _refresh_fleet_repair_button(fleet_manager: Node) -> bool:
+	if not fleet_manager.has_method("get_fleet_count"):
+		return false
+
+	var fleet_count := int(fleet_manager.get_fleet_count())
+	if fleet_count <= 0:
+		repair_ally_button.text = "Aucun allié à réparer"
+		repair_ally_button.disabled = true
+		return true
+
+	if not fleet_manager.has_method("get_total_missing_health") or not fleet_manager.has_method("get_fleet_repair_wood_cost"):
+		return false
+
+	var missing_health := int(fleet_manager.get_total_missing_health())
+	if missing_health <= 0:
+		repair_ally_button.text = "Flotte déjà intacte"
+		repair_ally_button.disabled = true
+		return true
+
+	var required_wood := int(fleet_manager.get_fleet_repair_wood_cost())
+	repair_ally_button.text = "Réparer la flotte : %d PV manquants - coût : %d bois" % [
+		missing_health,
+		required_wood,
+	]
+	repair_ally_button.disabled = false
+	return true
 
 
 func _refresh_recruit_ally_button() -> void:
