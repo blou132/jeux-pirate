@@ -1,0 +1,76 @@
+[gd_scene load_steps=10 format=3 uid="uid://island_v04"]
+
+[ext_resource type="Script" path="res://scripts/world/Island.gd" id="1_island"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sand"]
+albedo_color = Color(0.72, 0.62, 0.34, 1)
+roughness = 0.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_grass"]
+albedo_color = Color(0.16, 0.44, 0.2, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rock"]
+albedo_color = Color(0.32, 0.33, 0.34, 1)
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_chest"]
+albedo_color = Color(0.42, 0.22, 0.08, 1)
+roughness = 0.65
+
+[sub_resource type="BoxMesh" id="BoxMesh_land"]
+size = Vector3(7.0, 0.45, 5.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_grass"]
+size = Vector3(4.8, 0.22, 3.4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_detail"]
+size = Vector3(0.8, 0.8, 0.8)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_interaction"]
+size = Vector3(10.0, 4.0, 8.0)
+
+[node name="Island" type="Node3D"]
+script = ExtResource("1_island")
+
+[node name="Visuals" type="Node3D" parent="."]
+
+[node name="Sand" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 0.18, 0)
+mesh = SubResource("BoxMesh_land")
+material_override = SubResource("StandardMaterial3D_sand")
+
+[node name="Grass" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 0.56, 0)
+mesh = SubResource("BoxMesh_grass")
+material_override = SubResource("StandardMaterial3D_grass")
+
+[node name="RockA" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(-2.0, 0.95, -0.9)
+scale = Vector3(1.0, 0.8, 0.7)
+mesh = SubResource("BoxMesh_detail")
+material_override = SubResource("StandardMaterial3D_rock")
+
+[node name="RockB" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(2.2, 0.82, 1.1)
+scale = Vector3(0.75, 0.55, 0.9)
+mesh = SubResource("BoxMesh_detail")
+material_override = SubResource("StandardMaterial3D_rock")
+
+[node name="ChestMarker" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0.7, 0.9, -0.7)
+scale = Vector3(0.8, 0.45, 0.55)
+mesh = SubResource("BoxMesh_detail")
+material_override = SubResource("StandardMaterial3D_chest")
+
+[node name="NameLabel" type="Label3D" parent="."]
+position = Vector3(0, 2.2, 0)
+text = "Île inconnue"
+font_size = 34
+billboard = 1
+
+[node name="InteractionArea" type="Area3D" parent="."]
+position = Vector3(0, 1.2, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="InteractionArea"]
+shape = SubResource("BoxShape3D_interaction")

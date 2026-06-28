@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://world_root_v01"]
+[gd_scene load_steps=30 format=3 uid="uid://world_root_v01"]
 
 [ext_resource type="Script" path="res://scripts/world/World.gd" id="1_world"]
 [ext_resource type="PackedScene" path="res://scenes/boats/PlayerBoat.tscn" id="2_player"]
@@ -11,6 +11,7 @@
 [ext_resource type="Script" path="res://scripts/world/EnemySpawnPoint.gd" id="9_enemy_spawn_point"]
 [ext_resource type="Script" path="res://scripts/world/DangerZone.gd" id="10_danger_zone"]
 [ext_resource type="Script" path="res://scripts/world/WorldBounds.gd" id="11_world_bounds"]
+[ext_resource type="PackedScene" path="res://scenes/world/Island.tscn" id="12_island"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ocean"]
 albedo_color = Color(0.02, 0.28, 0.45, 1)
@@ -201,6 +202,26 @@ danger_zone = "hostile"
 [node name="Port" parent="." instance=ExtResource("6_port")]
 position = Vector3(-9, 0, 8)
 rotation_degrees = Vector3(0, 25, 0)
+
+[node name="Islands" type="Node3D" parent="."]
+
+[node name="ShipwreckIsland" parent="Islands" instance=ExtResource("12_island")]
+position = Vector3(18, 0, 12)
+rotation_degrees = Vector3(0, -18, 0)
+scale = Vector3(0.85, 0.85, 0.85)
+island_name = "Île du Naufrage"
+
+[node name="RockyIsland" parent="Islands" instance=ExtResource("12_island")]
+position = Vector3(44, 0, -32)
+rotation_degrees = Vector3(0, 28, 0)
+scale = Vector3(1.15, 1.0, 1.05)
+island_name = "Île des Rochers"
+
+[node name="CursedIslet" parent="Islands" instance=ExtResource("12_island")]
+position = Vector3(-56, 0, 40)
+rotation_degrees = Vector3(0, 64, 0)
+scale = Vector3(1.25, 1.0, 1.2)
+island_name = "Îlot Maudit"
 
 [node name="PlayerBoat" parent="." instance=ExtResource("2_player")]
 position = Vector3(0, 0, 0)
