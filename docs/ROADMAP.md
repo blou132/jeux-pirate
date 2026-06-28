@@ -57,6 +57,7 @@
 - Lui faire suivre le joueur à distance lisible.
 - Ajouter un soutien de combat simple contre les ennemis proches.
 - Gérer sa destruction et permettre un nouveau recrutement.
+- Correctif v0.6.1 : coûts de port affichés, réparation dynamique joueur/allié, allié ciblable, vraie visée de bordée, dégâts garantis et kills alliés crédités au joueur.
 
 ## v0.7 - Flotte basique avec ordres simples
 

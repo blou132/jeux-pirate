@@ -34,6 +34,8 @@ La v0.5.1 rend les missions plus robustes : plusieurs missions peuvent être act
 
 La v0.6 ajoute un premier bateau allié : le Sloop allié peut être recruté au port, suit le joueur, apporte un soutien de combat simple et peut être recruté de nouveau après destruction.
 
+La v0.6.1 rend l'allié plus lisible et utile : coûts de port affichés, réparation dynamique, réparation alliée, ciblage par les ennemis, vraie visée de bordée, dégâts confirmés et kills alliés crédités au joueur.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -157,8 +159,19 @@ La v0.6 ajoute un premier bateau allié : le Sloop allié peut être recruté au
 - Limite volontaire à 1 allié actif pour cette version.
 - Suivi du joueur avec distance arrière-latérale, ralentissement si trop proche et rattrapage si trop loin.
 - Soutien de combat simple contre les ennemis proches avec boulets alliés visibles.
-- HUD allié : `Allié : aucun` ou `Allié : Sloop - X PV`.
+- HUD allié : `Allié : aucun` ou `Allié : Sloop — X/80 PV`.
 - Si l'allié est détruit, le HUD affiche `Allié détruit` et un nouveau recrutement est possible au port.
+
+## Correctifs v0.6.1
+
+- Le bouton de recrutement affiche `Recruter un allié : 150 or, 60 bois`.
+- La réparation du joueur affiche les PV manquants et le coût dynamique en bois.
+- Le port permet de réparer le Sloop allié avec la même règle : 1 bois pour 5 PV.
+- L'allié est réellement destructible : PV clampés à 0, HUD remis à `Allié : aucun`, nouveau recrutement possible.
+- Les ennemis ciblent maintenant la cible hostile la plus proche : joueur ou allié.
+- L'allié utilise `AimPoint`, points de canon latéraux et validation de ligne de bordée avant de tirer.
+- Les boulets alliés appliquent bien leurs dégâts aux ennemis et affichent un feedback de touche.
+- Si l'allié coule un ennemi, le loot, le danger et la quête `Chasse pirate` progressent comme pour un kill joueur.
 
 ## Lancement
 

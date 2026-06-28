@@ -203,6 +203,18 @@ Le Sloop allié pose une première base de coopération sans lancer encore une f
 - Boulets alliés dédiés, visibles, qui ciblent les ennemis et pas le joueur.
 - Destruction non bloquante : le HUD prévient le joueur et le port permet de recruter de nouveau.
 
+## Correctifs allié v0.6.1
+
+La v0.6.1 rend le premier allié testable dans une vraie boucle de combat :
+
+- Les coûts de port doivent être lisibles avant achat ou réparation.
+- La réparation du joueur et de l'allié dépend des PV manquants avec la règle 1 bois pour 5 PV.
+- Les ennemis peuvent choisir le joueur ou le Sloop allié selon la cible hostile la plus proche.
+- Les tirs ennemis utilisent l'AimPoint de leur cible, joueur ou allié.
+- Le Sloop allié utilise une bordée comparable aux ennemis : AimPoint cible, points de canon, ligne de tir et projectile droit.
+- Les dégâts alliés doivent être visibles et les kills alliés appartiennent au joueur pour loot, danger et missions.
+- Un allié détruit ne bloque pas la session : le HUD revient à aucun allié et le port permet un nouveau recrutement.
+
 ## Piliers a long terme
 
 - Navigation lisible : le joueur doit toujours comprendre son cap, sa vitesse et les menaces proches.
