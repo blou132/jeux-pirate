@@ -36,6 +36,7 @@ func _ready() -> void:
 	root_control.visible = false
 	upgrades_container.visible = false
 	missions_container.visible = false
+	recruit_ally_button.text = "Recruter un allié : 150 or, 60 bois"
 	repair_button.pressed.connect(_on_repair_pressed)
 	upgrades_button.pressed.connect(_on_upgrades_pressed)
 	hull_upgrade_button.pressed.connect(_on_hull_upgrade_pressed)

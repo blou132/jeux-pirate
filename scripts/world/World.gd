@@ -65,7 +65,7 @@ func recruit_ally_ship() -> String:
 		return "Recrutement indisponible"
 	if not game_state.spend_resources(ALLY_RECRUIT_GOLD_COST, ALLY_RECRUIT_WOOD_COST):
 		ally.queue_free()
-		return "Ressources insuffisantes"
+		return "Ressources insuffisantes — coût : 150 or, 60 bois"
 
 	var ally_node := ally as Node3D
 	add_child(ally_node)
