@@ -160,7 +160,11 @@ func _refresh_ally_status() -> void:
 	if _ally_ship.has_method("get_health"):
 		current_health = int(_ally_ship.get_health())
 
-	ally_label.text = "Allié : %s - %d PV" % [ally_name, current_health]
+	var max_health := 0
+	if _ally_ship.has_method("get_max_health"):
+		max_health = int(_ally_ship.get_max_health())
+
+	ally_label.text = "Allié : %s — %d/%d PV" % [ally_name, current_health, max_health]
 
 
 func _on_health_changed(current_health: int, max_health: int) -> void:
