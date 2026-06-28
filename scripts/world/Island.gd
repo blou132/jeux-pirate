@@ -45,14 +45,14 @@ func get_island_name() -> String:
 	return island_name
 
 
-func explore() -> String:
+func explore() -> Dictionary:
 	if _chest_opened:
-		return "Coffre déjà vidé"
+		return _make_exploration_result(["Coffre déjà vidé"])
 
 	_chest_opened = true
 	_refresh_chest_visual()
 	_grant_treasure_rewards()
-	return _build_treasure_summary()
+	return _make_exploration_result(_build_treasure_messages())
 
 
 func _refresh_label() -> void:
@@ -77,27 +77,36 @@ func _grant_treasure_rewards() -> void:
 		game_state.add_treasure_resources(reward_map_fragments, reward_ancient_relics)
 
 
-func _build_treasure_summary() -> String:
-	var parts: Array = []
-	if reward_gold > 0:
-		parts.append("+%d or" % reward_gold)
-	if reward_wood > 0:
-		parts.append("+%d bois" % reward_wood)
+func _build_treasure_messages() -> Array:
+	var messages: Array = []
+	if reward_gold > 0 or reward_wood > 0:
+		messages.append("Trésor trouvé : +%d or, +%d bois" % [reward_gold, reward_wood])
 	if reward_map_fragments > 0:
-		parts.append("+%d fragment de carte" % reward_map_fragments)
+		messages.append("Fragment de carte trouvé")
 	if reward_ancient_relics > 0:
-		parts.append("+%d relique ancienne" % reward_ancient_relics)
+		messages.append("Relique ancienne trouvée")
 
-	if parts.is_empty():
-		return "Coffre ouvert"
+	if messages.is_empty():
+		messages.append("Coffre ouvert")
 
+	return messages
+
+
+func _make_exploration_result(messages: Array) -> Dictionary:
+	return {
+		"summary": _join_messages(messages),
+		"messages": messages,
+	}
+
+
+func _join_messages(messages: Array) -> String:
 	var summary := ""
-	for part in parts:
+	for message in messages:
 		if not summary.is_empty():
-			summary += ", "
-		summary += String(part)
+			summary += "\n"
+		summary += String(message)
 
-	return "Butin reçu : %s" % summary
+	return summary
 
 
 func _get_game_state() -> Node:

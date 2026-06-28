@@ -2,6 +2,8 @@ extends CanvasLayer
 
 signal closed
 
+@export var hud_message_duration: float = 2.4
+
 @onready var root_control: Control = $Root
 @onready var title_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/TitleLabel
 @onready var status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/StatusLabel
@@ -57,7 +59,11 @@ func _on_search_pressed() -> void:
 		return
 
 	if _island.has_method("explore"):
-		status_label.text = String(_island.explore())
+		var exploration_result = _island.explore()
+		if exploration_result is Dictionary:
+			_show_exploration_result(exploration_result)
+		else:
+			status_label.text = String(exploration_result)
 	else:
 		status_label.text = "Exploration indisponible"
 
@@ -67,3 +73,23 @@ func _get_island_name() -> String:
 		return _island.get_island_name()
 
 	return "Île inconnue"
+
+
+func _show_exploration_result(result: Dictionary) -> void:
+	var summary := String(result.get("summary", ""))
+	status_label.text = summary
+	_show_hud_message(summary)
+
+
+func _show_hud_message(message: String) -> void:
+	if message.is_empty():
+		return
+
+	var hud := get_tree().get_first_node_in_group("hud")
+	if hud == null:
+		return
+
+	if hud.has_method("show_temporary_context_message"):
+		hud.show_temporary_context_message(message, hud_message_duration)
+	elif hud.has_method("set_context_message"):
+		hud.set_context_message(message)
