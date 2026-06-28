@@ -120,11 +120,7 @@ func claim_reward(quest_id: String) -> String:
 		return "Mission non terminée"
 
 	var quest: Dictionary = _get_quest_config(quest_id)
-	var reward_gold: int = int(quest.get("reward_gold", 0))
-	var reward_wood: int = int(quest.get("reward_wood", 0))
-	var game_state := _get_game_state()
-	if game_state != null and game_state.has_method("add_resources"):
-		game_state.add_resources(reward_gold, reward_wood)
+	_grant_quest_reward(quest)
 
 	state["reward_claimed"] = true
 	_quest_states[quest_id] = state
@@ -134,8 +130,12 @@ func claim_reward(quest_id: String) -> String:
 
 	quest_reward_claimed.emit(quest_id, _get_quest_name(quest_id))
 	quests_changed.emit()
-	_show_hud_message("Récompense récupérée : %s" % _get_quest_name(quest_id), 2.0)
-	return "Récompense récupérée"
+	var reward_message := "Récompense récupérée : %s\n+%s" % [
+		_get_quest_name(quest_id),
+		_build_reward_text(quest_id),
+	]
+	_show_hud_message(reward_message, 2.4)
+	return reward_message
 
 
 func record_enemy_destroyed(_enemy_type_id: String = "") -> void:
@@ -265,7 +265,10 @@ func _complete_quest(quest_id: String) -> void:
 	_quest_states[quest_id] = state
 	quest_completed.emit(quest_id, _get_quest_name(quest_id))
 	quests_changed.emit()
-	_show_hud_message("Mission terminée : %s" % _get_quest_name(quest_id), 2.4)
+	_show_hud_message(
+		"Mission terminée : %s\nRetour au port pour la récompense" % _get_quest_name(quest_id),
+		2.8
+	)
 
 
 func _emit_progress(quest_id: String) -> void:
@@ -348,6 +351,14 @@ func _build_reward_text(quest_id: String) -> String:
 			reward_text += ", "
 		reward_text += part
 	return reward_text
+
+
+func _grant_quest_reward(quest: Dictionary) -> void:
+	var reward_gold: int = int(quest.get("reward_gold", 0))
+	var reward_wood: int = int(quest.get("reward_wood", 0))
+	var game_state := _get_game_state()
+	if game_state != null and game_state.has_method("add_resources"):
+		game_state.add_resources(reward_gold, reward_wood)
 
 
 func _build_status_text(quest_id: String) -> String:
