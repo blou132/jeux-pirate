@@ -248,6 +248,14 @@ func get_active_quest_summaries(limit: int = MAX_ACTIVE_QUESTS) -> Array[String]
 	return summaries
 
 
+func get_active_quest_count() -> int:
+	return active_quest_ids.size()
+
+
+func get_max_active_quests() -> int:
+	return MAX_ACTIVE_QUESTS
+
+
 func can_accept_quest(quest_id: String) -> bool:
 	if not _quest_configs.has(quest_id):
 		return false

@@ -17,6 +17,7 @@ const REPAIR_HEALTH_PER_WOOD := 5
 @onready var cannons_upgrade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/CannonsUpgradeButton
 @onready var missions_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsButton
 @onready var missions_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer
+@onready var missions_intro_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/MissionsIntroLabel
 @onready var mission_list: ItemList = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/MissionList
 @onready var mission_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/MissionStatusLabel
 @onready var accept_mission_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/AcceptMissionButton
@@ -222,11 +223,13 @@ func _refresh_mission_rows() -> void:
 
 	var quest_system := _get_quest_system()
 	if quest_system == null or not quest_system.has_method("get_all_quest_views"):
+		missions_intro_label.text = "Missions indisponibles"
 		mission_status_label.text = "Missions indisponibles"
 		accept_mission_button.disabled = true
 		claim_mission_reward_button.disabled = true
 		return
 
+	missions_intro_label.text = _build_missions_intro_text(quest_system)
 	var quest_views: Array = quest_system.get_all_quest_views()
 	for quest_view in quest_views:
 		if not (quest_view is Dictionary):
@@ -238,10 +241,7 @@ func _refresh_mission_rows() -> void:
 			continue
 
 		_mission_ids.append(quest_id)
-		mission_list.add_item("%s - %s" % [
-			String(view.get("name", "Mission")),
-			String(view.get("status_text", "Disponible")),
-		])
+		mission_list.add_item(_build_mission_row_text(view))
 
 	if _mission_ids.is_empty():
 		_selected_mission_id = ""
@@ -268,7 +268,8 @@ func _refresh_selected_mission() -> void:
 		return
 
 	var view: Dictionary = quest_system.get_quest_view(_selected_mission_id)
-	mission_status_label.text = "%s\nObjectif : %s\nProgression : %s\nRécompense : %s\nStatut : %s" % [
+	mission_status_label.text = "%s\n%s\nObjectif : %s\nProgression : %s\nRécompense : %s\nStatut : %s" % [
+		_build_missions_intro_text(quest_system),
 		String(view.get("name", "Mission")),
 		String(view.get("objective", "")),
 		String(view.get("progress_text", "")),
@@ -277,6 +278,30 @@ func _refresh_selected_mission() -> void:
 	]
 	accept_mission_button.disabled = not bool(view.get("can_accept", false))
 	claim_mission_reward_button.disabled = not bool(view.get("can_claim", false))
+
+
+func _build_missions_intro_text(quest_system: Node) -> String:
+	if quest_system.has_method("get_active_quest_count") and quest_system.has_method("get_max_active_quests"):
+		return "Missions actives : %d/%d" % [
+			int(quest_system.get_active_quest_count()),
+			int(quest_system.get_max_active_quests()),
+		]
+
+	return "Missions disponibles"
+
+
+func _build_mission_row_text(view: Dictionary) -> String:
+	var name := String(view.get("name", "Mission"))
+	var status := String(view.get("status_text", "Disponible"))
+	var progress := String(view.get("progress_text", ""))
+	if bool(view.get("active", false)):
+		return "[Active] %s - %s" % [name, progress]
+	if bool(view.get("completed", false)) and not bool(view.get("reward_claimed", false)):
+		return "[Terminée] %s - récompense à récupérer" % name
+	if bool(view.get("reward_claimed", false)):
+		return "[Récupérée] %s - récompense récupérée" % name
+
+	return "[Disponible] %s - %s" % [name, status]
 
 
 func _get_mission_index(quest_id: String) -> int:
