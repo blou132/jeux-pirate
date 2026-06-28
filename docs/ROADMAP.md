@@ -52,15 +52,18 @@
 
 ## v0.6 - Premier bateau allié
 
-- Ajouter un bateau allié de base.
-- Lui faire suivre le joueur.
-- Préparer les ordres simples.
+- Ajouter un Sloop allié de base.
+- Ajouter le recrutement au port contre ressources.
+- Lui faire suivre le joueur à distance lisible.
+- Ajouter un soutien de combat simple contre les ennemis proches.
+- Gérer sa destruction et permettre un nouveau recrutement.
 
-## v0.7 - Flotte basique
+## v0.7 - Flotte basique avec ordres simples
 
 - Gerer plusieurs bateaux allies.
 - Ajouter une formation simple.
 - Eviter les collisions les plus visibles.
+- Ajouter des ordres simples : suivre, tenir position, attaquer.
 
 ## v0.8 - Abordage simple
 

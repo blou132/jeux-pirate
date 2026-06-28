@@ -60,9 +60,18 @@ Le joueur incarne le capitaine d'un petit navire independant qui construit progr
 6. Le HUD affiche les missions actives.
 7. Une mission terminée demande de revenir au port pour récupérer sa récompense.
 
+## Boucle de jeu v0.6
+
+1. Le joueur collecte assez d'or et de bois.
+2. Il revient au port et recrute un Sloop allié.
+3. L'allié apparaît près du port et suit le joueur en mer.
+4. Il reste à distance lisible du bateau joueur.
+5. Lorsqu'un ennemi est proche, il manœuvre grossièrement pour tirer de côté.
+6. Si l'allié est détruit, le joueur peut continuer et en recruter un autre.
+
 ## Port et progression
 
-Le port sert de premier point sûr et de première interface de progression. Il ne contient pas encore de commerce avancé, de missions ou de PNJ, mais il établit le rythme attendu : partir en mer, obtenir des ressources, revenir au port, réparer et améliorer le bateau.
+Le port sert de premier point sûr et de première interface de progression. Il établit le rythme attendu : partir en mer, obtenir des ressources, revenir au port, réparer, améliorer le bateau, accepter des missions et recruter un premier soutien allié.
 
 Les améliorations de v0.2 restent volontairement simples :
 
@@ -183,6 +192,17 @@ Les missions donnent un premier cadre aux actions déjà jouables sans créer de
 - Les objectifs temporaires sont nettoyés après récupération de la récompense.
 - Les récompenses se récupèrent au port et ne peuvent pas être réclamées plusieurs fois.
 
+## Premier allié v0.6
+
+Le Sloop allié pose une première base de coopération sans lancer encore une flotte complète :
+
+- Recrutement au port contre 150 or et 60 bois.
+- Un seul allié actif à la fois pour garder le prototype lisible.
+- Suivi automatique du joueur avec distance arrière-latérale.
+- Soutien de combat simple contre les ennemis proches.
+- Boulets alliés dédiés, visibles, qui ciblent les ennemis et pas le joueur.
+- Destruction non bloquante : le HUD prévient le joueur et le port permet de recruter de nouveau.
+
 ## Piliers a long terme
 
 - Navigation lisible : le joueur doit toujours comprendre son cap, sa vitesse et les menaces proches.
@@ -233,3 +253,11 @@ Les missions donnent un premier cadre aux actions déjà jouables sans créer de
 - Flotte alliée.
 - Abordage.
 - Sauvegarde persistante des missions.
+
+## Hors scope v0.6
+
+- Flotte complète avec plusieurs alliés.
+- Ordres de flotte détaillés.
+- Réparations ou améliorations dédiées aux alliés.
+- Abordage.
+- Sauvegarde persistante de l'allié recruté.
