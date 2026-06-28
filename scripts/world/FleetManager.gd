@@ -39,6 +39,10 @@ var _allies: Array[Node3D] = []
 var _current_order: String = ORDER_FOLLOW
 
 
+func _ready() -> void:
+	add_to_group("fleet_manager")
+
+
 func setup(world: Node3D, player: Node3D, hud: Node) -> void:
 	_world = world
 	_player = player

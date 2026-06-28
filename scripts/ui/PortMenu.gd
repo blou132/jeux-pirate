@@ -37,7 +37,6 @@ func _ready() -> void:
 	root_control.visible = false
 	upgrades_container.visible = false
 	missions_container.visible = false
-	recruit_ally_button.text = "Recruter un allié : 150 or, 60 bois"
 	repair_button.pressed.connect(_on_repair_pressed)
 	repair_ally_button.pressed.connect(_on_repair_ally_pressed)
 	upgrades_button.pressed.connect(_on_upgrades_pressed)
@@ -68,6 +67,7 @@ func open(player: Node) -> void:
 	missions_container.visible = false
 	_refresh_repair_button()
 	_refresh_ally_repair_button()
+	_refresh_recruit_ally_button()
 	_refresh_upgrade_rows()
 	_refresh_mission_rows()
 	root_control.visible = true
@@ -206,6 +206,14 @@ func _get_ally_ship() -> Node:
 	return get_tree().get_first_node_in_group("ally_ships")
 
 
+func _get_fleet_manager() -> Node:
+	var world := get_tree().current_scene
+	if world != null and world.has_method("get_fleet_manager"):
+		return world.get_fleet_manager()
+
+	return get_tree().get_first_node_in_group("fleet_manager")
+
+
 func _refresh_repair_button() -> void:
 	if _player == null or not _player.has_method("get_health") or not _player.has_method("get_max_health"):
 		repair_button.text = "Réparer le bateau"
@@ -245,6 +253,39 @@ func _refresh_ally_repair_button() -> void:
 		required_wood,
 	]
 	repair_ally_button.disabled = false
+
+
+func _refresh_recruit_ally_button() -> void:
+	var fleet_manager := _get_fleet_manager()
+	if fleet_manager == null:
+		recruit_ally_button.text = "Recrutement indisponible"
+		recruit_ally_button.disabled = true
+		return
+
+	var fleet_count := 0
+	var max_allies := 3
+	if fleet_manager.has_method("get_fleet_count"):
+		fleet_count = int(fleet_manager.get_fleet_count())
+	if fleet_manager.has_method("get_max_allies"):
+		max_allies = int(fleet_manager.get_max_allies())
+
+	if fleet_manager.has_method("is_full") and fleet_manager.is_full():
+		recruit_ally_button.text = "Flotte complète : %d/%d" % [fleet_count, max_allies]
+		recruit_ally_button.disabled = true
+		return
+
+	if fleet_manager.has_method("get_next_recruit_cost"):
+		var cost: Dictionary = fleet_manager.get_next_recruit_cost()
+		recruit_ally_button.text = "Recruter un allié - Flotte : %d/%d - coût : %d or, %d bois" % [
+			fleet_count,
+			max_allies,
+			int(cost["gold"]),
+			int(cost["wood"]),
+		]
+	else:
+		recruit_ally_button.text = "Recruter un allié - Flotte : %d/%d" % [fleet_count, max_allies]
+
+	recruit_ally_button.disabled = false
 
 
 func _on_hull_upgrade_pressed() -> void:
@@ -337,6 +378,7 @@ func _on_recruit_ally_pressed() -> void:
 
 	status_label.text = world.recruit_ally_ship()
 	_refresh_ally_repair_button()
+	_refresh_recruit_ally_button()
 
 
 func _refresh_mission_rows() -> void:
