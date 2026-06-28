@@ -4,6 +4,8 @@ extends CanvasLayer
 @onready var health_label: Label = $MarginContainer/PanelContainer/VBoxContainer/HealthLabel
 @onready var gold_label: Label = $MarginContainer/PanelContainer/VBoxContainer/GoldLabel
 @onready var wood_label: Label = $MarginContainer/PanelContainer/VBoxContainer/WoodLabel
+@onready var map_fragments_label: Label = $MarginContainer/PanelContainer/VBoxContainer/MapFragmentsLabel
+@onready var ancient_relics_label: Label = $MarginContainer/PanelContainer/VBoxContainer/AncientRelicsLabel
 @onready var hull_level_label: Label = $MarginContainer/PanelContainer/VBoxContainer/HullLevelLabel
 @onready var sails_level_label: Label = $MarginContainer/PanelContainer/VBoxContainer/SailsLevelLabel
 @onready var cannons_level_label: Label = $MarginContainer/PanelContainer/VBoxContainer/CannonsLevelLabel
@@ -103,6 +105,13 @@ func _connect_game_state() -> void:
 	if _game_state.has_method("get_gold") and _game_state.has_method("get_wood"):
 		_on_resources_changed(_game_state.get_gold(), _game_state.get_wood())
 
+	var treasure_resources_callback := Callable(self, "_on_treasure_resources_changed")
+	if _game_state.has_signal("treasure_resources_changed") and not _game_state.is_connected("treasure_resources_changed", treasure_resources_callback):
+		_game_state.connect("treasure_resources_changed", treasure_resources_callback)
+
+	if _game_state.has_method("get_map_fragments") and _game_state.has_method("get_ancient_relics"):
+		_on_treasure_resources_changed(_game_state.get_map_fragments(), _game_state.get_ancient_relics())
+
 	var danger_callback := Callable(self, "_on_danger_changed")
 	if _game_state.has_signal("danger_changed") and not _game_state.is_connected("danger_changed", danger_callback):
 		_game_state.connect("danger_changed", danger_callback)
@@ -114,6 +123,11 @@ func _connect_game_state() -> void:
 func _on_resources_changed(gold: int, wood: int) -> void:
 	gold_label.text = "Or: %d" % gold
 	wood_label.text = "Bois: %d" % wood
+
+
+func _on_treasure_resources_changed(map_fragments: int, ancient_relics: int) -> void:
+	map_fragments_label.text = "Fragments: %d" % map_fragments
+	ancient_relics_label.text = "Reliques: %d" % ancient_relics
 
 
 func _on_danger_changed(danger_level: int, enemies_defeated: int) -> void:
