@@ -211,18 +211,29 @@ position = Vector3(18, 0, 12)
 rotation_degrees = Vector3(0, -18, 0)
 scale = Vector3(0.85, 0.85, 0.85)
 island_name = "Île du Naufrage"
+chest_id = "shipwreck_island_chest"
+reward_gold = 30
+reward_wood = 15
 
 [node name="RockyIsland" parent="Islands" instance=ExtResource("12_island")]
 position = Vector3(44, 0, -32)
 rotation_degrees = Vector3(0, 28, 0)
 scale = Vector3(1.15, 1.0, 1.05)
 island_name = "Île des Rochers"
+chest_id = "rocky_island_chest"
+reward_gold = 60
+reward_wood = 30
+reward_map_fragments = 1
 
 [node name="CursedIslet" parent="Islands" instance=ExtResource("12_island")]
 position = Vector3(-56, 0, 40)
 rotation_degrees = Vector3(0, 64, 0)
 scale = Vector3(1.25, 1.0, 1.2)
 island_name = "Îlot Maudit"
+chest_id = "cursed_islet_chest"
+reward_gold = 120
+reward_wood = 50
+reward_ancient_relics = 1
 
 [node name="PlayerBoat" parent="." instance=ExtResource("2_player")]
 position = Vector3(0, 0, 0)
