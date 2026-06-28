@@ -20,10 +20,13 @@ extends Node
 @export var broadside_muzzle_height: float = 0.62
 @export var combat_maneuver_speed_scale: float = 0.52
 @export var broadside_line_correction_weight: float = 0.65
+@export var ally_separation_distance: float = 5.0
+@export var ally_separation_weight: float = 1.15
 
 @onready var ship: AllyShip = get_parent() as AllyShip
 
 var _player: Node3D
+var _fleet_manager: Node
 var _attack_cooldown_remaining: float = 0.0
 
 
@@ -57,10 +60,27 @@ func _physics_process(delta: float) -> void:
 	var follow_slot := _get_follow_slot()
 	var distance_to_slot := ship_position.distance_to(follow_slot)
 	if distance_to_slot <= slot_tolerance:
-		ship.brake(delta)
+		var close_separation := _get_ally_separation_direction()
+		if close_separation == Vector3.ZERO:
+			ship.brake(delta)
+		else:
+			ship.steer_along_direction_with_speed(close_separation, delta, close_speed_scale)
 		return
 
-	ship.steer_toward(follow_slot, delta, _get_follow_speed_scale(distance_to_slot))
+	var desired_direction := follow_slot - ship_position
+	desired_direction.y = 0.0
+	var separation_direction := _get_ally_separation_direction()
+	if separation_direction != Vector3.ZERO and desired_direction.length_squared() > 0.01:
+		desired_direction = (desired_direction.normalized() + (separation_direction * ally_separation_weight)).normalized()
+
+	if desired_direction.length_squared() < 0.01:
+		ship.brake(delta)
+	else:
+		ship.steer_along_direction_with_speed(
+			desired_direction.normalized(),
+			delta,
+			_get_follow_speed_scale(distance_to_slot)
+		)
 
 
 func _refresh_player() -> void:
@@ -71,6 +91,11 @@ func _refresh_player() -> void:
 
 
 func _get_follow_slot() -> Vector3:
+	var fleet_manager := _get_fleet_manager()
+	if fleet_manager != null and fleet_manager.has_method("get_follow_slot_for_ally"):
+		var fleet_slot: Vector3 = fleet_manager.get_follow_slot_for_ally(ship)
+		return fleet_slot
+
 	var rear_direction: Vector3 = _player.global_transform.basis.z
 	rear_direction.y = 0.0
 	if rear_direction.length_squared() < 0.01:
@@ -90,6 +115,19 @@ func _get_follow_slot() -> Vector3:
 	return follow_slot
 
 
+func _get_fleet_manager() -> Node:
+	if is_instance_valid(_fleet_manager):
+		return _fleet_manager
+
+	var world := get_tree().current_scene
+	if world != null and world.has_method("get_fleet_manager"):
+		_fleet_manager = world.get_fleet_manager()
+	if _fleet_manager == null:
+		_fleet_manager = get_tree().get_first_node_in_group("fleet_manager")
+
+	return _fleet_manager
+
+
 func _get_follow_speed_scale(distance_to_slot: float) -> float:
 	if distance_to_slot > too_far_distance:
 		return catch_up_speed_scale
@@ -107,6 +145,32 @@ func _move_away_from_player(player_position: Vector3, ship_position: Vector3, de
 		return
 
 	ship.steer_along_direction_with_speed(away_direction.normalized(), delta, close_speed_scale)
+
+
+func _get_ally_separation_direction() -> Vector3:
+	var separation := Vector3.ZERO
+	var ship_position := ship.global_position
+	ship_position.y = 0.0
+
+	for ally in get_tree().get_nodes_in_group("ally_ships"):
+		if ally == ship or not ally is Node3D:
+			continue
+		if ally.has_method("is_destroyed") and ally.is_destroyed():
+			continue
+
+		var ally_node := ally as Node3D
+		var offset := ship_position - ally_node.global_position
+		offset.y = 0.0
+		var distance := offset.length()
+		if distance <= 0.01 or distance >= ally_separation_distance:
+			continue
+
+		separation += offset.normalized() * ((ally_separation_distance - distance) / ally_separation_distance)
+
+	if separation.length_squared() < 0.01:
+		return Vector3.ZERO
+
+	return separation.normalized()
 
 
 func _try_combat_support(delta: float) -> bool:
