@@ -84,6 +84,7 @@ func register_quest(config: Dictionary) -> void:
 
 
 func clear_quests() -> void:
+	_cleanup_all_quest_objectives()
 	active_quest_ids.clear()
 	_quest_order.clear()
 	_quest_configs.clear()
@@ -137,6 +138,7 @@ func claim_reward(quest_id: String) -> String:
 		active_quest_changed.emit(quest_id)
 		active_quests_changed.emit(active_quest_ids)
 
+	_cleanup_quest_objective(quest_id)
 	quest_reward_claimed.emit(quest_id, _get_quest_name(quest_id))
 	quests_changed.emit()
 	var reward_message := "Récompense récupérée : %s\n+%s" % [
@@ -451,6 +453,18 @@ func _spawn_quest_objective(quest_id: String) -> void:
 	var spawner := get_tree().get_first_node_in_group("quest_objective_spawner")
 	if spawner != null and spawner.has_method("spawn_objective_for_quest"):
 		spawner.spawn_objective_for_quest(quest_id)
+
+
+func _cleanup_quest_objective(quest_id: String) -> void:
+	var spawner := get_tree().get_first_node_in_group("quest_objective_spawner")
+	if spawner != null and spawner.has_method("clear_objective_for_quest"):
+		spawner.clear_objective_for_quest(quest_id)
+
+
+func _cleanup_all_quest_objectives() -> void:
+	var spawner := get_tree().get_first_node_in_group("quest_objective_spawner")
+	if spawner != null and spawner.has_method("clear_all_objectives"):
+		spawner.clear_all_objectives()
 
 
 func _show_hud_message(message: String, duration: float) -> void:

@@ -87,6 +87,22 @@ func get_objective_for_quest(quest_id: String) -> Node:
 	return null
 
 
+func clear_objective_for_quest(quest_id: String) -> void:
+	if not _spawned_objectives.has(quest_id):
+		return
+
+	var objective: Node = _spawned_objectives[quest_id]
+	if is_instance_valid(objective):
+		objective.queue_free()
+
+	_spawned_objectives.erase(quest_id)
+
+
+func clear_all_objectives() -> void:
+	for quest_id in _spawned_objectives.keys():
+		clear_objective_for_quest(String(quest_id))
+
+
 func _on_objective_interaction_requested(objective: Node) -> void:
 	if objective.has_method("is_player_in_range") and not objective.is_player_in_range():
 		return
