@@ -72,8 +72,11 @@
 ## v0.8 - Réputation et titres pirates
 
 - Ajouter une réputation pirate simple.
+- Ajouter des rangs de réputation.
 - Débloquer des titres selon les actions du joueur.
-- Utiliser la réputation comme première progression sociale.
+- Donner de la réputation via combat, missions, coffres, reliques et flotte.
+- Afficher réputation et titre dans le HUD.
+- Ajouter un panneau `Statut pirate` au port.
 
 ## v0.9 - Hiérarchie des navires
 
@@ -88,8 +91,20 @@
 - Interface propre pour ressources, PV, missions, flotte et ordres.
 - Build exportable pour test externe.
 
-## v1.1 - Ports améliorés et commerce
+## v1.1 - Hiérarchie des ports et commerce
 
 - Ajouter plus d'options de port.
 - Préparer un commerce simple entre ressources.
 - Donner plus de rôle aux ports dans la progression.
+
+## v1.2 - Hiérarchie des trésors avancée
+
+- Différencier les types de trésors.
+- Relier les reliques et fragments à des récompenses plus rares.
+- Préparer des collections ou découvertes majeures.
+
+## v1.3 - Zones de danger avancées
+
+- Rendre les zones de danger plus évolutives.
+- Relier danger, réputation et types d'ennemis.
+- Préparer des routes maritimes plus risquées.

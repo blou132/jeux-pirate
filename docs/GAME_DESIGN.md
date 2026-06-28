@@ -79,6 +79,14 @@ Le joueur incarne le capitaine d'un petit navire independant qui construit progr
 6. Le port répare toute la flotte selon les PV manquants.
 7. Un allié détruit est retiré de la flotte et peut être remplacé.
 
+## Boucle de jeu v0.8
+
+1. Le joueur gagne de la réputation en accomplissant les actions déjà jouables.
+2. Les ennemis coulés, coffres, reliques, missions et recrutements font progresser son statut.
+3. Le HUD affiche le rang de réputation et le titre pirate courant.
+4. Les changements importants affichent un feedback court.
+5. Le port permet de consulter le statut pirate et la progression vers le prochain rang.
+
 ## Port et progression
 
 Le port sert de premier point sûr et de première interface de progression. Il établit le rythme attendu : partir en mer, obtenir des ressources, revenir au port, réparer, améliorer le bateau, accepter des missions et recruter un premier soutien allié.
@@ -240,6 +248,18 @@ La v0.7 transforme le premier allié en petite escadre sans lancer encore les sy
 - La réparation de flotte garde la règle simple de port : 1 bois pour 5 PV réparés.
 - Les kills de n'importe quel allié restent crédités au joueur pour le loot, le danger et les missions.
 
+## Réputation et titres v0.8
+
+La réputation donne une progression sociale simple sans ajouter encore de contrôle de territoire ou de hiérarchie de ports :
+
+- Les points de réputation montent avec les actions de base : combat, missions, exploration, reliques et flotte.
+- Les rangs de réputation représentent la notoriété du joueur dans le monde pirate.
+- Les titres pirates sont séparés des rangs pour rester extensibles avec d'autres critères plus tard.
+- Le score de titre dépend surtout de la réputation, avec de petits bonus pour missions, ennemis, trésors et taille de flotte atteinte.
+- Le HUD reste volontairement sobre : rang, points et titre.
+- Le port affiche un statut plus complet avec progression vers le prochain rang.
+- Les gains sont branchés sur des événements déjà uniques pour éviter les doubles récompenses.
+
 ## Piliers a long terme
 
 - Navigation lisible : le joueur doit toujours comprendre son cap, sa vitesse et les menaces proches.
@@ -306,3 +326,11 @@ La v0.7 transforme le premier allié en petite escadre sans lancer encore les sy
 - Monstres marins.
 - Hiérarchie détaillée des navires.
 - Sauvegarde persistante de la flotte.
+
+## Hors scope v0.8
+
+- Contrôle de territoire.
+- Monstres marins.
+- Hiérarchie complète des ports.
+- Réputation persistante sur disque.
+- Factions pirates concurrentes.

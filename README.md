@@ -38,6 +38,8 @@ La v0.6.1 rend l'allié plus lisible et utile : coûts de port affichés, répar
 
 La v0.7 ajoute une flotte basique : jusqu'à 3 Sloops alliés, recrutement progressif, formation de suivi, ordres simples, réparation de flotte et HUD de flotte.
 
+La v0.8 ajoute une progression sociale : réputation pirate, rangs de réputation, titres pirates, gains liés aux actions jouables, affichage HUD et statut pirate au port.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -185,6 +187,16 @@ La v0.7 ajoute une flotte basique : jusqu'à 3 Sloops alliés, recrutement progr
 - Le port propose `Réparer la flotte` avec coût total selon les PV manquants.
 - Les alliés détruits sont retirés de la flotte et libèrent une place de recrutement.
 
+## Etat v0.8
+
+- Système global de réputation pirate en session.
+- Rangs de réputation : Inconnu, Recherché, Craint, Redouté, Célèbre, Légendaire, Fléau des mers, Roi des pirates.
+- Titres pirates séparés : de `Loup de mer` jusqu'à `Légende éternelle`.
+- Gains de réputation : ennemis coulés, missions terminées, coffres, reliques anciennes, recrutement allié et flotte complète.
+- Les kills faits par la flotte donnent aussi la réputation au joueur.
+- Le HUD affiche le rang de réputation, les points et le titre courant.
+- Le menu du port ajoute `Statut pirate` avec titre, rang, points, prochain rang et progression.
+
 ## Lancement
 
 1. Installer Godot 4.x.
@@ -234,6 +246,7 @@ Les lignes de bordée ennemies peuvent être affichées avec `debug_show_broadsi
 - `GameState` est configure en autoload pour suivre les ressources joueur.
 - `UpgradeSystem` est configure en autoload pour suivre les niveaux d'amélioration.
 - `QuestSystem` est configure en autoload pour suivre les missions actives et les récompenses.
+- `ReputationSystem` est configure en autoload pour suivre réputation, rangs, titres pirates et feedback de progression.
 - `QuestObjectiveSpawner` crée les objectifs temporaires de mission dans la scène jouable.
 - `FleetManager` gère les alliés actifs, la limite de flotte, les ordres, la formation et la réparation de flotte.
 - `AllyShip` et `AllyShipAI` gèrent le comportement individuel des bateaux alliés recrutés en session.
