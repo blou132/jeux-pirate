@@ -38,7 +38,8 @@ func _on_body_entered(body: Node) -> void:
 
 	if body.has_method("take_damage"):
 		body.take_damage(damage, _source)
-		_show_hit_feedback(damage)
+		if not body.has_method("is_destroyed") or not body.is_destroyed():
+			_show_hit_feedback(damage)
 		queue_free()
 
 

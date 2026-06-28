@@ -188,6 +188,10 @@ func get_display_name() -> String:
 	return display_name
 
 
+func is_destroyed() -> bool:
+	return _destroyed
+
+
 func get_aim_position() -> Vector3:
 	var aim_point := get_node_or_null("AimPoint") as Node3D
 	if aim_point != null:
