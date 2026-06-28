@@ -15,21 +15,34 @@ const REPAIR_HEALTH_PER_WOOD := 5
 @onready var hull_upgrade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/HullUpgradeButton
 @onready var sails_upgrade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/SailsUpgradeButton
 @onready var cannons_upgrade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/CannonsUpgradeButton
+@onready var missions_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsButton
+@onready var missions_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer
+@onready var mission_list: ItemList = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/MissionList
+@onready var mission_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/MissionStatusLabel
+@onready var accept_mission_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/AcceptMissionButton
+@onready var claim_mission_reward_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/ClaimMissionRewardButton
 @onready var quit_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/QuitButton
 
 var _player: Node
 var _previous_pause_state: bool = false
+var _mission_ids: Array[String] = []
+var _selected_mission_id: String = ""
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	root_control.visible = false
 	upgrades_container.visible = false
+	missions_container.visible = false
 	repair_button.pressed.connect(_on_repair_pressed)
 	upgrades_button.pressed.connect(_on_upgrades_pressed)
 	hull_upgrade_button.pressed.connect(_on_hull_upgrade_pressed)
 	sails_upgrade_button.pressed.connect(_on_sails_upgrade_pressed)
 	cannons_upgrade_button.pressed.connect(_on_cannons_upgrade_pressed)
+	missions_button.pressed.connect(_on_missions_pressed)
+	mission_list.item_selected.connect(_on_mission_selected)
+	accept_mission_button.pressed.connect(_on_accept_mission_pressed)
+	claim_mission_reward_button.pressed.connect(_on_claim_mission_reward_pressed)
 	quit_button.pressed.connect(close)
 
 
@@ -46,7 +59,9 @@ func open(player: Node) -> void:
 	_player = player
 	status_label.text = ""
 	upgrades_container.visible = false
+	missions_container.visible = false
 	_refresh_upgrade_rows()
+	_refresh_mission_rows()
 	root_control.visible = true
 	_previous_pause_state = get_tree().paused
 	get_tree().paused = true
@@ -101,6 +116,7 @@ func _on_repair_pressed() -> void:
 func _on_upgrades_pressed() -> void:
 	upgrades_container.visible = not upgrades_container.visible
 	if upgrades_container.visible:
+		missions_container.visible = false
 		status_label.text = "Choisis une amélioration"
 		_refresh_upgrade_rows()
 	else:
@@ -113,6 +129,10 @@ func _get_game_state() -> Node:
 
 func _get_upgrade_system() -> Node:
 	return get_node_or_null("/root/UpgradeSystem")
+
+
+func _get_quest_system() -> Node:
+	return get_node_or_null("/root/QuestSystem")
 
 
 func _on_hull_upgrade_pressed() -> void:
@@ -156,3 +176,115 @@ func _set_upgrade_row(upgrade_system: Node, upgrade_id: String, label: Label, bu
 
 	if upgrade_system.has_method("is_max_level"):
 		button.disabled = upgrade_system.is_max_level(upgrade_id)
+
+
+func _on_missions_pressed() -> void:
+	missions_container.visible = not missions_container.visible
+	if missions_container.visible:
+		upgrades_container.visible = false
+		status_label.text = "Choisis une mission"
+		_refresh_mission_rows()
+	else:
+		status_label.text = ""
+
+
+func _on_mission_selected(index: int) -> void:
+	if index < 0 or index >= _mission_ids.size():
+		return
+
+	_selected_mission_id = _mission_ids[index]
+	_refresh_selected_mission()
+
+
+func _on_accept_mission_pressed() -> void:
+	var quest_system := _get_quest_system()
+	if quest_system == null or not quest_system.has_method("accept_quest"):
+		status_label.text = "Missions indisponibles"
+		return
+
+	status_label.text = quest_system.accept_quest(_selected_mission_id)
+	_refresh_mission_rows()
+
+
+func _on_claim_mission_reward_pressed() -> void:
+	var quest_system := _get_quest_system()
+	if quest_system == null or not quest_system.has_method("claim_reward"):
+		status_label.text = "Missions indisponibles"
+		return
+
+	status_label.text = quest_system.claim_reward(_selected_mission_id)
+	_refresh_mission_rows()
+
+
+func _refresh_mission_rows() -> void:
+	mission_list.clear()
+	_mission_ids.clear()
+
+	var quest_system := _get_quest_system()
+	if quest_system == null or not quest_system.has_method("get_all_quest_views"):
+		mission_status_label.text = "Missions indisponibles"
+		accept_mission_button.disabled = true
+		claim_mission_reward_button.disabled = true
+		return
+
+	var quest_views: Array = quest_system.get_all_quest_views()
+	for quest_view in quest_views:
+		if not (quest_view is Dictionary):
+			continue
+
+		var view: Dictionary = quest_view
+		var quest_id := String(view.get("id", ""))
+		if quest_id.is_empty():
+			continue
+
+		_mission_ids.append(quest_id)
+		mission_list.add_item("%s - %s" % [
+			String(view.get("name", "Mission")),
+			String(view.get("status_text", "Disponible")),
+		])
+
+	if _mission_ids.is_empty():
+		_selected_mission_id = ""
+		mission_status_label.text = "Aucune mission disponible"
+		accept_mission_button.disabled = true
+		claim_mission_reward_button.disabled = true
+		return
+
+	var selected_index := _get_mission_index(_selected_mission_id)
+	if selected_index < 0:
+		selected_index = 0
+		_selected_mission_id = _mission_ids[selected_index]
+
+	mission_list.select(selected_index)
+	_refresh_selected_mission()
+
+
+func _refresh_selected_mission() -> void:
+	var quest_system := _get_quest_system()
+	if quest_system == null or not quest_system.has_method("get_quest_view") or _selected_mission_id.is_empty():
+		mission_status_label.text = "Missions indisponibles"
+		accept_mission_button.disabled = true
+		claim_mission_reward_button.disabled = true
+		return
+
+	var view: Dictionary = quest_system.get_quest_view(_selected_mission_id)
+	mission_status_label.text = "%s\nObjectif : %s\nProgression : %s\nRécompense : %s\nStatut : %s" % [
+		String(view.get("name", "Mission")),
+		String(view.get("objective", "")),
+		String(view.get("progress_text", "")),
+		String(view.get("reward_text", "")),
+		String(view.get("status_text", "")),
+	]
+	accept_mission_button.disabled = not bool(view.get("can_accept", false))
+	claim_mission_reward_button.disabled = not bool(view.get("can_claim", false))
+
+
+func _get_mission_index(quest_id: String) -> int:
+	if quest_id.is_empty():
+		return -1
+
+	for index in range(_mission_ids.size()):
+		if _mission_ids[index] == quest_id:
+			return index
+
+	return -1
