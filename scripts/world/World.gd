@@ -81,6 +81,11 @@ func recruit_ally_ship() -> String:
 	return "Sloop allié recruté"
 
 
+func get_ally_ship() -> Node:
+	_cleanup_ally_reference()
+	return _ally_ship
+
+
 func _connect_island(island: Node) -> void:
 	if not island.has_signal("interaction_requested"):
 		return

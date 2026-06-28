@@ -52,6 +52,10 @@ horizontal_alignment = 1
 layout_mode = 2
 text = "Réparer le bateau"
 
+[node name="RepairAllyButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Aucun allié à réparer"
+
 [node name="UpgradesButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
 text = "Améliorations"

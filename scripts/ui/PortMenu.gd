@@ -7,6 +7,7 @@ const REPAIR_HEALTH_PER_WOOD := 5
 @onready var root_control: Control = $Root
 @onready var status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/StatusLabel
 @onready var repair_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/RepairButton
+@onready var repair_ally_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/RepairAllyButton
 @onready var upgrades_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesButton
 @onready var upgrades_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer
 @onready var hull_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/HullStatusLabel
@@ -38,6 +39,7 @@ func _ready() -> void:
 	missions_container.visible = false
 	recruit_ally_button.text = "Recruter un allié : 150 or, 60 bois"
 	repair_button.pressed.connect(_on_repair_pressed)
+	repair_ally_button.pressed.connect(_on_repair_ally_pressed)
 	upgrades_button.pressed.connect(_on_upgrades_pressed)
 	hull_upgrade_button.pressed.connect(_on_hull_upgrade_pressed)
 	sails_upgrade_button.pressed.connect(_on_sails_upgrade_pressed)
@@ -65,6 +67,7 @@ func open(player: Node) -> void:
 	upgrades_container.visible = false
 	missions_container.visible = false
 	_refresh_repair_button()
+	_refresh_ally_repair_button()
 	_refresh_upgrade_rows()
 	_refresh_mission_rows()
 	root_control.visible = true
@@ -124,6 +127,53 @@ func _on_repair_pressed() -> void:
 	else:
 		status_label.text = "Coque déjà intacte"
 	_refresh_repair_button()
+	_refresh_ally_repair_button()
+
+
+func _on_repair_ally_pressed() -> void:
+	var ally_ship := _get_ally_ship()
+	if ally_ship == null:
+		status_label.text = "Aucun allié à réparer"
+		_refresh_ally_repair_button()
+		return
+	if not ally_ship.has_method("get_health") or not ally_ship.has_method("get_max_health"):
+		status_label.text = "Aucun allié à réparer"
+		_refresh_ally_repair_button()
+		return
+
+	var missing_health: int = int(ally_ship.get_max_health()) - int(ally_ship.get_health())
+	if missing_health <= 0:
+		status_label.text = "Allié déjà intact"
+		_refresh_ally_repair_button()
+		return
+
+	var game_state := _get_game_state()
+	if game_state == null or not game_state.has_method("get_wood"):
+		status_label.text = "Pas assez de bois"
+		_refresh_ally_repair_button()
+		return
+
+	var required_wood := ceili(float(missing_health) / float(REPAIR_HEALTH_PER_WOOD))
+	if game_state.get_wood() < required_wood:
+		status_label.text = "Pas assez de bois"
+		_refresh_ally_repair_button()
+		return
+
+	if not game_state.has_method("spend_resources") or not game_state.spend_resources(0, required_wood):
+		status_label.text = "Pas assez de bois"
+		_refresh_ally_repair_button()
+		return
+
+	var repaired_health := 0
+	if ally_ship.has_method("repair"):
+		repaired_health = ally_ship.repair(required_wood * REPAIR_HEALTH_PER_WOOD)
+
+	if repaired_health > 0:
+		status_label.text = "Allié réparé"
+	else:
+		status_label.text = "Allié déjà intact"
+	_refresh_ally_repair_button()
+	_refresh_repair_button()
 
 
 func _on_upgrades_pressed() -> void:
@@ -148,6 +198,14 @@ func _get_quest_system() -> Node:
 	return get_node_or_null("/root/QuestSystem")
 
 
+func _get_ally_ship() -> Node:
+	var world := get_tree().current_scene
+	if world != null and world.has_method("get_ally_ship"):
+		return world.get_ally_ship()
+
+	return get_tree().get_first_node_in_group("ally_ships")
+
+
 func _refresh_repair_button() -> void:
 	if _player == null or not _player.has_method("get_health") or not _player.has_method("get_max_health"):
 		repair_button.text = "Réparer le bateau"
@@ -166,6 +224,27 @@ func _refresh_repair_button() -> void:
 		required_wood,
 	]
 	repair_button.disabled = false
+
+
+func _refresh_ally_repair_button() -> void:
+	var ally_ship := _get_ally_ship()
+	if ally_ship == null or not ally_ship.has_method("get_health") or not ally_ship.has_method("get_max_health"):
+		repair_ally_button.text = "Aucun allié à réparer"
+		repair_ally_button.disabled = true
+		return
+
+	var missing_health: int = max(0, int(ally_ship.get_max_health()) - int(ally_ship.get_health()))
+	if missing_health <= 0:
+		repair_ally_button.text = "Allié déjà intact"
+		repair_ally_button.disabled = true
+		return
+
+	var required_wood := ceili(float(missing_health) / float(REPAIR_HEALTH_PER_WOOD))
+	repair_ally_button.text = "Réparer allié : %d PV manquants — coût : %d bois" % [
+		missing_health,
+		required_wood,
+	]
+	repair_ally_button.disabled = false
 
 
 func _on_hull_upgrade_pressed() -> void:
@@ -257,6 +336,7 @@ func _on_recruit_ally_pressed() -> void:
 		return
 
 	status_label.text = world.recruit_ally_ship()
+	_refresh_ally_repair_button()
 
 
 func _refresh_mission_rows() -> void:
