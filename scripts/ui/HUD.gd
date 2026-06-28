@@ -223,6 +223,10 @@ func _connect_quest_system() -> void:
 	if _quest_system.has_signal("active_quest_changed") and not _quest_system.is_connected("active_quest_changed", active_callback):
 		_quest_system.connect("active_quest_changed", active_callback)
 
+	var active_quests_callback := Callable(self, "_on_active_quests_changed")
+	if _quest_system.has_signal("active_quests_changed") and not _quest_system.is_connected("active_quests_changed", active_quests_callback):
+		_quest_system.connect("active_quests_changed", active_quests_callback)
+
 	var progress_callback := Callable(self, "_on_quest_progress_changed")
 	if _quest_system.has_signal("quest_progress_changed") and not _quest_system.is_connected("quest_progress_changed", progress_callback):
 		_quest_system.connect("quest_progress_changed", progress_callback)
@@ -246,6 +250,10 @@ func _on_active_quest_changed(_quest_id: String) -> void:
 	_refresh_quest_label()
 
 
+func _on_active_quests_changed(_quest_ids: Array[String]) -> void:
+	_refresh_quest_label()
+
+
 func _on_quest_progress_changed(_quest_id: String, _progress: int, _target: int) -> void:
 	_refresh_quest_label()
 
@@ -259,10 +267,31 @@ func _on_quest_reward_claimed(_quest_id: String, _quest_name: String) -> void:
 
 
 func _refresh_quest_label() -> void:
-	if _quest_system == null or not _quest_system.has_method("get_active_quest_summary"):
+	if _quest_system == null:
 		quest_label.visible = false
 		return
 
-	var quest_summary: String = _quest_system.get_active_quest_summary()
+	var quest_summary := _get_quest_summary_text()
 	quest_label.text = quest_summary
 	quest_label.visible = not quest_summary.is_empty()
+
+
+func _get_quest_summary_text() -> String:
+	if _quest_system.has_method("get_active_quest_summaries"):
+		var summaries: Array = _quest_system.get_active_quest_summaries(3)
+		return _join_quest_lines(summaries)
+
+	if _quest_system.has_method("get_active_quest_summary"):
+		return _quest_system.get_active_quest_summary()
+
+	return ""
+
+
+func _join_quest_lines(lines: Array) -> String:
+	var text := ""
+	for line in lines:
+		if not text.is_empty():
+			text += "\n"
+		text += String(line)
+
+	return text
