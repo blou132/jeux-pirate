@@ -6,6 +6,12 @@ extends Node3D
 @onready var island_exploration_menu: CanvasLayer = $IslandExplorationMenu
 
 
+func _enter_tree() -> void:
+	var game_state := get_node_or_null("/root/GameState")
+	if game_state != null and game_state.has_method("reset_island_chests"):
+		game_state.reset_island_chests()
+
+
 func _ready() -> void:
 	if hud.has_method("set_player"):
 		hud.set_player(player)

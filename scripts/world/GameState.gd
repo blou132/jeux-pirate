@@ -12,6 +12,7 @@ var gold: int = 0
 var wood: int = 0
 var map_fragments: int = 0
 var ancient_relics: int = 0
+var opened_island_chests: Dictionary = {}
 
 
 func add_resources(gold_amount: int, wood_amount: int) -> void:
@@ -56,6 +57,24 @@ func record_enemy_destroyed() -> void:
 	enemies_defeated += 1
 	danger_level = 1 + int(enemies_defeated / ENEMIES_PER_DANGER_LEVEL)
 	danger_changed.emit(danger_level, enemies_defeated)
+
+
+func is_island_chest_opened(chest_id: String) -> bool:
+	if chest_id.is_empty():
+		return false
+
+	return bool(opened_island_chests.get(chest_id, false))
+
+
+func mark_island_chest_opened(chest_id: String) -> void:
+	if chest_id.is_empty():
+		return
+
+	opened_island_chests[chest_id] = true
+
+
+func reset_island_chests() -> void:
+	opened_island_chests.clear()
 
 
 func get_danger_level() -> int:

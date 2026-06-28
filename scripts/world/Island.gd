@@ -24,6 +24,8 @@ var _chest_opened: bool = false
 func _ready() -> void:
 	add_to_group("islands")
 	_refresh_label()
+	_chest_opened = _is_chest_opened()
+	_refresh_chest_visual()
 	interaction_area.body_entered.connect(_on_body_entered)
 	interaction_area.body_exited.connect(_on_body_exited)
 
@@ -46,10 +48,12 @@ func get_island_name() -> String:
 
 
 func explore() -> Dictionary:
-	if _chest_opened:
+	if _is_chest_opened():
+		_chest_opened = true
+		_refresh_chest_visual()
 		return _make_exploration_result(["Coffre déjà vidé"])
 
-	_chest_opened = true
+	_mark_chest_opened()
 	_refresh_chest_visual()
 	_grant_treasure_rewards()
 	return _make_exploration_result(_build_treasure_messages())
@@ -111,6 +115,32 @@ func _join_messages(messages: Array) -> String:
 
 func _get_game_state() -> Node:
 	return get_node_or_null("/root/GameState")
+
+
+func _is_chest_opened() -> bool:
+	if _chest_opened:
+		return true
+
+	var game_state := _get_game_state()
+	if game_state != null and game_state.has_method("is_island_chest_opened"):
+		return game_state.is_island_chest_opened(_get_chest_key())
+
+	return false
+
+
+func _mark_chest_opened() -> void:
+	_chest_opened = true
+
+	var game_state := _get_game_state()
+	if game_state != null and game_state.has_method("mark_island_chest_opened"):
+		game_state.mark_island_chest_opened(_get_chest_key())
+
+
+func _get_chest_key() -> String:
+	if not chest_id.is_empty():
+		return chest_id
+
+	return str(get_path())
 
 
 func _on_body_entered(body: Node) -> void:
