@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3 uid="uid://ally_cannon_ball_v06"]
+
+[ext_resource type="Script" path="res://scripts/combat/AllyCannonBall.gd" id="1_ally_cannon_ball"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ally_cannon_ball"]
+albedo_color = Color(0.08, 0.55, 0.72, 1)
+emission_enabled = true
+emission = Color(0.08, 0.55, 0.72, 1)
+emission_energy_multiplier = 0.35
+
+[sub_resource type="SphereMesh" id="SphereMesh_ally_cannon_ball"]
+radius = 0.19
+height = 0.38
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_ally_cannon_ball"]
+radius = 0.19
+
+[node name="AllyCannonBall" type="Area3D"]
+script = ExtResource("1_ally_cannon_ball")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_ally_cannon_ball")
+material_override = SubResource("StandardMaterial3D_ally_cannon_ball")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_ally_cannon_ball")
