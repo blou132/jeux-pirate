@@ -216,6 +216,8 @@ func _refresh_cannon_points() -> void:
 func _refresh_debug_markers() -> void:
 	var marker_paths: Array[NodePath] = [
 		NodePath("AimPoint/DebugMarker"),
+		NodePath("LeftCannonPoint/DebugMarker"),
+		NodePath("RightCannonPoint/DebugMarker"),
 	]
 
 	for marker_path in marker_paths:

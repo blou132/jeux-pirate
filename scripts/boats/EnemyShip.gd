@@ -186,6 +186,14 @@ func get_display_name() -> String:
 	return display_name
 
 
+func get_aim_position() -> Vector3:
+	var aim_point := get_node_or_null("AimPoint") as Node3D
+	if aim_point != null:
+		return aim_point.global_position
+
+	return global_position
+
+
 func get_broadside_cannon_position(fire_direction: Vector3, fallback_offset: float, fallback_height: float) -> Vector3:
 	var cannon_point := _get_broadside_cannon_point(fire_direction)
 	if cannon_point != null:
@@ -356,6 +364,7 @@ func _get_broadside_cannon_point(fire_direction: Vector3) -> Node3D:
 
 func _refresh_debug_markers() -> void:
 	var marker_paths: Array[NodePath] = [
+		NodePath("AimPoint/DebugMarker"),
 		NodePath("LeftCannonPoint/DebugMarker"),
 		NodePath("RightCannonPoint/DebugMarker"),
 	]

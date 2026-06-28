@@ -15,9 +15,11 @@ extends Node
 @export var attack_cooldown: float = 2.5
 @export var projectile_speed: float = 16.0
 @export var broadside_alignment_degrees: float = 35.0
+@export var broadside_line_tolerance: float = 1.35
 @export var broadside_muzzle_offset: float = 1.35
 @export var broadside_muzzle_height: float = 0.62
 @export var combat_maneuver_speed_scale: float = 0.52
+@export var broadside_line_correction_weight: float = 0.65
 
 @onready var ship: AllyShip = get_parent() as AllyShip
 
@@ -112,14 +114,15 @@ func _try_combat_support(delta: float) -> bool:
 	if target == null:
 		return false
 
-	var offset := target.global_position - ship.global_position
+	var target_aim_position := _get_target_aim_position(target)
+	var offset := target_aim_position - ship.global_position
 	offset.y = 0.0
 	if offset.length_squared() > attack_detection_range * attack_detection_range:
 		return false
 
-	var fire_direction := _get_ready_fire_direction(offset)
+	var fire_direction := _get_ready_fire_direction(target)
 	if fire_direction == Vector3.ZERO:
-		_maneuver_for_broadside(offset, delta)
+		_maneuver_for_broadside(target, delta)
 		return true
 
 	ship.brake(delta)
@@ -146,25 +149,31 @@ func _get_closest_enemy() -> Node3D:
 	return closest_enemy
 
 
-func _get_ready_fire_direction(offset_to_enemy: Vector3) -> Vector3:
+func _get_ready_fire_direction(target: Node3D) -> Vector3:
+	var target_aim_position := _get_target_aim_position(target)
+	var offset_to_enemy := target_aim_position - ship.global_position
+	offset_to_enemy.y = 0.0
 	if offset_to_enemy.length_squared() < 0.01:
 		return Vector3.ZERO
 
 	var to_enemy := offset_to_enemy.normalized()
-	var starboard_axis: Vector3 = ship.get_starboard_axis()
-	var port_axis: Vector3 = ship.get_port_axis()
-	var fire_direction := starboard_axis
-	if to_enemy.dot(port_axis) > to_enemy.dot(starboard_axis):
-		fire_direction = port_axis
+	var fire_direction := _get_preferred_fire_direction(offset_to_enemy)
+	if fire_direction == Vector3.ZERO:
+		return Vector3.ZERO
 
 	var required_alignment := cos(deg_to_rad(broadside_alignment_degrees))
 	if to_enemy.dot(fire_direction) < required_alignment:
+		return Vector3.ZERO
+	if not _is_broadside_aim_line_valid(fire_direction, target_aim_position):
 		return Vector3.ZERO
 
 	return fire_direction
 
 
-func _maneuver_for_broadside(offset_to_enemy: Vector3, delta: float) -> void:
+func _maneuver_for_broadside(target: Node3D, delta: float) -> void:
+	var target_aim_position := _get_target_aim_position(target)
+	var offset_to_enemy := target_aim_position - ship.global_position
+	offset_to_enemy.y = 0.0
 	if offset_to_enemy.length_squared() < 0.01:
 		ship.brake(delta)
 		return
@@ -181,6 +190,11 @@ func _maneuver_for_broadside(offset_to_enemy: Vector3, delta: float) -> void:
 	current_forward.y = 0.0
 	if current_forward.dot(opposite_forward) > current_forward.dot(desired_forward):
 		desired_forward = opposite_forward
+
+	var preferred_fire_direction := _get_preferred_fire_direction(offset_to_enemy)
+	var line_error := _get_broadside_line_error(preferred_fire_direction, target_aim_position)
+	if line_error.length_squared() > broadside_line_tolerance * broadside_line_tolerance:
+		desired_forward = (desired_forward + (line_error.normalized() * broadside_line_correction_weight)).normalized()
 
 	ship.steer_along_direction_with_speed(desired_forward, delta, combat_maneuver_speed_scale)
 
@@ -199,13 +213,76 @@ func _try_fire(fire_direction: Vector3) -> void:
 	if parent == null:
 		parent = get_tree().root
 	parent.add_child(projectile_node)
-	projectile_node.global_position = ship.get_broadside_cannon_position(
-		fire_direction,
-		broadside_muzzle_offset,
-		broadside_muzzle_height
-	)
+	projectile_node.global_position = _get_broadside_muzzle_position(fire_direction)
 
 	if projectile.has_method("launch"):
 		projectile.launch(fire_direction.normalized(), ship, projectile_speed, attack_damage)
 
 	_attack_cooldown_remaining = attack_cooldown
+
+
+func _get_target_aim_position(target: Node3D) -> Vector3:
+	if target != null and target.has_method("get_aim_position"):
+		var aim_position: Vector3 = target.get_aim_position()
+		return aim_position
+
+	return target.global_position
+
+
+func _get_preferred_fire_direction(offset_to_enemy: Vector3) -> Vector3:
+	if offset_to_enemy.length_squared() < 0.01:
+		return Vector3.ZERO
+
+	var to_enemy := offset_to_enemy.normalized()
+	var starboard_axis: Vector3 = ship.get_starboard_axis()
+	var port_axis: Vector3 = ship.get_port_axis()
+	if to_enemy.dot(port_axis) > to_enemy.dot(starboard_axis):
+		return port_axis
+
+	return starboard_axis
+
+
+func _is_broadside_aim_line_valid(fire_direction: Vector3, target_aim_position: Vector3) -> bool:
+	if fire_direction.length_squared() < 0.01:
+		return false
+
+	var line_origin := _get_broadside_muzzle_position(fire_direction)
+	var line_direction := fire_direction.normalized()
+	line_direction.y = 0.0
+	if line_direction.length_squared() < 0.01:
+		return false
+
+	var to_target := target_aim_position - line_origin
+	var parallel_distance := to_target.dot(line_direction)
+	if parallel_distance <= 0.0:
+		return false
+
+	var closest_point := line_origin + (line_direction * parallel_distance)
+	var perpendicular_distance := target_aim_position.distance_to(closest_point)
+	return perpendicular_distance <= broadside_line_tolerance
+
+
+func _get_broadside_line_error(fire_direction: Vector3, target_aim_position: Vector3) -> Vector3:
+	if fire_direction.length_squared() < 0.01:
+		return Vector3.ZERO
+
+	var line_origin := _get_broadside_muzzle_position(fire_direction)
+	var line_direction := fire_direction.normalized()
+	line_direction.y = 0.0
+	if line_direction.length_squared() < 0.01:
+		return Vector3.ZERO
+
+	var to_target := target_aim_position - line_origin
+	var parallel_distance := maxf(0.0, to_target.dot(line_direction))
+	var closest_point := line_origin + (line_direction * parallel_distance)
+	var error := target_aim_position - closest_point
+	error.y = 0.0
+	return error
+
+
+func _get_broadside_muzzle_position(fire_direction: Vector3) -> Vector3:
+	return ship.get_broadside_cannon_position(
+		fire_direction,
+		broadside_muzzle_offset,
+		broadside_muzzle_height
+	)

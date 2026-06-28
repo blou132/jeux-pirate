@@ -83,6 +83,13 @@ material_override = SubResource("StandardMaterial3D_deck")
 position = Vector3(0, 0.25, 0)
 shape = SubResource("BoxShape3D_collision")
 
+[node name="AimPoint" type="Marker3D" parent="."]
+position = Vector3(0, 0.58, -0.08)
+
+[node name="DebugMarker" type="MeshInstance3D" parent="AimPoint"]
+mesh = SubResource("SphereMesh_debug_point")
+material_override = SubResource("StandardMaterial3D_debug_right")
+
 [node name="LeftCannonPoint" type="Marker3D" parent="."]
 position = Vector3(-1.35, 0.65, -0.25)
 
