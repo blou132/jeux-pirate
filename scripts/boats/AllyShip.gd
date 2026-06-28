@@ -22,6 +22,7 @@ var angular_velocity: float = 0.0
 
 var _current_speed: float = 0.0
 var _destroyed: bool = false
+var _fleet_index: int = 0
 
 
 func _ready() -> void:
@@ -143,6 +144,15 @@ func get_hud_name() -> String:
 	return hud_name
 
 
+func set_fleet_index(index: int) -> void:
+	_fleet_index = maxi(0, index)
+	_refresh_nameplate()
+
+
+func get_fleet_index() -> int:
+	return _fleet_index
+
+
 func get_aim_position() -> Vector3:
 	var aim_point := get_node_or_null("AimPoint") as Node3D
 	if aim_point != null:
@@ -200,7 +210,10 @@ func _destroy() -> void:
 func _refresh_nameplate() -> void:
 	var nameplate := get_node_or_null("Nameplate") as Label3D
 	if nameplate != null:
-		nameplate.text = "Allié : Sloop - %d PV" % health
+		if _fleet_index > 0:
+			nameplate.text = "Allié %d : Sloop - %d PV" % [_fleet_index, health]
+		else:
+			nameplate.text = "Allié : Sloop - %d PV" % health
 
 
 func _refresh_cannon_points() -> void:

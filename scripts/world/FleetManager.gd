@@ -338,6 +338,7 @@ func _on_ally_destroyed(ally_ship: Node) -> void:
 
 
 func _remove_ally(ally_ship: Node) -> void:
+	_disconnect_ally_signals(ally_ship)
 	var next_allies: Array[Node3D] = []
 	for ally in _allies:
 		if ally != ally_ship and is_instance_valid(ally):
@@ -346,6 +347,19 @@ func _remove_ally(ally_ship: Node) -> void:
 	_allies = next_allies
 	_renumber_allies()
 	_emit_fleet_changed()
+
+
+func _disconnect_ally_signals(ally_ship: Node) -> void:
+	if ally_ship == null or not is_instance_valid(ally_ship):
+		return
+
+	var destroyed_callback := Callable(self, "_on_ally_destroyed").bind(ally_ship)
+	if ally_ship.has_signal("destroyed") and ally_ship.is_connected("destroyed", destroyed_callback):
+		ally_ship.disconnect("destroyed", destroyed_callback)
+
+	var health_callback := Callable(self, "_on_ally_health_changed").bind(ally_ship)
+	if ally_ship.has_signal("health_changed") and ally_ship.is_connected("health_changed", health_callback):
+		ally_ship.disconnect("health_changed", health_callback)
 
 
 func _cleanup_allies() -> void:
