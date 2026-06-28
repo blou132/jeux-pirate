@@ -69,6 +69,16 @@ Le joueur incarne le capitaine d'un petit navire independant qui construit progr
 5. Lorsqu'un ennemi est proche, il manœuvre grossièrement pour tirer de côté.
 6. Si l'allié est détruit, le joueur peut continuer et en recruter un autre.
 
+## Boucle de jeu v0.7
+
+1. Le joueur recrute jusqu'à trois Sloops alliés au port.
+2. Chaque recrutement coûte plus cher que le précédent.
+3. Les alliés suivent le joueur en formation simple.
+4. Le joueur donne un ordre global : suivre, attaquer, protéger ou fuir.
+5. Les alliés adaptent leur comportement de navigation et de tir à l'ordre actif.
+6. Le port répare toute la flotte selon les PV manquants.
+7. Un allié détruit est retiré de la flotte et peut être remplacé.
+
 ## Port et progression
 
 Le port sert de premier point sûr et de première interface de progression. Il établit le rythme attendu : partir en mer, obtenir des ressources, revenir au port, réparer, améliorer le bateau, accepter des missions et recruter un premier soutien allié.
@@ -215,6 +225,21 @@ La v0.6.1 rend le premier allié testable dans une vraie boucle de combat :
 - Les dégâts alliés doivent être visibles et les kills alliés appartiennent au joueur pour loot, danger et missions.
 - Un allié détruit ne bloque pas la session : le HUD revient à aucun allié et le port permet un nouveau recrutement.
 
+## Flotte basique v0.7
+
+La v0.7 transforme le premier allié en petite escadre sans lancer encore les systèmes lourds d'abordage, de territoire ou de hiérarchie navale :
+
+- La flotte est limitée à 3 alliés actifs.
+- Les coûts de recrutement progressent pour rendre la croissance lisible.
+- Les slots de formation gardent les alliés derrière le joueur : arrière gauche, arrière droite, puis arrière centre.
+- Les ordres restent globaux pour éviter une microgestion trop précoce.
+- `Suivre` privilégie la formation et ne tire que si un ennemi est très proche.
+- `Attaquer` cherche les ennemis proches et utilise la bordée alliée existante.
+- `Protéger` reste autour du joueur et de la flotte, puis cible les ennemis proches des navires amis.
+- `Fuir` coupe les tirs alliés et dirige les bateaux vers une zone sûre proche du port.
+- La réparation de flotte garde la règle simple de port : 1 bois pour 5 PV réparés.
+- Les kills de n'importe quel allié restent crédités au joueur pour le loot, le danger et les missions.
+
 ## Piliers a long terme
 
 - Navigation lisible : le joueur doit toujours comprendre son cap, sa vitesse et les menaces proches.
@@ -273,3 +298,11 @@ La v0.6.1 rend le premier allié testable dans une vraie boucle de combat :
 - Réparations ou améliorations dédiées aux alliés.
 - Abordage.
 - Sauvegarde persistante de l'allié recruté.
+
+## Hors scope v0.7
+
+- Abordage.
+- Contrôle de territoire.
+- Monstres marins.
+- Hiérarchie détaillée des navires.
+- Sauvegarde persistante de la flotte.

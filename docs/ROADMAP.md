@@ -61,26 +61,35 @@
 
 ## v0.7 - Flotte basique avec ordres simples
 
-- Gerer plusieurs bateaux allies.
-- Ajouter une formation simple.
-- Eviter les collisions les plus visibles.
-- Ajouter des ordres simples : suivre, tenir position, attaquer.
+- Gérer jusqu'à 3 bateaux alliés.
+- Ajouter un recrutement progressif au port.
+- Ajouter une formation simple de suivi.
+- Éviter les collisions les plus visibles entre alliés et joueur.
+- Ajouter des ordres simples : suivre, attaquer, protéger, fuir.
+- Afficher la flotte, l'ordre courant et les PV alliés dans le HUD.
+- Ajouter une réparation de flotte au port.
 
-## v0.8 - Abordage simple
+## v0.8 - Réputation et titres pirates
 
-- Ajouter une action d'abordage à courte portée.
-- Récompenser l'abordage avec plus de ressources.
-- Poser une première base de risque/recompense.
+- Ajouter une réputation pirate simple.
+- Débloquer des titres selon les actions du joueur.
+- Utiliser la réputation comme première progression sociale.
 
-## v0.9 - Carte du monde
+## v0.9 - Hiérarchie des navires
 
-- Préparer une carte simple des zones découvertes.
-- Utiliser les fragments de carte comme première ressource d'exploration.
-- Afficher les îles connues et les zones dangereuses.
+- Différencier davantage les rôles des navires alliés et ennemis.
+- Préparer des classes de navires plus lisibles.
+- Relier la hiérarchie aux coûts, PV, vitesse et puissance de bordée.
 
-## v1.0 - Demo jouable
+## v1.0 - Démo jouable complète
 
-- Boucle complete : partir du port, naviguer, combattre, looter, reparer et ameliorer.
-- Zone de jeu limitee mais coherente.
-- Interface propre pour les ressources, PV et objectifs.
+- Boucle complète : partir du port, naviguer, combattre, looter, réparer, améliorer, recruter et accomplir des missions.
+- Zone de jeu limitée mais cohérente.
+- Interface propre pour ressources, PV, missions, flotte et ordres.
 - Build exportable pour test externe.
+
+## v1.1 - Ports améliorés et commerce
+
+- Ajouter plus d'options de port.
+- Préparer un commerce simple entre ressources.
+- Donner plus de rôle aux ports dans la progression.

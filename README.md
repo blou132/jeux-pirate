@@ -36,6 +36,8 @@ La v0.6 ajoute un premier bateau allié : le Sloop allié peut être recruté au
 
 La v0.6.1 rend l'allié plus lisible et utile : coûts de port affichés, réparation dynamique, réparation alliée, ciblage par les ennemis, vraie visée de bordée, dégâts confirmés et kills alliés crédités au joueur.
 
+La v0.7 ajoute une flotte basique : jusqu'à 3 Sloops alliés, recrutement progressif, formation de suivi, ordres simples, réparation de flotte et HUD de flotte.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -173,6 +175,16 @@ La v0.6.1 rend l'allié plus lisible et utile : coûts de port affichés, répar
 - Les boulets alliés appliquent bien leurs dégâts aux ennemis et affichent un feedback de touche.
 - Si l'allié coule un ennemi, le loot, le danger et la quête `Chasse pirate` progressent comme pour un kill joueur.
 
+## Etat v0.7
+
+- Flotte alliée limitée à 3 Sloops pour garder le prototype lisible.
+- Recrutement progressif au port : 150 or/60 bois, puis 250 or/100 bois, puis 400 or/160 bois.
+- Formation de suivi : allié 1 arrière gauche, allié 2 arrière droite, allié 3 arrière centre.
+- Ordres globaux : suivre, attaquer, protéger et fuir.
+- Le HUD affiche `Flotte : x/3`, l'ordre courant et les PV de chaque allié.
+- Le port propose `Réparer la flotte` avec coût total selon les PV manquants.
+- Les alliés détruits sont retirés de la flotte et libèrent une place de recrutement.
+
 ## Lancement
 
 1. Installer Godot 4.x.
@@ -193,6 +205,10 @@ Godot n'est pas inclus dans ce depot.
 - `E` : interagir avec le port ou explorer une île selon la zone
 - `Échap` : fermer le menu
 - `R` : réapparaître au port après destruction
+- `F` : ordre flotte suivre
+- `G` : ordre flotte attaquer
+- `H` : ordre flotte protéger
+- `J` : ordre flotte fuir
 
 ## Debug développement
 
@@ -219,7 +235,8 @@ Les lignes de bordée ennemies peuvent être affichées avec `debug_show_broadsi
 - `UpgradeSystem` est configure en autoload pour suivre les niveaux d'amélioration.
 - `QuestSystem` est configure en autoload pour suivre les missions actives et les récompenses.
 - `QuestObjectiveSpawner` crée les objectifs temporaires de mission dans la scène jouable.
-- `AllyShip` et `AllyShipAI` gèrent le premier bateau allié recruté en session.
+- `FleetManager` gère les alliés actifs, la limite de flotte, les ordres, la formation et la réparation de flotte.
+- `AllyShip` et `AllyShipAI` gèrent le comportement individuel des bateaux alliés recrutés en session.
 - `SpawnManager` gère les ennemis actifs, le respawn et la sélection des variantes.
 - `World.tscn` est la scene de test jouable.
 - Les assets visuels de v0.1 sont des primitives Godot creees dans les scenes ou par script.
