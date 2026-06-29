@@ -19,6 +19,8 @@ extends Node
 @export var broadside_side_lock_duration: float = 1.5
 @export var port_safe_radius: float = 55.0
 @export var port_expulsion_radius: float = 70.0
+@export var island_safe_radius: float = 24.0
+@export var island_expulsion_radius: float = 42.0
 @export var safe_zone_reengage_cooldown: float = 5.0
 @export var safe_zone_escape_speed_scale: float = 1.0
 # Temporary v0.3.5 console helper to verify enemy broadside selection during tests.
@@ -54,8 +56,8 @@ func _physics_process(delta: float) -> void:
 	_side_lock_remaining = maxf(0.0, _side_lock_remaining - delta)
 	_safe_zone_cooldown_remaining = maxf(0.0, _safe_zone_cooldown_remaining - delta)
 
-	if _is_ship_inside_port_safe_zone():
-		_begin_port_safe_zone_escape()
+	if _is_ship_inside_safe_zone():
+		_begin_safe_zone_escape()
 
 	if _safe_zone_cooldown_remaining > 0.0:
 		_clear_broadside_debug_lines()
@@ -83,8 +85,7 @@ func _physics_process(delta: float) -> void:
 	if distance_squared > active_chase_leash * active_chase_leash:
 		_clear_broadside_debug_lines()
 		_clear_broadside_side_lock()
-		_player = null
-		ship.brake(delta)
+		_begin_disengage_from_position(player_aim_position)
 		return
 
 	_update_broadside_debug_lines(offset)
@@ -192,7 +193,7 @@ func _is_valid_chase_target(target: Node) -> bool:
 		return false
 
 	var target_node := target as Node3D
-	if _is_position_inside_port_safe_zone(target_node.global_position):
+	if _is_position_inside_safe_zone(target_node.global_position):
 		return false
 
 	var chase_leash := _get_chase_leash_distance()
@@ -208,22 +209,21 @@ func _is_valid_hostile_target(target: Node) -> bool:
 		return false
 
 	var target_node := target as Node3D
-	if _is_position_inside_port_safe_zone(target_node.global_position):
+	if _is_position_inside_safe_zone(target_node.global_position):
 		return false
 
 	var active_detection_range := _get_detection_range()
 	return ship.global_position.distance_squared_to(target_node.global_position) <= active_detection_range * active_detection_range
 
 
-func _is_ship_inside_port_safe_zone() -> bool:
+func _is_ship_inside_safe_zone() -> bool:
 	if ship == null:
 		return false
 
-	return _is_position_inside_port_safe_zone(ship.global_position)
+	return _is_position_inside_safe_zone(ship.global_position)
 
 
-func _is_position_inside_port_safe_zone(position: Vector3) -> bool:
-	var safe_radius_squared := port_safe_radius * port_safe_radius
+func _is_position_inside_safe_zone(position: Vector3) -> bool:
 	for port in get_tree().get_nodes_in_group("ports"):
 		if not port is Node3D:
 			continue
@@ -231,37 +231,57 @@ func _is_position_inside_port_safe_zone(position: Vector3) -> bool:
 		var port_node := port as Node3D
 		var offset := position - port_node.global_position
 		offset.y = 0.0
-		if offset.length_squared() <= safe_radius_squared:
+		if offset.length_squared() <= port_safe_radius * port_safe_radius:
+			return true
+
+	for island in get_tree().get_nodes_in_group("islands"):
+		if not island is Node3D:
+			continue
+
+		var island_node := island as Node3D
+		var island_offset := position - island_node.global_position
+		island_offset.y = 0.0
+		if island_offset.length_squared() <= island_safe_radius * island_safe_radius:
 			return true
 
 	return false
 
 
-func _begin_port_safe_zone_escape() -> void:
-	var port := _get_closest_port()
-	if port == null:
+func _begin_safe_zone_escape() -> void:
+	var escape_position := _get_closest_safe_zone_escape_position()
+	if not _is_valid_escape_position(escape_position):
 		return
 
-	var offset := ship.global_position - port.global_position
-	offset.y = 0.0
-	var escape_direction := offset.normalized()
-	if escape_direction.length_squared() < 0.01:
-		escape_direction = -ship.global_transform.basis.z
-		escape_direction.y = 0.0
-		escape_direction = escape_direction.normalized()
-	if escape_direction.length_squared() < 0.01:
-		escape_direction = Vector3.FORWARD
-
-	_safe_zone_escape_position = port.global_position + (escape_direction * port_expulsion_radius)
+	_safe_zone_escape_position = escape_position
 	_safe_zone_escape_position.y = 0.0
 	_has_safe_zone_escape_position = true
 	_safe_zone_cooldown_remaining = safe_zone_reengage_cooldown
 	_player = null
 
 
-func _get_closest_port() -> Node3D:
-	var closest_port: Node3D
+func _begin_disengage_from_position(threat_position: Vector3) -> void:
+	var escape_direction := ship.global_position - threat_position
+	escape_direction.y = 0.0
+	if escape_direction.length_squared() < 0.01:
+		escape_direction = -ship.global_transform.basis.z
+		escape_direction.y = 0.0
+	if escape_direction.length_squared() < 0.01:
+		escape_direction = Vector3.FORWARD
+
+	var escape_distance := maxf(_get_detection_range(), 24.0)
+	_safe_zone_escape_position = ship.global_position + (escape_direction.normalized() * escape_distance)
+	_safe_zone_escape_position.y = 0.0
+	_has_safe_zone_escape_position = true
+	_safe_zone_cooldown_remaining = safe_zone_reengage_cooldown
+	_player = null
+
+
+func _get_closest_safe_zone_escape_position() -> Vector3:
+	var closest_center := Vector3.ZERO
+	var closest_expulsion_radius := port_expulsion_radius
 	var closest_distance_squared := INF
+	var found_anchor := false
+
 	for port in get_tree().get_nodes_in_group("ports"):
 		if not port is Node3D:
 			continue
@@ -270,9 +290,38 @@ func _get_closest_port() -> Node3D:
 		var distance_squared := ship.global_position.distance_squared_to(port_node.global_position)
 		if distance_squared < closest_distance_squared:
 			closest_distance_squared = distance_squared
-			closest_port = port_node
+			closest_center = port_node.global_position
+			closest_expulsion_radius = port_expulsion_radius
+			found_anchor = true
 
-	return closest_port
+	for island in get_tree().get_nodes_in_group("islands"):
+		if not island is Node3D:
+			continue
+
+		var island_node := island as Node3D
+		var island_distance_squared := ship.global_position.distance_squared_to(island_node.global_position)
+		if island_distance_squared < closest_distance_squared:
+			closest_distance_squared = island_distance_squared
+			closest_center = island_node.global_position
+			closest_expulsion_radius = island_expulsion_radius
+			found_anchor = true
+
+	if not found_anchor:
+		return Vector3(INF, INF, INF)
+
+	var escape_direction := ship.global_position - closest_center
+	escape_direction.y = 0.0
+	if escape_direction.length_squared() < 0.01:
+		escape_direction = -ship.global_transform.basis.z
+		escape_direction.y = 0.0
+	if escape_direction.length_squared() < 0.01:
+		escape_direction = Vector3.FORWARD
+
+	return closest_center + (escape_direction.normalized() * closest_expulsion_radius)
+
+
+func _is_valid_escape_position(position: Vector3) -> bool:
+	return position.x != INF and position.y != INF and position.z != INF
 
 
 func _move_to_safe_zone_escape(delta: float) -> void:
