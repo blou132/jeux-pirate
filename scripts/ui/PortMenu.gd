@@ -136,26 +136,26 @@ func _on_repair_pressed() -> void:
 		_refresh_repair_button()
 		return
 
-	var game_state := _get_game_state()
+	var game_state: Node = _get_game_state()
 	if game_state == null or not game_state.has_method("get_wood"):
 		status_label.text = "Pas assez de bois"
 		_refresh_repair_button()
 		return
 
-	var required_wood := ceili(float(missing_health) / float(REPAIR_HEALTH_PER_WOOD))
-	if game_state.get_wood() < required_wood:
+	var required_wood: int = ceili(float(missing_health) / float(REPAIR_HEALTH_PER_WOOD))
+	if int(game_state.call("get_wood")) < required_wood:
 		status_label.text = "Pas assez de bois"
 		_refresh_repair_button()
 		return
 
-	if not game_state.has_method("spend_resources") or not game_state.spend_resources(0, required_wood):
+	if not game_state.has_method("spend_resources") or not bool(game_state.call("spend_resources", 0, required_wood)):
 		status_label.text = "Pas assez de bois"
 		_refresh_repair_button()
 		return
 
-	var repaired_health := 0
+	var repaired_health: int = 0
 	if _player.has_method("repair"):
-		repaired_health = _player.repair(required_wood * REPAIR_HEALTH_PER_WOOD)
+		repaired_health = int(_player.call("repair", required_wood * REPAIR_HEALTH_PER_WOOD))
 
 	if repaired_health > 0:
 		status_label.text = "Bateau réparé"
@@ -189,26 +189,26 @@ func _on_repair_ally_pressed() -> void:
 		_refresh_ally_repair_button()
 		return
 
-	var game_state := _get_game_state()
+	var game_state: Node = _get_game_state()
 	if game_state == null or not game_state.has_method("get_wood"):
 		status_label.text = "Pas assez de bois"
 		_refresh_ally_repair_button()
 		return
 
-	var required_wood := ceili(float(missing_health) / float(REPAIR_HEALTH_PER_WOOD))
-	if game_state.get_wood() < required_wood:
+	var required_wood: int = ceili(float(missing_health) / float(REPAIR_HEALTH_PER_WOOD))
+	if int(game_state.call("get_wood")) < required_wood:
 		status_label.text = "Pas assez de bois"
 		_refresh_ally_repair_button()
 		return
 
-	if not game_state.has_method("spend_resources") or not game_state.spend_resources(0, required_wood):
+	if not game_state.has_method("spend_resources") or not bool(game_state.call("spend_resources", 0, required_wood)):
 		status_label.text = "Pas assez de bois"
 		_refresh_ally_repair_button()
 		return
 
-	var repaired_health := 0
+	var repaired_health: int = 0
 	if ally_ship.has_method("repair"):
-		repaired_health = ally_ship.repair(required_wood * REPAIR_HEALTH_PER_WOOD)
+		repaired_health = int(ally_ship.call("repair", required_wood * REPAIR_HEALTH_PER_WOOD))
 
 	if repaired_health > 0:
 		status_label.text = "Allié réparé"
@@ -450,10 +450,10 @@ func _set_upgrade_row(upgrade_system: Node, upgrade_id: String, label: Label, bu
 
 
 func _get_upgrade_ship_context_text() -> String:
-	var game_state := _get_game_state()
-	var ship_id := ShipCatalog.STARTING_SHIP_ID
+	var game_state: Node = _get_game_state()
+	var ship_id: String = ShipCatalog.STARTING_SHIP_ID
 	if game_state != null and game_state.has_method("get_active_player_ship_id"):
-		ship_id = String(game_state.get_active_player_ship_id())
+		ship_id = String(game_state.call("get_active_player_ship_id"))
 
 	return "Navire : %s — max coque %d, voiles %d, canons %d" % [
 		ShipCatalog.get_ship_name(ship_id),
@@ -479,7 +479,7 @@ func _refresh_shipyard_rows() -> void:
 	ship_list.clear()
 	_ship_ids.clear()
 
-	var game_state := _get_game_state()
+	var game_state: Node = _get_game_state()
 	if game_state == null:
 		current_ship_label.text = "Navire actuel indisponible"
 		ship_details_label.text = "Chantier naval indisponible"
@@ -488,13 +488,13 @@ func _refresh_shipyard_rows() -> void:
 		equip_ship_button.disabled = true
 		return
 
-	var active_ship_id := ShipCatalog.STARTING_SHIP_ID
+	var active_ship_id: String = ShipCatalog.STARTING_SHIP_ID
 	if game_state.has_method("get_active_player_ship_id"):
-		active_ship_id = String(game_state.get_active_player_ship_id())
+		active_ship_id = String(game_state.call("get_active_player_ship_id"))
 
 	current_ship_label.text = "Navire actuel : %s" % ShipCatalog.get_ship_name(active_ship_id)
 	ship_hierarchy_label.text = _build_ship_hierarchy_text()
-	var ship_ids := ShipCatalog.get_player_ship_ids()
+	var ship_ids: Array[String] = ShipCatalog.get_player_ship_ids()
 	for ship_id in ship_ids:
 		_ship_ids.append(ship_id)
 		ship_list.add_item(_build_ship_row_text(game_state, ship_id))
@@ -506,7 +506,7 @@ func _refresh_shipyard_rows() -> void:
 		equip_ship_button.disabled = true
 		return
 
-	var selected_index := _get_ship_index(_selected_ship_id)
+	var selected_index: int = _get_ship_index(_selected_ship_id)
 	if selected_index < 0:
 		selected_index = _get_ship_index(active_ship_id)
 	if selected_index < 0:
@@ -518,12 +518,24 @@ func _refresh_shipyard_rows() -> void:
 
 
 func _build_ship_row_text(game_state: Node, ship_id: String) -> String:
-	var status := ShipCatalog.format_cost(ship_id)
-	if game_state.has_method("is_player_ship_owned") and game_state.is_player_ship_owned(ship_id):
+	var status: String = ShipCatalog.format_cost(ship_id)
+	var owned: bool = false
+	if game_state.has_method("is_player_ship_owned"):
+		owned = bool(game_state.call("is_player_ship_owned", ship_id))
+
+	var active: bool = false
+	if game_state.has_method("get_active_player_ship_id"):
+		active = String(game_state.call("get_active_player_ship_id")) == ship_id
+
+	var can_afford: bool = false
+	if game_state.has_method("can_afford_player_ship"):
+		can_afford = bool(game_state.call("can_afford_player_ship", ship_id))
+
+	if owned:
 		status = "possédé"
-	if game_state.has_method("get_active_player_ship_id") and String(game_state.get_active_player_ship_id()) == ship_id:
+	if active:
 		status = "navire actuel"
-	elif game_state.has_method("can_afford_player_ship") and not game_state.can_afford_player_ship(ship_id):
+	elif not can_afford:
 		status = "ressources insuffisantes"
 
 	return "%s - %s" % [ShipCatalog.get_ship_name(ship_id), status]
@@ -538,17 +550,26 @@ func _on_ship_selected(index: int) -> void:
 
 
 func _refresh_selected_ship() -> void:
-	var game_state := _get_game_state()
+	var game_state: Node = _get_game_state()
 	if game_state == null or _selected_ship_id.is_empty():
 		ship_details_label.text = "Navire indisponible"
 		buy_ship_button.disabled = true
 		equip_ship_button.disabled = true
 		return
 
-	var lines := ShipCatalog.get_ship_stat_lines(_selected_ship_id)
-	var owned := game_state.has_method("is_player_ship_owned") and game_state.is_player_ship_owned(_selected_ship_id)
-	var active := game_state.has_method("get_active_player_ship_id") and String(game_state.get_active_player_ship_id()) == _selected_ship_id
-	var can_afford := game_state.has_method("can_afford_player_ship") and game_state.can_afford_player_ship(_selected_ship_id)
+	var lines: Array[String] = ShipCatalog.get_ship_stat_lines(_selected_ship_id)
+
+	var owned: bool = false
+	if game_state.has_method("is_player_ship_owned"):
+		owned = bool(game_state.call("is_player_ship_owned", _selected_ship_id))
+
+	var active: bool = false
+	if game_state.has_method("get_active_player_ship_id"):
+		active = String(game_state.call("get_active_player_ship_id")) == _selected_ship_id
+
+	var can_afford: bool = false
+	if game_state.has_method("can_afford_player_ship"):
+		can_afford = bool(game_state.call("can_afford_player_ship", _selected_ship_id))
 
 	if active:
 		lines.append("État : navire actuel")
@@ -569,24 +590,24 @@ func _refresh_selected_ship() -> void:
 
 
 func _on_buy_ship_pressed() -> void:
-	var game_state := _get_game_state()
+	var game_state: Node = _get_game_state()
 	if game_state == null or _selected_ship_id.is_empty() or not game_state.has_method("purchase_player_ship"):
 		status_label.text = "Achat indisponible"
 		return
 
-	status_label.text = game_state.purchase_player_ship(_selected_ship_id)
+	status_label.text = String(game_state.call("purchase_player_ship", _selected_ship_id))
 	_refresh_shipyard_rows()
 	_refresh_repair_button()
 	_refresh_upgrade_rows()
 
 
 func _on_equip_ship_pressed() -> void:
-	var game_state := _get_game_state()
+	var game_state: Node = _get_game_state()
 	if game_state == null or _selected_ship_id.is_empty() or not game_state.has_method("equip_player_ship"):
 		status_label.text = "Équipement indisponible"
 		return
 
-	status_label.text = game_state.equip_player_ship(_selected_ship_id)
+	status_label.text = String(game_state.call("equip_player_ship", _selected_ship_id))
 	_refresh_shipyard_rows()
 	_refresh_repair_button()
 	_refresh_upgrade_rows()
@@ -605,11 +626,11 @@ func _get_ship_index(ship_id: String) -> int:
 
 func _build_ship_hierarchy_text() -> String:
 	var parts: Array[String] = []
-	var entries := ShipCatalog.get_hierarchy_entries()
+	var entries: Array[Dictionary] = ShipCatalog.get_hierarchy_entries()
 	for index in range(entries.size()):
 		var entry: Dictionary = entries[index]
-		var status := String(entry.get("status", "à venir"))
-		var suffix := "max %d" % int(entry.get("upgrade_max", 0))
+		var status: String = String(entry.get("status", "à venir"))
+		var suffix: String = "max %d" % int(entry.get("upgrade_max", 0))
 		if status != "jouable":
 			suffix += ", à venir"
 		parts.append("%d. %s (%s)" % [index + 1, String(entry.get("name", "Navire")), suffix])
@@ -648,14 +669,14 @@ func _refresh_pirate_status_panel() -> void:
 		return
 
 	var view: Dictionary = reputation_system.get_reputation_view()
-	var rank_progress := String(view.get("progress_text", "0 / 100"))
-	var next_rank := String(view.get("next_rank_name", "Maximum atteint"))
+	var rank_progress: String = String(view.get("progress_text", "0 / 100"))
+	var next_rank: String = String(view.get("next_rank_name", "Maximum atteint"))
 	if bool(view.get("rank_is_max", false)):
 		next_rank = "Maximum atteint"
 		rank_progress = "MAX"
 
-	var title_progress := String(view.get("title_progress_text", "0 / 120"))
-	var next_title := String(view.get("next_title_name", "Maximum atteint"))
+	var title_progress: String = String(view.get("title_progress_text", "0 / 120"))
+	var next_title: String = String(view.get("next_title_name", "Maximum atteint"))
 	if bool(view.get("title_is_max", false)):
 		next_title = "Maximum atteint"
 		title_progress = "MAX"
@@ -730,7 +751,7 @@ func _refresh_mission_rows() -> void:
 			continue
 
 		var view: Dictionary = quest_view
-		var quest_id := String(view.get("id", ""))
+		var quest_id: String = String(view.get("id", ""))
 		if quest_id.is_empty():
 			continue
 
@@ -785,9 +806,9 @@ func _build_missions_intro_text(quest_system: Node) -> String:
 
 
 func _build_mission_row_text(view: Dictionary) -> String:
-	var name := String(view.get("name", "Mission"))
-	var status := String(view.get("status_text", "Disponible"))
-	var progress := String(view.get("progress_text", ""))
+	var name: String = String(view.get("name", "Mission"))
+	var status: String = String(view.get("status_text", "Disponible"))
+	var progress: String = String(view.get("progress_text", ""))
 	if bool(view.get("active", false)):
 		return "[Active] %s - %s" % [name, progress]
 	if bool(view.get("completed", false)) and not bool(view.get("reward_claimed", false)):
