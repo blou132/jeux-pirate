@@ -214,10 +214,12 @@ La refonte UI pirate ajoute une premiere direction visuelle dark fantasy : barre
 ## Finition UI v0.8.2
 
 - Le HUD de navigation est compact par defaut pour liberer l'ecran en mer et en combat.
-- Le mode compact affiche ressources, PV, vitesse, danger, flotte, missions et renom court.
+- La barre superieure garde les ressources principales et les PV : or, bois, fragments, reliques et coque.
+- Le HUD compact revient en panneau vertical a gauche avec vitesse, danger, flotte, ordre, missions, rang et titre.
 - `TAB` bascule entre HUD compact et HUD detaille.
 - Le menu du port force le HUD detaille pendant son ouverture, puis rend le controle au mode compact/TAB.
 - Le HUD detaille separe mieux les sections Navire, Ameliorations, Mer et combat, Flotte et Missions.
+- Les notifications de zone restent separees du HUD compact, centrees sous la barre de ressources.
 - L'anti-farm de reputation alliee reste base sur le premier remplissage de chaque emplacement de flotte et sur le premier 3/3.
 
 ## Correctifs v0.8.3

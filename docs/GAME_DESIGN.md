@@ -277,7 +277,9 @@ La premiere refonte UI doit rendre le prototype plus lisible sans changer les sy
 
 - En mer, le HUD compact est le mode par defaut pour garder le champ de vision libre.
 - Le HUD detaille reste disponible avec `TAB` et pendant l'utilisation du menu du port.
-- Les informations compactes privilegient les besoins de navigation : PV, vitesse, danger, flotte, ordre, missions et renom court.
+- La barre de ressources reste en haut avec or, bois, fragments, reliques et PV.
+- Les informations compactes reviennent dans un panneau vertical gauche : vitesse, danger, flotte, ordre, missions, rang et titre.
+- Les notifications de zone sont centrees sous la barre de ressources et ne font pas partie du panneau compact.
 - Les gains de reputation de recrutement restent non farmables : chaque slot de flotte ne donne son bonus qu'une fois, et le bonus flotte complete ne se declenche qu'au premier 3/3.
 - Les controles gameplay ne doivent pas etre consommes par le HUD, sauf `TAB` pour la bascule d'affichage.
 

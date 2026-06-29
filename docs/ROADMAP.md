@@ -83,6 +83,7 @@
 - Finition v0.8.2 : HUD compact en mer, HUD detaille avec `TAB`, sections plus lisibles et verification des entrees gameplay.
 - Correctifs v0.8.3 : F3 renommee debug, renommee de recompense mission, perte de renommee a la defaite, anti-friendly-fire flotte, respawn port securise et HUD compacte.
 - Correctifs v0.8.4 : plafonds renommee/titre, refresh UI apres F3, affichage maximum propre, libelles compacts ameliores, notifications de zone separees, detection/leash ennemis et zone sure portuaire renforcee.
+- Ajustement HUD compact : retour a un panneau vertical gauche, barre de ressources conservee en haut et notifications de zone separees.
 
 ## v0.9 - Hiérarchie des navires
 
