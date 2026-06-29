@@ -171,6 +171,60 @@ layout_mode = 2
 text = "Titre suivant : 0 / 120"
 autowrap_mode = 3
 
+[node name="BottomNavigationBar" type="PanelContainer" parent="HUDRoot"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 260.0
+offset_top = -62.0
+offset_right = -260.0
+offset_bottom = -14.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+
+[node name="NavigationTabs" type="HBoxContainer" parent="HUDRoot/BottomNavigationBar"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="PortTab" type="Button" parent="HUDRoot/BottomNavigationBar/NavigationTabs"]
+custom_minimum_size = Vector2(110, 30)
+layout_mode = 2
+mouse_filter = 2
+focus_mode = 0
+text = "Port"
+
+[node name="MissionsTab" type="Button" parent="HUDRoot/BottomNavigationBar/NavigationTabs"]
+custom_minimum_size = Vector2(110, 30)
+layout_mode = 2
+mouse_filter = 2
+focus_mode = 0
+text = "Missions"
+
+[node name="FleetTab" type="Button" parent="HUDRoot/BottomNavigationBar/NavigationTabs"]
+custom_minimum_size = Vector2(110, 30)
+layout_mode = 2
+mouse_filter = 2
+focus_mode = 0
+text = "Flotte"
+
+[node name="MapTab" type="Button" parent="HUDRoot/BottomNavigationBar/NavigationTabs"]
+custom_minimum_size = Vector2(110, 30)
+layout_mode = 2
+mouse_filter = 2
+focus_mode = 0
+text = "Carte"
+
+[node name="RenownTab" type="Button" parent="HUDRoot/BottomNavigationBar/NavigationTabs"]
+custom_minimum_size = Vector2(110, 30)
+layout_mode = 2
+mouse_filter = 2
+focus_mode = 0
+text = "Renom"
+
 [node name="MessagePanel" type="PanelContainer" parent="HUDRoot"]
 layout_mode = 1
 anchors_preset = 7
