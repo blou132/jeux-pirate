@@ -30,6 +30,7 @@ mouse_filter = 2
 layout_mode = 2
 theme_override_constants/separation = 22
 alignment = 1
+mouse_filter = 2
 
 [node name="GoldLabel" type="Label" parent="HUDRoot/TopResourceBar/ResourceRow"]
 layout_mode = 2
@@ -62,6 +63,7 @@ mouse_filter = 2
 [node name="CompactRow" type="HBoxContainer" parent="HUDRoot/CompactSailingPanel"]
 layout_mode = 2
 theme_override_constants/separation = 16
+mouse_filter = 2
 
 [node name="CompactSpeedLabel" type="Label" parent="HUDRoot/CompactSailingPanel/CompactRow"]
 custom_minimum_size = Vector2(112, 0)
@@ -101,6 +103,7 @@ mouse_filter = 2
 [node name="LeftVBox" type="VBoxContainer" parent="HUDRoot/LeftStatusPanel"]
 layout_mode = 2
 theme_override_constants/separation = 5
+mouse_filter = 2
 
 [node name="ShipHeaderLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
@@ -118,6 +121,7 @@ text = "Coque: 100/100 PV"
 
 [node name="UpgradeDivider" type="HSeparator" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="UpgradeHeaderLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
@@ -139,6 +143,7 @@ text = "Canons: niv. 0/3"
 
 [node name="WorldDivider" type="HSeparator" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="WorldHeaderLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
@@ -156,6 +161,7 @@ text = "Ennemis detruits: 0"
 
 [node name="FleetDivider" type="HSeparator" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="FleetHeaderLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
@@ -171,6 +177,7 @@ autowrap_mode = 3
 
 [node name="MissionDivider" type="HSeparator" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="MissionHeaderLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
@@ -197,6 +204,7 @@ mouse_filter = 2
 [node name="ReputationVBox" type="VBoxContainer" parent="HUDRoot/RightReputationPanel"]
 layout_mode = 2
 theme_override_constants/separation = 6
+mouse_filter = 2
 
 [node name="ReputationHeaderLabel" type="Label" parent="HUDRoot/RightReputationPanel/ReputationVBox"]
 layout_mode = 2
@@ -249,6 +257,7 @@ mouse_filter = 2
 layout_mode = 2
 theme_override_constants/separation = 10
 alignment = 1
+mouse_filter = 2
 
 [node name="PortTab" type="Button" parent="HUDRoot/BottomNavigationBar/NavigationTabs"]
 custom_minimum_size = Vector2(110, 30)
@@ -305,6 +314,7 @@ layout_mode = 2
 text = "Appuie sur E pour ouvrir le port"
 horizontal_alignment = 1
 autowrap_mode = 3
+mouse_filter = 2
 
 [node name="ZoneNotificationContainer" type="CenterContainer" parent="HUDRoot"]
 layout_mode = 1
@@ -319,3 +329,4 @@ mouse_filter = 2
 layout_mode = 2
 text = "Zone portuaire - danger faible"
 horizontal_alignment = 1
+mouse_filter = 2
