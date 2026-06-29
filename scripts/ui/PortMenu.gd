@@ -469,7 +469,7 @@ func _refresh_pirate_status_panel() -> void:
 		next_title = "Maximum atteint"
 		title_progress = "MAX"
 
-	pirate_status_label.text = "Titre : %s\nRéputation : %s\nPoints : %d/%d\nProchain rang : %s\nProgression rang : %s\nTitre suivant : %s\nProgression titre : %s" % [
+	pirate_status_label.text = "Titre pirate : %s\nRenom : %s\nPoints de renom : %d/%d\nProchain rang : %s\nProgression rang : %s\nTitre suivant : %s\nProgression titre : %s" % [
 		String(view.get("title_name", "Loup de mer")),
 		String(view.get("rank_name", "Inconnu")),
 		int(view.get("points", 0)),

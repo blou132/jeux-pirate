@@ -20,11 +20,11 @@ const PIRATE_TITLES: Array[Dictionary] = [
 	{"name": "Capitaine", "threshold": 120},
 	{"name": "Seigneur des vagues", "threshold": 300},
 	{"name": "Maître des flottes", "threshold": 600},
-	{"name": "Conquérant des océans", "threshold": 1000},
+	{"name": "Conquérant des mers", "threshold": 1000},
 	{"name": "Fléau des mers", "threshold": 1500},
-	{"name": "Souverain des océans", "threshold": 2300},
-	{"name": "Roi des pirates", "threshold": 3500},
-	{"name": "Empereur des mers", "threshold": 5000},
+	{"name": "Souverain des mers", "threshold": 2300},
+	{"name": "Roi des océans", "threshold": 3500},
+	{"name": "Empereur des océans", "threshold": 5000},
 	{"name": "Légende éternelle", "threshold": 7000},
 ]
 

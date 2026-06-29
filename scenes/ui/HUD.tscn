@@ -213,7 +213,7 @@ horizontal_alignment = 1
 
 [node name="ReputationLabel" type="Label" parent="HUDRoot/RightReputationPanel/ReputationVBox"]
 layout_mode = 2
-text = "Reputation : Inconnu (0)"
+text = "Renom : Inconnu (0)"
 autowrap_mode = 3
 
 [node name="ReputationProgressLabel" type="Label" parent="HUDRoot/RightReputationPanel/ReputationVBox"]
@@ -231,7 +231,7 @@ mouse_filter = 2
 
 [node name="PirateTitleLabel" type="Label" parent="HUDRoot/RightReputationPanel/ReputationVBox"]
 layout_mode = 2
-text = "Titre : Loup de mer"
+text = "Titre pirate : Loup de mer"
 autowrap_mode = 3
 
 [node name="TitleProgressLabel" type="Label" parent="HUDRoot/RightReputationPanel/ReputationVBox"]

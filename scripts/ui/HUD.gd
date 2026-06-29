@@ -424,17 +424,17 @@ func _refresh_reputation_labels() -> void:
 			100.0
 		)
 	if rank_is_max:
-		reputation_label.text = "Réputation : %s (%d/%d)" % [
+		reputation_label.text = "Renom : %s (%d/%d)" % [
 			String(view.get("rank_name", "Inconnu")),
 			points,
 			max_points,
 		]
 	else:
-		reputation_label.text = "Réputation : %s (%d)" % [
+		reputation_label.text = "Renom : %s (%d)" % [
 			String(view.get("rank_name", "Inconnu")),
 			points,
 		]
-	pirate_title_label.text = "Titre : %s" % String(view.get("title_name", "Loup de mer"))
+	pirate_title_label.text = "Titre pirate : %s" % String(view.get("title_name", "Loup de mer"))
 	if rank_is_max:
 		reputation_progress_label.text = "Prochain rang : Maximum atteint"
 	else:
@@ -473,16 +473,16 @@ func _get_compact_title_label(title_name: String) -> String:
 			return "Seigneur vagues"
 		"Maître des flottes":
 			return "Maître flotte"
-		"Conquérant des océans":
+		"Conquérant des mers":
 			return "Conquérant"
 		"Fléau des mers":
 			return "Fléau mers"
-		"Souverain des océans":
+		"Souverain des mers":
 			return "Souverain"
-		"Roi des pirates":
-			return "Roi pirate"
-		"Empereur des mers":
-			return "Empereur"
+		"Roi des océans":
+			return "Roi océans"
+		"Empereur des océans":
+			return "Empereur océans"
 		"Légende éternelle":
 			return "Légende"
 		_:
