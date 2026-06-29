@@ -51,6 +51,20 @@ func _on_area_entered(area: Area3D) -> void:
 
 
 func _apply_hit(target: Node) -> void:
+	if _is_friendly_target(target):
+		return
+
 	if target.has_method("take_damage"):
 		target.take_damage(_damage)
 		queue_free()
+
+
+func _is_friendly_target(target: Node) -> bool:
+	if target == null or _source == null or not is_instance_valid(_source):
+		return false
+
+	var source_is_fleet := _source.is_in_group("player") or _source.is_in_group("ally_ships")
+	if not source_is_fleet:
+		return false
+
+	return target.is_in_group("player") or target.is_in_group("ally_ships")
