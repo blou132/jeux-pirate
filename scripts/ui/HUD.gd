@@ -1,6 +1,7 @@
 extends CanvasLayer
 
 @onready var speed_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/SpeedLabel
+@onready var ship_health_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/ShipHealthLabel
 @onready var health_label: Label = $HUDRoot/TopResourceBar/ResourceRow/HealthLabel
 @onready var gold_label: Label = $HUDRoot/TopResourceBar/ResourceRow/GoldLabel
 @onready var wood_label: Label = $HUDRoot/TopResourceBar/ResourceRow/WoodLabel
@@ -248,6 +249,7 @@ func _refresh_ally_status() -> void:
 
 func _on_health_changed(current_health: int, max_health: int) -> void:
 	health_label.text = "[PV] %d/%d" % [current_health, max_health]
+	ship_health_label.text = "Coque: %d/%d PV" % [current_health, max_health]
 
 
 func _on_speed_changed(speed: float) -> void:

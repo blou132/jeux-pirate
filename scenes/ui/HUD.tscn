@@ -55,8 +55,8 @@ text = "[PV] 100/100"
 layout_mode = 0
 offset_left = 16.0
 offset_top = 74.0
-offset_right = 350.0
-offset_bottom = 536.0
+offset_right = 364.0
+offset_bottom = 590.0
 mouse_filter = 2
 
 [node name="LeftVBox" type="VBoxContainer" parent="HUDRoot/LeftStatusPanel"]
@@ -72,6 +72,14 @@ horizontal_alignment = 1
 layout_mode = 2
 text = "Vitesse: 0.0 nd"
 
+[node name="ShipHealthLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
+layout_mode = 2
+text = "Coque: 100/100 PV"
+
+[node name="UpgradeHeaderLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
+layout_mode = 2
+text = "Ameliorations"
+
 [node name="HullLevelLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
 text = "Coque: niv. 0/3"
@@ -84,6 +92,10 @@ text = "Voiles: niv. 0/3"
 layout_mode = 2
 text = "Canons: niv. 0/3"
 
+[node name="WorldHeaderLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
+layout_mode = 2
+text = "Mer et combat"
+
 [node name="DangerLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
 text = "Danger: 1"
@@ -92,10 +104,19 @@ text = "Danger: 1"
 layout_mode = 2
 text = "Ennemis detruits: 0"
 
+[node name="FleetHeaderLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
+layout_mode = 2
+text = "Flotte"
+
 [node name="AllyLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
+custom_minimum_size = Vector2(0, 74)
 layout_mode = 2
 text = "Flotte : 0/3"
 autowrap_mode = 3
+
+[node name="ReputationHeaderLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
+layout_mode = 2
+text = "Renom"
 
 [node name="ReputationLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
@@ -104,6 +125,10 @@ text = "Reputation : Inconnu (0)"
 [node name="PirateTitleLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
 text = "Titre : Loup de mer"
+
+[node name="MissionHeaderLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
+layout_mode = 2
+text = "Missions"
 
 [node name="QuestLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
