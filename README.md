@@ -211,6 +211,15 @@ La refonte UI pirate ajoute une premiere direction visuelle dark fantasy : barre
 - Les onglets bas `Port`, `Missions`, `Flotte`, `Carte` et `Renom` preparent la navigation future sans ajouter de gameplay.
 - Les panneaux HUD decoratifs ignorent la souris pour ne pas bloquer les clics de canon.
 
+## Finition UI v0.8.2
+
+- Le HUD de navigation est compact par defaut pour liberer l'ecran en mer et en combat.
+- Le mode compact affiche ressources, PV, vitesse, danger, flotte, missions et renom court.
+- `TAB` bascule entre HUD compact et HUD detaille.
+- Le menu du port force le HUD detaille pendant son ouverture, puis rend le controle au mode compact/TAB.
+- Le HUD detaille separe mieux les sections Navire, Ameliorations, Mer et combat, Flotte et Missions.
+- L'anti-farm de reputation alliee reste base sur le premier remplissage de chaque emplacement de flotte et sur le premier 3/3.
+
 ## Lancement
 
 1. Installer Godot 4.x.
@@ -235,6 +244,8 @@ Godot n'est pas inclus dans ce depot.
 - `G` : ordre flotte attaquer
 - `H` : ordre flotte protéger
 - `J` : ordre flotte fuir
+
+- `TAB` : basculer HUD compact / HUD detaille
 
 ## Debug développement
 

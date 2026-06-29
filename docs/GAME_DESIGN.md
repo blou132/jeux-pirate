@@ -273,6 +273,14 @@ La premiere refonte UI doit rendre le prototype plus lisible sans changer les sy
 - Les onglets bas annoncent les futures sections de navigation sans encore lancer de nouvelle mecanique.
 - Les elements HUD non interactifs ne doivent pas intercepter la souris pour preserver le combat naval.
 
+### Finition v0.8.2
+
+- En mer, le HUD compact est le mode par defaut pour garder le champ de vision libre.
+- Le HUD detaille reste disponible avec `TAB` et pendant l'utilisation du menu du port.
+- Les informations compactes privilegient les besoins de navigation : PV, vitesse, danger, flotte, ordre, missions et renom court.
+- Les gains de reputation de recrutement restent non farmables : chaque slot de flotte ne donne son bonus qu'une fois, et le bonus flotte complete ne se declenche qu'au premier 3/3.
+- Les controles gameplay ne doivent pas etre consommes par le HUD, sauf `TAB` pour la bascule d'affichage.
+
 ## Piliers a long terme
 
 - Navigation lisible : le joueur doit toujours comprendre son cap, sa vitesse et les menaces proches.

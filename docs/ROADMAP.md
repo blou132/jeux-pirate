@@ -80,6 +80,7 @@
 
 - Correctif v0.8.1 : empecher le farm de reputation par rachat d'allies apres destruction.
 - Refonte UI pirate : theme sombre, barre de ressources haute, panneau navire/flotte, panneau reputation/titre, menu portuaire central et onglets bas.
+- Finition v0.8.2 : HUD compact en mer, HUD detaille avec `TAB`, sections plus lisibles et verification des entrees gameplay.
 
 ## v0.9 - Hiérarchie des navires
 
