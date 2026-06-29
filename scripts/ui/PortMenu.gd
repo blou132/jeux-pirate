@@ -16,6 +16,13 @@ const REPAIR_HEALTH_PER_WOOD := 5
 @onready var hull_upgrade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/HullUpgradeButton
 @onready var sails_upgrade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/SailsUpgradeButton
 @onready var cannons_upgrade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/CannonsUpgradeButton
+@onready var shipyard_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardButton
+@onready var shipyard_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer
+@onready var current_ship_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer/CurrentShipLabel
+@onready var ship_list: ItemList = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer/ShipList
+@onready var ship_details_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer/ShipDetailsLabel
+@onready var buy_ship_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer/BuyShipButton
+@onready var equip_ship_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer/EquipShipButton
 @onready var missions_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsButton
 @onready var missions_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer
 @onready var missions_intro_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/MissionsIntroLabel
@@ -34,12 +41,15 @@ var _reputation_system: Node
 var _previous_pause_state: bool = false
 var _mission_ids: Array[String] = []
 var _selected_mission_id: String = ""
+var _ship_ids: Array[String] = []
+var _selected_ship_id: String = ""
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	root_control.visible = false
 	upgrades_container.visible = false
+	shipyard_container.visible = false
 	missions_container.visible = false
 	pirate_status_container.visible = false
 	repair_button.pressed.connect(_on_repair_pressed)
@@ -48,6 +58,10 @@ func _ready() -> void:
 	hull_upgrade_button.pressed.connect(_on_hull_upgrade_pressed)
 	sails_upgrade_button.pressed.connect(_on_sails_upgrade_pressed)
 	cannons_upgrade_button.pressed.connect(_on_cannons_upgrade_pressed)
+	shipyard_button.pressed.connect(_on_shipyard_pressed)
+	ship_list.item_selected.connect(_on_ship_selected)
+	buy_ship_button.pressed.connect(_on_buy_ship_pressed)
+	equip_ship_button.pressed.connect(_on_equip_ship_pressed)
 	missions_button.pressed.connect(_on_missions_pressed)
 	mission_list.item_selected.connect(_on_mission_selected)
 	accept_mission_button.pressed.connect(_on_accept_mission_pressed)
@@ -72,12 +86,14 @@ func open(player: Node) -> void:
 	_set_hud_detail_mode(true)
 	status_label.text = ""
 	upgrades_container.visible = false
+	shipyard_container.visible = false
 	missions_container.visible = false
 	pirate_status_container.visible = false
 	_refresh_repair_button()
 	_refresh_ally_repair_button()
 	_refresh_recruit_ally_button()
 	_refresh_upgrade_rows()
+	_refresh_shipyard_rows()
 	_refresh_mission_rows()
 	_refresh_pirate_status_panel()
 	root_control.visible = true
@@ -203,6 +219,7 @@ func _on_repair_ally_pressed() -> void:
 func _on_upgrades_pressed() -> void:
 	upgrades_container.visible = not upgrades_container.visible
 	if upgrades_container.visible:
+		shipyard_container.visible = false
 		missions_container.visible = false
 		pirate_status_container.visible = false
 		status_label.text = "Choisis une amélioration"
@@ -428,10 +445,149 @@ func _set_upgrade_row(upgrade_system: Node, upgrade_id: String, label: Label, bu
 		button.disabled = upgrade_system.is_max_level(upgrade_id)
 
 
+func _on_shipyard_pressed() -> void:
+	shipyard_container.visible = not shipyard_container.visible
+	if shipyard_container.visible:
+		upgrades_container.visible = false
+		missions_container.visible = false
+		pirate_status_container.visible = false
+		status_label.text = "Chantier naval"
+		_refresh_shipyard_rows()
+	else:
+		status_label.text = ""
+
+
+func _refresh_shipyard_rows() -> void:
+	ship_list.clear()
+	_ship_ids.clear()
+
+	var game_state := _get_game_state()
+	if game_state == null:
+		current_ship_label.text = "Navire actuel indisponible"
+		ship_details_label.text = "Chantier naval indisponible"
+		buy_ship_button.disabled = true
+		equip_ship_button.disabled = true
+		return
+
+	var active_ship_id := ShipCatalog.STARTING_SHIP_ID
+	if game_state.has_method("get_active_player_ship_id"):
+		active_ship_id = String(game_state.get_active_player_ship_id())
+
+	current_ship_label.text = "Navire actuel : %s" % ShipCatalog.get_ship_name(active_ship_id)
+	var ship_ids := ShipCatalog.get_player_ship_ids()
+	for ship_id in ship_ids:
+		_ship_ids.append(ship_id)
+		ship_list.add_item(_build_ship_row_text(game_state, ship_id))
+
+	if _ship_ids.is_empty():
+		_selected_ship_id = ""
+		ship_details_label.text = "Aucun navire disponible"
+		buy_ship_button.disabled = true
+		equip_ship_button.disabled = true
+		return
+
+	var selected_index := _get_ship_index(_selected_ship_id)
+	if selected_index < 0:
+		selected_index = _get_ship_index(active_ship_id)
+	if selected_index < 0:
+		selected_index = 0
+
+	_selected_ship_id = _ship_ids[selected_index]
+	ship_list.select(selected_index)
+	_refresh_selected_ship()
+
+
+func _build_ship_row_text(game_state: Node, ship_id: String) -> String:
+	var status := ShipCatalog.format_cost(ship_id)
+	if game_state.has_method("is_player_ship_owned") and game_state.is_player_ship_owned(ship_id):
+		status = "possédé"
+	if game_state.has_method("get_active_player_ship_id") and String(game_state.get_active_player_ship_id()) == ship_id:
+		status = "navire actuel"
+	elif game_state.has_method("can_afford_player_ship") and not game_state.can_afford_player_ship(ship_id):
+		status = "ressources insuffisantes"
+
+	return "%s - %s" % [ShipCatalog.get_ship_name(ship_id), status]
+
+
+func _on_ship_selected(index: int) -> void:
+	if index < 0 or index >= _ship_ids.size():
+		return
+
+	_selected_ship_id = _ship_ids[index]
+	_refresh_selected_ship()
+
+
+func _refresh_selected_ship() -> void:
+	var game_state := _get_game_state()
+	if game_state == null or _selected_ship_id.is_empty():
+		ship_details_label.text = "Navire indisponible"
+		buy_ship_button.disabled = true
+		equip_ship_button.disabled = true
+		return
+
+	var lines := ShipCatalog.get_ship_stat_lines(_selected_ship_id)
+	var owned := game_state.has_method("is_player_ship_owned") and game_state.is_player_ship_owned(_selected_ship_id)
+	var active := game_state.has_method("get_active_player_ship_id") and String(game_state.get_active_player_ship_id()) == _selected_ship_id
+	var can_afford := game_state.has_method("can_afford_player_ship") and game_state.can_afford_player_ship(_selected_ship_id)
+
+	if active:
+		lines.append("État : navire actuel")
+	elif owned:
+		lines.append("État : possédé")
+	elif can_afford:
+		lines.append("État : disponible à l'achat")
+	else:
+		lines.append("État : ressources insuffisantes")
+
+	ship_details_label.text = "\n".join(lines)
+	buy_ship_button.text = "Acheter : %s" % ShipCatalog.format_cost(_selected_ship_id)
+	buy_ship_button.disabled = owned or not can_afford
+	equip_ship_button.text = "Équiper"
+	equip_ship_button.disabled = not owned or active
+	if active:
+		equip_ship_button.text = "Navire actuel"
+
+
+func _on_buy_ship_pressed() -> void:
+	var game_state := _get_game_state()
+	if game_state == null or _selected_ship_id.is_empty() or not game_state.has_method("purchase_player_ship"):
+		status_label.text = "Achat indisponible"
+		return
+
+	status_label.text = game_state.purchase_player_ship(_selected_ship_id)
+	_refresh_shipyard_rows()
+	_refresh_repair_button()
+	_refresh_upgrade_rows()
+
+
+func _on_equip_ship_pressed() -> void:
+	var game_state := _get_game_state()
+	if game_state == null or _selected_ship_id.is_empty() or not game_state.has_method("equip_player_ship"):
+		status_label.text = "Équipement indisponible"
+		return
+
+	status_label.text = game_state.equip_player_ship(_selected_ship_id)
+	_refresh_shipyard_rows()
+	_refresh_repair_button()
+	_refresh_upgrade_rows()
+
+
+func _get_ship_index(ship_id: String) -> int:
+	if ship_id.is_empty():
+		return -1
+
+	for index in range(_ship_ids.size()):
+		if _ship_ids[index] == ship_id:
+			return index
+
+	return -1
+
+
 func _on_missions_pressed() -> void:
 	missions_container.visible = not missions_container.visible
 	if missions_container.visible:
 		upgrades_container.visible = false
+		shipyard_container.visible = false
 		pirate_status_container.visible = false
 		status_label.text = "Choisis une mission"
 		_refresh_mission_rows()
@@ -443,6 +599,7 @@ func _on_pirate_status_pressed() -> void:
 	pirate_status_container.visible = not pirate_status_container.visible
 	if pirate_status_container.visible:
 		upgrades_container.visible = false
+		shipyard_container.visible = false
 		missions_container.visible = false
 		status_label.text = "Statut pirate"
 		_refresh_pirate_status_panel()

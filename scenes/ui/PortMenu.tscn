@@ -116,6 +116,44 @@ custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 text = "Améliorer les canons"
 
+[node name="ShipyardButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+text = "Chantier naval"
+
+[node name="ShipyardContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ShipyardIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer"]
+layout_mode = 2
+text = "Navires jouables v0.9"
+horizontal_alignment = 1
+
+[node name="CurrentShipLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer"]
+layout_mode = 2
+text = "Navire actuel : Barque"
+horizontal_alignment = 1
+
+[node name="ShipList" type="ItemList" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer"]
+custom_minimum_size = Vector2(0, 130)
+layout_mode = 2
+
+[node name="ShipDetailsLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer"]
+layout_mode = 2
+text = "Sélectionne un navire"
+autowrap_mode = 3
+
+[node name="BuyShipButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "Acheter"
+
+[node name="EquipShipButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "Équiper"
+
 [node name="MissionsButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
