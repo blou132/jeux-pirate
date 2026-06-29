@@ -40,7 +40,7 @@ func get_cannons_level() -> int:
 
 
 func get_level(upgrade_id: String) -> int:
-	var levels := _get_active_levels()
+	var levels: Dictionary = _get_active_levels()
 	return int(levels.get(upgrade_id, 0))
 
 
@@ -59,16 +59,16 @@ func get_upgrade_status(upgrade_id: String) -> String:
 	if not LABELS.has(upgrade_id):
 		return "Amélioration inconnue"
 
-	var label := _get_label(upgrade_id)
-	var level := get_level(upgrade_id)
-	var max_level := get_max_level(upgrade_id)
+	var label: String = _get_label(upgrade_id)
+	var level: int = get_level(upgrade_id)
+	var max_level: int = get_max_level(upgrade_id)
 
 	if level >= max_level:
 		return "%s : niv. %d/%d — niveau maximum atteint" % [label, level, max_level]
 
-	var next_level := level + 1
-	var cost := get_upgrade_cost(next_level)
-	var status := "%s : niv. %d/%d — Coût : %d or, %d bois" % [
+	var next_level: int = level + 1
+	var cost: Dictionary = get_upgrade_cost(next_level)
+	var status: String = "%s : niv. %d/%d — Coût : %d or, %d bois" % [
 		label,
 		level,
 		max_level,
@@ -86,9 +86,9 @@ func can_afford_next(upgrade_id: String) -> bool:
 	if is_max_level(upgrade_id):
 		return false
 
-	var next_level := get_level(upgrade_id) + 1
-	var cost := get_upgrade_cost(next_level)
-	var game_state := _get_game_state()
+	var next_level: int = get_level(upgrade_id) + 1
+	var cost: Dictionary = get_upgrade_cost(next_level)
+	var game_state: Node = _get_game_state()
 	if game_state == null or not game_state.has_method("can_afford"):
 		return false
 
@@ -99,20 +99,20 @@ func purchase_upgrade(upgrade_id: String) -> String:
 	if not LABELS.has(upgrade_id):
 		return "Amélioration inconnue"
 
-	var level := get_level(upgrade_id)
+	var level: int = get_level(upgrade_id)
 	if level >= get_max_level(upgrade_id):
 		return "Niveau maximum atteint"
 
-	var next_level := level + 1
-	var cost := get_upgrade_cost(next_level)
-	var game_state := _get_game_state()
+	var next_level: int = level + 1
+	var cost: Dictionary = get_upgrade_cost(next_level)
+	var game_state: Node = _get_game_state()
 	if game_state == null or not game_state.has_method("spend_resources"):
 		return "Ressources insuffisantes"
 
 	if not game_state.spend_resources(int(cost["gold"]), int(cost["wood"])):
 		return "Ressources insuffisantes"
 
-	var levels := _get_active_levels()
+	var levels: Dictionary = _get_active_levels()
 	levels[upgrade_id] = next_level
 	_emit_upgrades_changed()
 	return "%s niveau %d" % [_get_label(upgrade_id), next_level]
@@ -135,11 +135,11 @@ func _get_game_state() -> Node:
 
 
 func _connect_game_state() -> void:
-	var game_state := _get_game_state()
+	var game_state: Node = _get_game_state()
 	if game_state == null:
 		return
 
-	var callback := Callable(self, "_on_player_ship_changed")
+	var callback: Callable = Callable(self, "_on_player_ship_changed")
 	if game_state.has_signal("player_ship_changed") and not game_state.is_connected("player_ship_changed", callback):
 		game_state.connect("player_ship_changed", callback)
 
@@ -150,7 +150,7 @@ func _on_player_ship_changed(_ship_id: String, _ship_name: String) -> void:
 
 
 func _get_active_ship_id() -> String:
-	var game_state := _get_game_state()
+	var game_state: Node = _get_game_state()
 	if game_state != null and game_state.has_method("get_active_player_ship_id"):
 		return String(game_state.get_active_player_ship_id())
 
@@ -158,7 +158,7 @@ func _get_active_ship_id() -> String:
 
 
 func _get_active_levels() -> Dictionary:
-	var ship_id := _get_active_ship_id()
+	var ship_id: String = _get_active_ship_id()
 	if not _levels_by_ship.has(ship_id):
 		_levels_by_ship[ship_id] = _get_empty_levels()
 

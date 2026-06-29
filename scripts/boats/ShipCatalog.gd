@@ -145,9 +145,9 @@ static func format_cost(ship_id: String) -> String:
 
 	var cost := get_ship_cost(ship_id)
 	var parts: Array[String] = []
-	var gold_cost := int(cost.get("gold", 0))
-	var wood_cost := int(cost.get("wood", 0))
-	var fragment_cost := int(cost.get("map_fragments", 0))
+	var gold_cost: int = int(cost.get("gold", 0))
+	var wood_cost: int = int(cost.get("wood", 0))
+	var fragment_cost: int = int(cost.get("map_fragments", 0))
 
 	if gold_cost > 0:
 		parts.append("%d or" % gold_cost)

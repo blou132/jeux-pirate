@@ -72,10 +72,10 @@ func spend_cost(cost: Dictionary) -> bool:
 	if not can_afford_cost(cost):
 		return false
 
-	var gold_cost := max(0, int(cost.get("gold", 0)))
-	var wood_cost := max(0, int(cost.get("wood", 0)))
-	var fragment_cost := max(0, int(cost.get("map_fragments", 0)))
-	var relic_cost := max(0, int(cost.get("ancient_relics", 0)))
+	var gold_cost: int = maxi(0, int(cost.get("gold", 0)))
+	var wood_cost: int = maxi(0, int(cost.get("wood", 0)))
+	var fragment_cost: int = maxi(0, int(cost.get("map_fragments", 0)))
+	var relic_cost: int = maxi(0, int(cost.get("ancient_relics", 0)))
 
 	gold -= gold_cost
 	wood -= wood_cost
