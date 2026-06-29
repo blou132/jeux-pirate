@@ -21,6 +21,7 @@ const REPAIR_HEALTH_PER_WOOD := 5
 @onready var current_ship_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer/CurrentShipLabel
 @onready var ship_list: ItemList = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer/ShipList
 @onready var ship_details_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer/ShipDetailsLabel
+@onready var ship_hierarchy_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer/ShipHierarchyLabel
 @onready var buy_ship_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer/BuyShipButton
 @onready var equip_ship_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer/EquipShipButton
 @onready var missions_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsButton
@@ -465,6 +466,7 @@ func _refresh_shipyard_rows() -> void:
 	if game_state == null:
 		current_ship_label.text = "Navire actuel indisponible"
 		ship_details_label.text = "Chantier naval indisponible"
+		ship_hierarchy_label.text = _build_ship_hierarchy_text()
 		buy_ship_button.disabled = true
 		equip_ship_button.disabled = true
 		return
@@ -474,6 +476,7 @@ func _refresh_shipyard_rows() -> void:
 		active_ship_id = String(game_state.get_active_player_ship_id())
 
 	current_ship_label.text = "Navire actuel : %s" % ShipCatalog.get_ship_name(active_ship_id)
+	ship_hierarchy_label.text = _build_ship_hierarchy_text()
 	var ship_ids := ShipCatalog.get_player_ship_ids()
 	for ship_id in ship_ids:
 		_ship_ids.append(ship_id)
@@ -581,6 +584,20 @@ func _get_ship_index(ship_id: String) -> int:
 			return index
 
 	return -1
+
+
+func _build_ship_hierarchy_text() -> String:
+	var parts: Array[String] = []
+	var entries := ShipCatalog.get_hierarchy_entries()
+	for index in range(entries.size()):
+		var entry: Dictionary = entries[index]
+		var status := String(entry.get("status", "à venir"))
+		var suffix := "max %d" % int(entry.get("upgrade_max", 0))
+		if status != "jouable":
+			suffix += ", à venir"
+		parts.append("%d. %s (%s)" % [index + 1, String(entry.get("name", "Navire")), suffix])
+
+	return "Hiérarchie : %s" % " -> ".join(parts)
 
 
 func _on_missions_pressed() -> void:

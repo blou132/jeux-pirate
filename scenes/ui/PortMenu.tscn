@@ -144,6 +144,11 @@ layout_mode = 2
 text = "Sélectionne un navire"
 autowrap_mode = 3
 
+[node name="ShipHierarchyLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer"]
+layout_mode = 2
+text = "Hiérarchie : Radeau à venir, Barque, Chaloupe, Sloop, Goélette"
+autowrap_mode = 3
+
 [node name="BuyShipButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
