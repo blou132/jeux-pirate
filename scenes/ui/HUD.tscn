@@ -104,8 +104,9 @@ theme_override_constants/separation = 5
 
 [node name="ShipHeaderLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
-text = "Navire et flotte"
+text = "Navire"
 horizontal_alignment = 1
+theme_override_font_sizes/font_size = 16
 
 [node name="SpeedLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
@@ -115,9 +116,14 @@ text = "Vitesse: 0.0 nd"
 layout_mode = 2
 text = "Coque: 100/100 PV"
 
+[node name="UpgradeDivider" type="HSeparator" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
+layout_mode = 2
+
 [node name="UpgradeHeaderLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
 text = "Ameliorations"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 16
 
 [node name="HullLevelLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
@@ -131,9 +137,14 @@ text = "Voiles: niv. 0/3"
 layout_mode = 2
 text = "Canons: niv. 0/3"
 
+[node name="WorldDivider" type="HSeparator" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
+layout_mode = 2
+
 [node name="WorldHeaderLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
 text = "Mer et combat"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 16
 
 [node name="DangerLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
@@ -143,9 +154,14 @@ text = "Danger: 1"
 layout_mode = 2
 text = "Ennemis detruits: 0"
 
+[node name="FleetDivider" type="HSeparator" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
+layout_mode = 2
+
 [node name="FleetHeaderLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
 text = "Flotte"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 16
 
 [node name="AllyLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 custom_minimum_size = Vector2(0, 74)
@@ -153,9 +169,14 @@ layout_mode = 2
 text = "Flotte : 0/3"
 autowrap_mode = 3
 
+[node name="MissionDivider" type="HSeparator" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
+layout_mode = 2
+
 [node name="MissionHeaderLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
 text = "Missions"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 16
 
 [node name="QuestLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
