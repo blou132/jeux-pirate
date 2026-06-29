@@ -262,6 +262,17 @@ La réputation donne une progression sociale simple sans ajouter encore de contr
 - La réputation de recrutement est liée aux nouveaux emplacements de flotte : un remplacement après destruction ne redonne pas le bonus.
 - Le bonus de flotte complète est accordé seulement la première fois que la flotte atteint 3/3.
 
+## Interface pirate
+
+La premiere refonte UI doit rendre le prototype plus lisible sans changer les systemes jouables :
+
+- Les ressources et PV importants restent visibles en permanence dans une barre superieure.
+- Le panneau gauche sert au pilotage : vitesse, coque, ameliorations, danger, flotte et missions.
+- Le panneau droit sert au statut social : reputation, progression de rang, titre et progression de titre.
+- Le menu du port reste central et fonctionnel, mais se lit comme un tableau de capitaine avec services, missions, ameliorations, flotte et statut pirate.
+- Les onglets bas annoncent les futures sections de navigation sans encore lancer de nouvelle mecanique.
+- Les elements HUD non interactifs ne doivent pas intercepter la souris pour preserver le combat naval.
+
 ## Piliers a long terme
 
 - Navigation lisible : le joueur doit toujours comprendre son cap, sa vitesse et les menaces proches.

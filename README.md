@@ -40,6 +40,8 @@ La v0.7 ajoute une flotte basique : jusqu'à 3 Sloops alliés, recrutement progr
 
 La v0.8 ajoute une progression sociale : réputation pirate, rangs de réputation, titres pirates, gains liés aux actions jouables, affichage HUD et statut pirate au port.
 
+La refonte UI pirate ajoute une premiere direction visuelle dark fantasy : barre de ressources en haut, panneau navire/flotte a gauche, panneau reputation/titre a droite, onglets bas de navigation et menu du port plus lisible.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -198,6 +200,16 @@ La v0.8 ajoute une progression sociale : réputation pirate, rangs de réputatio
 - Les kills faits par la flotte donnent aussi la réputation au joueur.
 - Le HUD affiche le rang de réputation, les points et le titre courant.
 - Le menu du port ajoute `Statut pirate` avec titre, rang, points, prochain rang et progression.
+
+## Refonte UI pirate
+
+- `PirateTheme.tres` centralise les couleurs sombres, bordures dorees, boutons, listes et barres de progression.
+- La barre superieure regroupe or, bois, fragments, reliques et PV du joueur.
+- Le panneau gauche se concentre sur navire, vitesse, coque, ameliorations, danger, ennemis detruits, flotte et missions.
+- Le panneau droit affiche reputation, progression de rang, titre pirate et progression de titre.
+- Le menu du port garde ses actions existantes mais gagne un panneau central plus large, des sections et une meilleure lisibilite.
+- Les onglets bas `Port`, `Missions`, `Flotte`, `Carte` et `Renom` preparent la navigation future sans ajouter de gameplay.
+- Les panneaux HUD decoratifs ignorent la souris pour ne pas bloquer les clics de canon.
 
 ## Lancement
 

@@ -78,6 +78,9 @@
 - Afficher réputation et titre dans le HUD.
 - Ajouter un panneau `Statut pirate` au port.
 
+- Correctif v0.8.1 : empecher le farm de reputation par rachat d'allies apres destruction.
+- Refonte UI pirate : theme sombre, barre de ressources haute, panneau navire/flotte, panneau reputation/titre, menu portuaire central et onglets bas.
+
 ## v0.9 - Hiérarchie des navires
 
 - Différencier davantage les rôles des navires alliés et ennemis.
