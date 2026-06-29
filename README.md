@@ -275,6 +275,15 @@ La refonte UI pirate ajoute une premiere direction visuelle dark fantasy : barre
 - Le HUD affiche les niveaux avec le maximum actif, par exemple `Coque: niv. 3/5`.
 - Couts par niveau : 20/10, 40/20, 80/40, 140/70, 220/110, 320/160 en or/bois.
 
+## Correctifs ciblage ennemi v0.9.1
+
+- Le `PlayerBoat` reste explicitement ciblable apres les changements de navire avec `is_alive()` et `can_be_targeted()`.
+- Les ennemis cherchent une cible hostile vivante : joueur dans le groupe `player`, puis allies dans `ally_ships`.
+- La zone sure qui bloque l'engagement ennemi s'applique uniquement au port, pas aux iles ou a l'archipel.
+- Le leash de poursuite abandonne la cible hors portee sans declencher le cooldown d'expulsion portuaire.
+- Les rayons attendus restent : detection 40/48/55 et leash 65/75/85 selon Petit pirate, Brigantin pirate et Patrouilleur lourd.
+- `debug_enemy_ai` peut etre active dans `EnemyShipAI` pour imprimer cible, distance, detection, leash et statut de zone portuaire.
+
 ## Lancement
 
 1. Installer Godot 4.x.

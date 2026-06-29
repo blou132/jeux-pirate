@@ -284,6 +284,17 @@ Les niveaux sont stockes par navire. Une Barque amelioree ne transfere pas ses n
 
 Les couts montent avec le niveau d'amelioration : niveau 1 a 20 or / 10 bois, niveau 2 a 40 / 20, niveau 3 a 80 / 40, niveau 4 a 140 / 70, niveau 5 a 220 / 110 et niveau 6 a 320 / 160.
 
+## Ciblage ennemi v0.9.1
+
+Les changements de navire ne doivent pas casser le combat existant. Le bateau joueur reste le meme `PlayerBoat` dans le groupe `player`, avec des stats remplacees selon le navire equipe.
+
+- Les ennemis peuvent cibler le joueur si `can_be_targeted()` confirme qu'il est vivant.
+- Les allies du groupe `ally_ships` restent des cibles hostiles valides pour les ennemis tant qu'ils ne sont pas detruits.
+- La zone sure qui bloque la detection et l'attaque ennemies est limitee au port.
+- Les iles et zones d'archipel ne rendent pas le joueur intouchable ; elles restent des lieux d'exploration et de danger normal.
+- Le leash sert seulement a abandonner une poursuite trop lointaine. Il ne declenche pas le cooldown d'expulsion portuaire.
+- Les boulets ennemis continuent de toucher uniquement le joueur et les allies, pas les autres ennemis.
+
 ## Réputation et titres v0.8
 
 La réputation donne une progression sociale simple sans ajouter encore de contrôle de territoire ou de hiérarchie de ports :
