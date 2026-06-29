@@ -13,9 +13,13 @@ extends CanvasLayer
 @onready var danger_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/DangerLabel
 @onready var enemies_defeated_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/EnemiesDefeatedLabel
 @onready var ally_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/AllyLabel
-@onready var reputation_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/ReputationLabel
-@onready var pirate_title_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/PirateTitleLabel
 @onready var quest_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/QuestLabel
+@onready var reputation_panel: Control = $HUDRoot/RightReputationPanel
+@onready var reputation_label: Label = $HUDRoot/RightReputationPanel/ReputationVBox/ReputationLabel
+@onready var reputation_progress_label: Label = $HUDRoot/RightReputationPanel/ReputationVBox/ReputationProgressLabel
+@onready var reputation_progress_bar: ProgressBar = $HUDRoot/RightReputationPanel/ReputationVBox/ReputationProgressBar
+@onready var pirate_title_label: Label = $HUDRoot/RightReputationPanel/ReputationVBox/PirateTitleLabel
+@onready var title_progress_label: Label = $HUDRoot/RightReputationPanel/ReputationVBox/TitleProgressLabel
 @onready var context_panel: Control = $HUDRoot/MessagePanel
 @onready var context_label: Label = $HUDRoot/MessagePanel/ContextLabel
 @onready var zone_notification_label: Label = $HUDRoot/ZoneNotificationContainer/ZoneNotificationLabel
@@ -301,8 +305,7 @@ func _on_danger_changed(danger_level: int, enemies_defeated: int) -> void:
 func _connect_reputation_system() -> void:
 	_reputation_system = get_node_or_null("/root/ReputationSystem")
 	if _reputation_system == null:
-		reputation_label.visible = false
-		pirate_title_label.visible = false
+		_set_reputation_panel_visible(false)
 		return
 
 	var reputation_callback := Callable(self, "_on_reputation_changed")
@@ -334,23 +337,48 @@ func _on_pirate_title_changed(_title_name: String, _title_score: int) -> void:
 
 func _refresh_reputation_labels() -> void:
 	if _reputation_system == null:
-		reputation_label.visible = false
-		pirate_title_label.visible = false
+		_set_reputation_panel_visible(false)
 		return
 
 	if not _reputation_system.has_method("get_reputation_view"):
-		reputation_label.visible = false
-		pirate_title_label.visible = false
+		_set_reputation_panel_visible(false)
 		return
 
 	var view: Dictionary = _reputation_system.get_reputation_view()
+	var points := int(view.get("points", 0))
+	var current_threshold := int(view.get("current_threshold", 0))
+	var next_threshold := int(view.get("next_threshold", current_threshold))
+	var rank_progress := 100.0
+	if next_threshold > current_threshold:
+		rank_progress = clampf(
+			(float(points - current_threshold) / float(next_threshold - current_threshold)) * 100.0,
+			0.0,
+			100.0
+		)
 	reputation_label.text = "Réputation : %s (%d)" % [
 		String(view.get("rank_name", "Inconnu")),
 		int(view.get("points", 0)),
 	]
 	pirate_title_label.text = "Titre : %s" % String(view.get("title_name", "Loup de mer"))
-	reputation_label.visible = true
-	pirate_title_label.visible = true
+	reputation_progress_label.text = "Prochain rang : %s - %s" % [
+		String(view.get("next_rank_name", "Rang maximum")),
+		String(view.get("progress_text", "0 / 100")),
+	]
+	reputation_progress_bar.value = rank_progress
+	title_progress_label.text = "Titre suivant : %s - %s" % [
+		String(view.get("next_title_name", "Titre maximum")),
+		String(view.get("title_progress_text", "0 / 120")),
+	]
+	_set_reputation_panel_visible(true)
+
+
+func _set_reputation_panel_visible(is_visible: bool) -> void:
+	reputation_panel.visible = is_visible
+	reputation_label.visible = is_visible
+	reputation_progress_label.visible = is_visible
+	reputation_progress_bar.visible = is_visible
+	pirate_title_label.visible = is_visible
+	title_progress_label.visible = is_visible
 
 
 func set_context_message(message: String) -> void:

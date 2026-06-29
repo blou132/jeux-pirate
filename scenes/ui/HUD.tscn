@@ -114,18 +114,6 @@ layout_mode = 2
 text = "Flotte : 0/3"
 autowrap_mode = 3
 
-[node name="ReputationHeaderLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
-layout_mode = 2
-text = "Renom"
-
-[node name="ReputationLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
-layout_mode = 2
-text = "Reputation : Inconnu (0)"
-
-[node name="PirateTitleLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
-layout_mode = 2
-text = "Titre : Loup de mer"
-
 [node name="MissionHeaderLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
 text = "Missions"
@@ -133,6 +121,54 @@ text = "Missions"
 [node name="QuestLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
 text = "Mission : Chasse pirate - 0/3 ennemis"
+autowrap_mode = 3
+
+[node name="RightReputationPanel" type="PanelContainer" parent="HUDRoot"]
+layout_mode = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -374.0
+offset_top = 74.0
+offset_right = -16.0
+offset_bottom = 290.0
+grow_horizontal = 0
+mouse_filter = 2
+
+[node name="ReputationVBox" type="VBoxContainer" parent="HUDRoot/RightReputationPanel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="ReputationHeaderLabel" type="Label" parent="HUDRoot/RightReputationPanel/ReputationVBox"]
+layout_mode = 2
+text = "Renom pirate"
+horizontal_alignment = 1
+
+[node name="ReputationLabel" type="Label" parent="HUDRoot/RightReputationPanel/ReputationVBox"]
+layout_mode = 2
+text = "Reputation : Inconnu (0)"
+autowrap_mode = 3
+
+[node name="ReputationProgressLabel" type="Label" parent="HUDRoot/RightReputationPanel/ReputationVBox"]
+layout_mode = 2
+text = "Prochain rang : 0 / 100"
+autowrap_mode = 3
+
+[node name="ReputationProgressBar" type="ProgressBar" parent="HUDRoot/RightReputationPanel/ReputationVBox"]
+custom_minimum_size = Vector2(0, 14)
+layout_mode = 2
+max_value = 100.0
+value = 0.0
+show_percentage = false
+mouse_filter = 2
+
+[node name="PirateTitleLabel" type="Label" parent="HUDRoot/RightReputationPanel/ReputationVBox"]
+layout_mode = 2
+text = "Titre : Loup de mer"
+autowrap_mode = 3
+
+[node name="TitleProgressLabel" type="Label" parent="HUDRoot/RightReputationPanel/ReputationVBox"]
+layout_mode = 2
+text = "Titre suivant : 0 / 120"
 autowrap_mode = 3
 
 [node name="MessagePanel" type="PanelContainer" parent="HUDRoot"]
