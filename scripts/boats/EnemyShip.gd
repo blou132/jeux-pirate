@@ -15,7 +15,7 @@ signal destroyed(world_position: Vector3, gold_reward: int, wood_reward: int)
 @export var attack_range: float = 20.0
 @export var attack_cooldown: float = 2.2
 @export var detection_range: float = 48.0
-@export var chase_leash_distance: float = 45.0
+@export var chase_leash_distance: float = 75.0
 @export var reward_gold: int = 12
 @export var reward_wood: int = 8
 @export var cannon_point_base_half_width: float = 1.35
