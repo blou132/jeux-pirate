@@ -284,6 +284,15 @@ La refonte UI pirate ajoute une premiere direction visuelle dark fantasy : barre
 - Les rayons attendus restent : detection 40/48/55 et leash 65/75/85 selon Petit pirate, Brigantin pirate et Patrouilleur lourd.
 - `debug_enemy_ai` peut etre active dans `EnemyShipAI` pour imprimer cible, distance, detection, leash et statut de zone portuaire.
 
+## Equilibrage poursuite v0.9.2
+
+- Les ennemis detectent mieux les navires rapides sans engager depuis toute la carte : 50, 60 et 70 unites.
+- Le leash de poursuite passe a 100, 120 et 140 unites pour eviter les decrochages immediats apres detection.
+- Les portees d'engagement passent a 32, 38 et 45 unites selon la variante ennemie.
+- En poursuite ou alignement de bordee, les ennemis appliquent un petit bonus de vitesse : x1.10, x1.15 ou x1.20.
+- La zone sure du port garde la priorite : elle coupe toujours l'engagement et force l'ennemi a s'eloigner.
+- Les boulets ennemis passent a 18.0 de vitesse pour rester coherents avec les nouvelles portees.
+
 ## Lancement
 
 1. Installer Godot 4.x.

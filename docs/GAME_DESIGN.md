@@ -295,6 +295,17 @@ Les changements de navire ne doivent pas casser le combat existant. Le bateau jo
 - Le leash sert seulement a abandonner une poursuite trop lointaine. Il ne declenche pas le cooldown d'expulsion portuaire.
 - Les boulets ennemis continuent de toucher uniquement le joueur et les allies, pas les autres ennemis.
 
+## Equilibrage poursuite v0.9.2
+
+Les navires joueur de v0.9 peuvent devenir nettement plus rapides avec les voiles ameliorees. L'IA ennemie doit donc rester capable d'engager sans transformer toute la carte en zone d'attaque.
+
+- Detection par variante : Petit pirate 50, Brigantin pirate 60, Patrouilleur lourd 70.
+- Leash par variante : Petit pirate 100, Brigantin pirate 120, Patrouilleur lourd 140.
+- Portee d'engagement : Petit pirate 32, Brigantin pirate 38, Patrouilleur lourd 45.
+- Bonus de vitesse seulement en poursuite/combat : x1.10, x1.15 et x1.20.
+- La zone sure portuaire reste prioritaire sur la poursuite et coupe l'engagement quand le joueur revient au port.
+- La vitesse des boulets ennemis est augmentee a 18.0 pour couvrir les nouvelles portees tout en restant esquivable par manoeuvre.
+
 ## Réputation et titres v0.8
 
 La réputation donne une progression sociale simple sans ajouter encore de contrôle de territoire ou de hiérarchie de ports :

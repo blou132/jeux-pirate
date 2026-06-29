@@ -96,6 +96,7 @@
 - Afficher la hierarchie complete avec les navires futurs marques `a venir`.
 - Donner a chaque navire ses propres plafonds d'amelioration et ses propres niveaux conserves.
 - Correctif v0.9.1 : restaurer le ciblage ennemi apres changement de navire, limiter la zone sure au port et separer leash de poursuite et cooldown portuaire.
+- Correctif v0.9.2 : augmenter detection, leash, portee d'engagement, bonus de vitesse en poursuite et vitesse des boulets ennemis contre les navires rapides.
 
 ## v0.10 - Equilibrage navires, stockage et commerce
 
