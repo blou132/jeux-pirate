@@ -84,7 +84,7 @@ func _physics_process(delta: float) -> void:
 	offset.y = 0.0
 	var distance_squared: float = offset.length_squared()
 	var attack_range: float = _get_attack_range()
-	var active_chase_leash := _get_chase_leash_distance()
+	var active_chase_leash: float = _get_chase_leash_distance()
 	var distance_to_player: float = sqrt(distance_squared)
 
 	if distance_squared > active_chase_leash * active_chase_leash:
@@ -269,20 +269,9 @@ func _begin_safe_zone_escape() -> void:
 	_player = null
 
 
-func _begin_disengage_from_position(threat_position: Vector3) -> void:
-	var escape_direction := ship.global_position - threat_position
-	escape_direction.y = 0.0
-	if escape_direction.length_squared() < 0.01:
-		escape_direction = -ship.global_transform.basis.z
-		escape_direction.y = 0.0
-	if escape_direction.length_squared() < 0.01:
-		escape_direction = Vector3.FORWARD
-
-	var escape_distance := maxf(_get_detection_range(), 24.0)
-	_safe_zone_escape_position = ship.global_position + (escape_direction.normalized() * escape_distance)
-	_safe_zone_escape_position.y = 0.0
-	_has_safe_zone_escape_position = true
-	_safe_zone_cooldown_remaining = safe_zone_reengage_cooldown
+func _begin_disengage_from_position(_threat_position: Vector3) -> void:
+	_has_safe_zone_escape_position = false
+	_safe_zone_cooldown_remaining = 0.0
 	_player = null
 
 
