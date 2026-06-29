@@ -259,6 +259,8 @@ La réputation donne une progression sociale simple sans ajouter encore de contr
 - Le HUD reste volontairement sobre : rang, points et titre.
 - Le port affiche un statut plus complet avec progression vers le prochain rang.
 - Les gains sont branchés sur des événements déjà uniques pour éviter les doubles récompenses.
+- La réputation de recrutement est liée aux nouveaux emplacements de flotte : un remplacement après destruction ne redonne pas le bonus.
+- Le bonus de flotte complète est accordé seulement la première fois que la flotte atteint 3/3.
 
 ## Piliers a long terme
 

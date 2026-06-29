@@ -192,7 +192,9 @@ La v0.8 ajoute une progression sociale : réputation pirate, rangs de réputatio
 - Système global de réputation pirate en session.
 - Rangs de réputation : Inconnu, Recherché, Craint, Redouté, Célèbre, Légendaire, Fléau des mers, Roi des pirates.
 - Titres pirates séparés : de `Loup de mer` jusqu'à `Légende éternelle`.
-- Gains de réputation : ennemis coulés, missions terminées, coffres, reliques anciennes, recrutement allié et flotte complète.
+- Gains de réputation : ennemis coulés, missions terminées, coffres, reliques anciennes, nouveaux emplacements de flotte remplis et flotte complète.
+- Le recrutement allié donne `+20 réputation` seulement la première fois que chaque emplacement de flotte est rempli.
+- Le bonus `Flotte complète` donne `+100 réputation` seulement la première fois que la flotte atteint 3/3.
 - Les kills faits par la flotte donnent aussi la réputation au joueur.
 - Le HUD affiche le rang de réputation, les points et le titre courant.
 - Le menu du port ajoute `Statut pirate` avec titre, rang, points, prochain rang et progression.
