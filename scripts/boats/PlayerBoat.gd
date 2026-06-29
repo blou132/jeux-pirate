@@ -25,8 +25,12 @@ signal destroyed
 
 var health: int
 var current_speed: float = 0.0
+var storage_capacity: int = 100
+var cannon_count: int = 1
 var _base_max_health: int
 var _base_max_forward_speed: float
+var _base_max_reverse_speed: float
+var _base_turn_speed: float
 var _destroyed: bool = false
 var _hit_feedback_cooldown_remaining: float = 0.0
 var _respawn_invulnerability_remaining: float = 0.0
@@ -35,8 +39,11 @@ var _respawn_invulnerability_remaining: float = 0.0
 func _ready() -> void:
 	_base_max_health = max_health
 	_base_max_forward_speed = max_forward_speed
+	_base_max_reverse_speed = max_reverse_speed
+	_base_turn_speed = turn_speed
 	health = max_health
 	add_to_group("player")
+	_connect_game_state()
 	_connect_upgrade_system()
 	_refresh_debug_markers()
 	health_changed.emit(health, max_health)
@@ -129,6 +136,14 @@ func get_current_speed() -> float:
 	return current_speed
 
 
+func get_storage_capacity() -> int:
+	return storage_capacity
+
+
+func get_cannon_count() -> int:
+	return cannon_count
+
+
 func get_aim_position() -> Vector3:
 	var aim_point := get_node_or_null("AimPoint") as Node3D
 	if aim_point != null:
@@ -200,6 +215,38 @@ func _apply_turn(delta: float) -> void:
 	rotate_y(turn_input * turn_speed * speed_factor * direction_factor * delta)
 
 
+func _connect_game_state() -> void:
+	var game_state := get_node_or_null("/root/GameState")
+	if game_state == null:
+		return
+
+	var callback := Callable(self, "_on_player_ship_changed")
+	if game_state.has_signal("player_ship_changed") and not game_state.is_connected("player_ship_changed", callback):
+		game_state.connect("player_ship_changed", callback)
+
+	_apply_active_ship_data(game_state)
+
+
+func _on_player_ship_changed(_ship_id: String, _ship_name: String) -> void:
+	var game_state := get_node_or_null("/root/GameState")
+	if game_state != null:
+		_apply_active_ship_data(game_state)
+
+
+func _apply_active_ship_data(game_state: Node) -> void:
+	if not game_state.has_method("get_active_player_ship_data"):
+		return
+
+	var ship: Dictionary = game_state.get_active_player_ship_data()
+	_base_max_health = int(ship.get("max_health", _base_max_health))
+	_base_max_forward_speed = float(ship.get("max_speed", _base_max_forward_speed))
+	_base_max_reverse_speed = float(ship.get("reverse_speed", _base_max_reverse_speed))
+	_base_turn_speed = float(ship.get("turn_speed", _base_turn_speed))
+	storage_capacity = int(ship.get("storage", storage_capacity))
+	cannon_count = int(ship.get("cannons", cannon_count))
+	_refresh_stats_from_upgrade_system()
+
+
 func _connect_upgrade_system() -> void:
 	var upgrade_system := get_node_or_null("/root/UpgradeSystem")
 	if upgrade_system == null:
@@ -217,16 +264,36 @@ func _connect_upgrade_system() -> void:
 		)
 
 
+func _refresh_stats_from_upgrade_system() -> void:
+	var upgrade_system := get_node_or_null("/root/UpgradeSystem")
+	if upgrade_system == null:
+		_on_upgrades_changed(0, 0, 0)
+		return
+	if not upgrade_system.has_method("get_hull_level") or not upgrade_system.has_method("get_sails_level") or not upgrade_system.has_method("get_cannons_level"):
+		_on_upgrades_changed(0, 0, 0)
+		return
+
+	_on_upgrades_changed(
+		upgrade_system.get_hull_level(),
+		upgrade_system.get_sails_level(),
+		upgrade_system.get_cannons_level()
+	)
+
+
 func _on_upgrades_changed(hull_level: int, sails_level: int, _cannons_level: int) -> void:
 	var previous_max_health := max_health
 	max_health = _base_max_health + (hull_level * hull_health_bonus_per_level)
 	max_forward_speed = _base_max_forward_speed + (sails_level * sail_speed_bonus_per_level)
+	max_reverse_speed = _base_max_reverse_speed
+	turn_speed = _base_turn_speed
 
 	if max_health > previous_max_health:
 		health += max_health - previous_max_health
 
 	health = clampi(health, 0, max_health)
+	current_speed = clampf(current_speed, -max_reverse_speed, max_forward_speed)
 	health_changed.emit(health, max_health)
+	speed_changed.emit(current_speed)
 
 
 func _handle_destroyed() -> void:
