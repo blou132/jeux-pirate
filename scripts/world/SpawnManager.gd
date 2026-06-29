@@ -1,9 +1,9 @@
 extends Node3D
 
 @export var enemy_scene: PackedScene = preload("res://scenes/boats/EnemyShip.tscn")
-@export var max_enemies: int = 4
+@export var max_enemies: int = 5
 @export var initial_spawn_count: int = 3
-@export var respawn_delay: float = 6.0
+@export var respawn_delay: float = 5.0
 @export var min_player_spawn_distance: float = 22.0
 @export var port_avoidance_distance: float = 45.0
 
