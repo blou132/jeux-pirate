@@ -8,6 +8,7 @@ extends CanvasLayer
 @onready var map_fragments_label: Label = $HUDRoot/TopResourceBar/ResourceRow/MapFragmentsLabel
 @onready var ancient_relics_label: Label = $HUDRoot/TopResourceBar/ResourceRow/AncientRelicsLabel
 @onready var compact_panel: Control = $HUDRoot/CompactSailingPanel
+@onready var compact_ship_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactShipLabel
 @onready var compact_speed_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactSpeedLabel
 @onready var compact_danger_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactDangerLabel
 @onready var compact_fleet_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactFleetLabel
@@ -15,6 +16,7 @@ extends CanvasLayer
 @onready var compact_quest_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactQuestLabel
 @onready var compact_reputation_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactReputationLabel
 @onready var left_status_panel: Control = $HUDRoot/LeftStatusPanel
+@onready var ship_name_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/ShipNameLabel
 @onready var hull_level_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/HullLevelLabel
 @onready var sails_level_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/SailsLevelLabel
 @onready var cannons_level_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/CannonsLevelLabel
@@ -350,6 +352,12 @@ func _connect_game_state() -> void:
 	if _game_state.has_method("get_danger_level") and _game_state.has_method("get_enemies_defeated"):
 		_on_danger_changed(_game_state.get_danger_level(), _game_state.get_enemies_defeated())
 
+	var player_ship_callback := Callable(self, "_on_player_ship_changed")
+	if _game_state.has_signal("player_ship_changed") and not _game_state.is_connected("player_ship_changed", player_ship_callback):
+		_game_state.connect("player_ship_changed", player_ship_callback)
+
+	_refresh_player_ship_label()
+
 
 func _on_resources_changed(gold: int, wood: int) -> void:
 	gold_label.text = "[Or] %d" % gold
@@ -365,6 +373,20 @@ func _on_danger_changed(danger_level: int, enemies_defeated: int) -> void:
 	danger_label.text = "Danger: %d" % danger_level
 	compact_danger_label.text = "Danger: %d" % danger_level
 	enemies_defeated_label.text = "Ennemis détruits: %d" % enemies_defeated
+
+
+func _on_player_ship_changed(_ship_id: String, _ship_name: String) -> void:
+	_refresh_player_ship_label()
+	_refresh_upgrade_levels_from_system()
+
+
+func _refresh_player_ship_label() -> void:
+	var ship_name := "Barque"
+	if _game_state != null and _game_state.has_method("get_active_player_ship_name"):
+		ship_name = String(_game_state.get_active_player_ship_name())
+
+	ship_name_label.text = "Navire : %s" % ship_name
+	compact_ship_label.text = "Navire: %s" % ship_name
 
 
 func _connect_reputation_system() -> void:
@@ -557,17 +579,35 @@ func _connect_upgrade_system() -> void:
 		_upgrade_system.connect("upgrades_changed", upgrades_callback)
 
 	if _upgrade_system.has_method("get_hull_level") and _upgrade_system.has_method("get_sails_level") and _upgrade_system.has_method("get_cannons_level"):
-		_on_upgrades_changed(
-			_upgrade_system.get_hull_level(),
-			_upgrade_system.get_sails_level(),
-			_upgrade_system.get_cannons_level()
-		)
+		_refresh_upgrade_levels_from_system()
 
 
 func _on_upgrades_changed(hull_level: int, sails_level: int, cannons_level: int) -> void:
-	hull_level_label.text = "Coque: niv. %d/3" % hull_level
-	sails_level_label.text = "Voiles: niv. %d/3" % sails_level
-	cannons_level_label.text = "Canons: niv. %d/3" % cannons_level
+	hull_level_label.text = "Coque: niv. %d/%d" % [hull_level, _get_upgrade_max_level("hull")]
+	sails_level_label.text = "Voiles: niv. %d/%d" % [sails_level, _get_upgrade_max_level("sails")]
+	cannons_level_label.text = "Canons: niv. %d/%d" % [cannons_level, _get_upgrade_max_level("cannons")]
+
+
+func _refresh_upgrade_levels_from_system() -> void:
+	if _upgrade_system == null:
+		_on_upgrades_changed(0, 0, 0)
+		return
+	if not _upgrade_system.has_method("get_hull_level") or not _upgrade_system.has_method("get_sails_level") or not _upgrade_system.has_method("get_cannons_level"):
+		_on_upgrades_changed(0, 0, 0)
+		return
+
+	_on_upgrades_changed(
+		_upgrade_system.get_hull_level(),
+		_upgrade_system.get_sails_level(),
+		_upgrade_system.get_cannons_level()
+	)
+
+
+func _get_upgrade_max_level(upgrade_id: String) -> int:
+	if _upgrade_system != null and _upgrade_system.has_method("get_max_level"):
+		return int(_upgrade_system.get_max_level(upgrade_id))
+
+	return 3
 
 
 func _connect_quest_system() -> void:

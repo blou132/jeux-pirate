@@ -65,6 +65,10 @@ layout_mode = 2
 theme_override_constants/separation = 5
 mouse_filter = 2
 
+[node name="CompactShipLabel" type="Label" parent="HUDRoot/CompactSailingPanel/CompactRow"]
+layout_mode = 2
+text = "Navire: Barque"
+
 [node name="CompactSpeedLabel" type="Label" parent="HUDRoot/CompactSailingPanel/CompactRow"]
 layout_mode = 2
 text = "Vitesse: 0.0 nd"
@@ -110,6 +114,10 @@ layout_mode = 2
 text = "Navire"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 16
+
+[node name="ShipNameLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
+layout_mode = 2
+text = "Navire : Barque"
 
 [node name="SpeedLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
