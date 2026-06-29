@@ -156,6 +156,14 @@ func is_destroyed() -> bool:
 	return _destroyed
 
 
+func is_alive() -> bool:
+	return not _destroyed and health > 0
+
+
+func can_be_targeted() -> bool:
+	return is_alive()
+
+
 func respawn_at_port() -> void:
 	if not _destroyed:
 		return
