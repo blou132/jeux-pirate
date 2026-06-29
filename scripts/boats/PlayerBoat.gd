@@ -18,8 +18,8 @@ signal destroyed
 @export var fallback_respawn_position: Vector3 = Vector3.ZERO
 @export var respawn_offset_from_port: Vector3 = Vector3(8.0, 0.0, -8.0)
 @export var respawn_invulnerability_duration: float = 3.0
-@export var respawn_safe_radius: float = 55.0
-@export var respawn_enemy_push_distance: float = 70.0
+@export var respawn_safe_radius: float = 45.0
+@export var respawn_enemy_push_distance: float = 60.0
 # Temporary v0.3.7 helper to inspect the real player aim point during tests.
 @export var debug_show_aim_points: bool = false
 

@@ -17,11 +17,11 @@ extends Node
 @export var broadside_min_maneuver_speed_scale: float = 0.35
 @export var broadside_line_correction_weight: float = 0.7
 @export var broadside_side_lock_duration: float = 1.5
-@export var port_safe_radius: float = 55.0
-@export var port_expulsion_radius: float = 70.0
+@export var port_safe_radius: float = 45.0
+@export var port_expulsion_radius: float = 60.0
 @export var island_safe_radius: float = 24.0
 @export var island_expulsion_radius: float = 42.0
-@export var safe_zone_reengage_cooldown: float = 5.0
+@export var safe_zone_reengage_cooldown: float = 3.0
 @export var safe_zone_escape_speed_scale: float = 1.0
 # Temporary v0.3.5 console helper to verify enemy broadside selection during tests.
 @export var debug_broadside_fire: bool = false

@@ -5,7 +5,7 @@ extends Node3D
 @export var initial_spawn_count: int = 3
 @export var respawn_delay: float = 6.0
 @export var min_player_spawn_distance: float = 22.0
-@export var port_avoidance_distance: float = 55.0
+@export var port_avoidance_distance: float = 45.0
 
 var _active_enemies: Array[Node] = []
 var _spawn_points: Array[Marker3D] = []
