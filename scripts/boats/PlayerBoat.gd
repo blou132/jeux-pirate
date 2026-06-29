@@ -21,7 +21,7 @@ signal destroyed
 @export var respawn_safe_radius: float = 28.0
 @export var respawn_enemy_push_distance: float = 42.0
 # Temporary v0.3.7 helper to inspect the real player aim point during tests.
-@export var debug_show_aim_points: bool = true
+@export var debug_show_aim_points: bool = false
 
 var health: int
 var current_speed: float = 0.0

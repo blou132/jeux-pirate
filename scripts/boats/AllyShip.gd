@@ -15,7 +15,7 @@ signal destroyed
 @export var cannon_point_base_half_width: float = 1.05
 @export var cannon_point_height: float = 0.58
 @export var cannon_point_forward_offset: float = -0.2
-@export var debug_show_aim_points: bool = true
+@export var debug_show_aim_points: bool = false
 
 var health: int
 var angular_velocity: float = 0.0

@@ -18,9 +18,9 @@ extends Node
 @export var broadside_line_correction_weight: float = 0.7
 @export var broadside_side_lock_duration: float = 1.5
 # Temporary v0.3.5 console helper to verify enemy broadside selection during tests.
-@export var debug_broadside_fire: bool = true
+@export var debug_broadside_fire: bool = false
 @export var debug_broadside_fire_interval: float = 1.5
-@export var debug_show_broadside_lines: bool = true
+@export var debug_show_broadside_lines: bool = false
 @export var debug_broadside_line_length: float = 28.0
 
 const BROADSIDE_SIDE_NONE := 0

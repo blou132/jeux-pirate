@@ -20,7 +20,7 @@ signal destroyed(world_position: Vector3, gold_reward: int, wood_reward: int)
 @export var cannon_point_height: float = 0.65
 @export var cannon_point_forward_offset: float = -0.25
 # Temporary v0.3.7 helper to inspect enemy broadside cannon points during tests.
-@export var debug_show_aim_points: bool = true
+@export var debug_show_aim_points: bool = false
 
 var health: int
 var angular_velocity: float = 0.0
