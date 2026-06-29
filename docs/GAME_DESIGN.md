@@ -87,6 +87,16 @@ Le joueur incarne le capitaine d'un petit navire independant qui construit progr
 4. Les changements importants affichent un feedback court.
 5. Le port permet de consulter le statut pirate et la progression vers le prochain rang.
 
+## Boucle de jeu v0.9
+
+1. Le joueur revient au port.
+2. Il ouvre le `Chantier naval`.
+3. Il compare Barque, Chaloupe, Sloop et Goelette.
+4. Il achete un navire avec or, bois et parfois fragments.
+5. Il equipe le navire possede de son choix.
+6. Le bateau joueur applique les stats du navire actif.
+7. Les ameliorations restent des bonus au-dessus du navire de base.
+
 ## Port et progression
 
 Le port sert de premier point sûr et de première interface de progression. Il établit le rythme attendu : partir en mer, obtenir des ressources, revenir au port, réparer, améliorer le bateau, accepter des missions et recruter un premier soutien allié.
@@ -247,6 +257,19 @@ La v0.7 transforme le premier allié en petite escadre sans lancer encore les sy
 - `Fuir` coupe les tirs alliés et dirige les bateaux vers une zone sûre proche du port.
 - La réparation de flotte garde la règle simple de port : 1 bois pour 5 PV réparés.
 - Les kills de n'importe quel allié restent crédités au joueur pour le loot, le danger et les missions.
+
+## Hierarchie des navires v0.9
+
+La v0.9 introduit une progression de coque sans lancer encore le commerce complet ni la hierarchie des ports :
+
+- Barque : navire de depart, 100 PV, vitesse 7.0, tres accessible et agile.
+- Chaloupe : navire rapide pour missions legeres, 125 PV, vitesse 8.0, cout 400 or et 120 bois.
+- Sloop : navire polyvalent, 175 PV, vitesse 7.5, cout 900 or et 250 bois.
+- Goelette : navire plus robuste pour commerce et escorte, 220 PV, vitesse 8.5, cout 1600 or, 400 bois et 1 fragment.
+- Les navires plus puissants coutent plus cher, stockent davantage et gagnent une base de degats plus haute, mais tournent moins vite.
+- La flotte alliee reste volontairement sur des Sloops allies dans cette version.
+
+La hierarchie affiche aussi les paliers futurs : Radeau, Brick, Fregate, Galion, Vaisseau de ligne et Navire legendaire.
 
 ## Réputation et titres v0.8
 

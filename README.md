@@ -255,6 +255,17 @@ La refonte UI pirate ajoute une premiere direction visuelle dark fantasy : barre
 - Titres pirates officiels : Loup de mer, Capitaine, Seigneur des vagues, Maître des flottes, Conquérant des mers, Fléau des mers, Souverain des mers, Roi des océans, Empereur des océans, Légende éternelle.
 - L'UI distingue le `Renom` du `Titre pirate`, avec des libelles courts propres dans le HUD compact.
 
+## Etat v0.9
+
+- `ShipCatalog` centralise les navires joueur, leurs stats, leurs couts et la hierarchie future.
+- Navires jouables : Barque, Chaloupe, Sloop et Goelette.
+- Le joueur commence avec la Barque possedee et equipee.
+- Le port ajoute un `Chantier naval` pour consulter les stats, acheter et equiper les navires.
+- Les navires non possedes affichent leur cout ou `ressources insuffisantes`.
+- La hierarchie complete est visible : Radeau, Barque, Chaloupe, Sloop, Goelette, Brick, Fregate, Galion, Vaisseau de ligne, Navire legendaire.
+- Le bateau joueur applique les stats du navire equipe : PV, vitesse, maniabilite, stockage prepare et degats de canon de base.
+- Le HUD compact et detaille affiche le navire actif.
+
 ## Lancement
 
 1. Installer Godot 4.x.
@@ -309,6 +320,7 @@ Les lignes de bordée ennemies peuvent être affichées avec `debug_show_broadsi
 - `QuestSystem` est configure en autoload pour suivre les missions actives et les récompenses.
 - `ReputationSystem` est configure en autoload pour suivre réputation, rangs, titres pirates et feedback de progression.
 - `QuestObjectiveSpawner` crée les objectifs temporaires de mission dans la scène jouable.
+- `ShipCatalog` centralise les donnees des navires joueur et leur hierarchie.
 - `FleetManager` gère les alliés actifs, la limite de flotte, les ordres, la formation et la réparation de flotte.
 - `AllyShip` et `AllyShipAI` gèrent le comportement individuel des bateaux alliés recrutés en session.
 - `SpawnManager` gère les ennemis actifs, le respawn et la sélection des variantes.

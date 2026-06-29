@@ -88,9 +88,19 @@
 
 ## v0.9 - Hiérarchie des navires
 
-- Différencier davantage les rôles des navires alliés et ennemis.
-- Préparer des classes de navires plus lisibles.
-- Relier la hiérarchie aux coûts, PV, vitesse et puissance de bordée.
+- Ajouter `ShipCatalog` comme catalogue central des navires joueur.
+- Ajouter Barque, Chaloupe, Sloop et Goelette comme navires jouables.
+- Ajouter un chantier naval au port pour acheter et equiper les navires.
+- Appliquer les stats du navire joueur : PV, vitesse, maniabilite, stockage prepare et degats de canon.
+- Afficher le navire actif dans le HUD.
+- Afficher la hierarchie complete avec les navires futurs marques `a venir`.
+
+## v0.10 - Equilibrage navires, stockage et commerce
+
+- Equilibrer plus finement les couts, vitesses, PV et degats des navires.
+- Donner un vrai role au stockage.
+- Preparer une premiere boucle de commerce simple.
+- Relier les routes commerciales aux zones de danger.
 
 ## v1.0 - Démo jouable complète
 
