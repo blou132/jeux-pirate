@@ -41,6 +41,7 @@ const QUEST_CHEST_REPUTATION := 15
 const ANCIENT_RELIC_REPUTATION := 75
 const ALLY_RECRUITED_REPUTATION := 20
 const FULL_FLEET_REPUTATION := 100
+const PLAYER_DEFEAT_REPUTATION_LOSS := 25
 
 var reputation_points: int = 0
 var _current_rank_index: int = 0
@@ -82,6 +83,32 @@ func add_reputation(amount: int, _reason: String = "") -> void:
 		_current_rank_index != previous_rank_index,
 		_current_title_index != previous_title_index
 	)
+
+
+func remove_reputation(amount: int, _reason: String = "") -> int:
+	amount = maxi(0, amount)
+	if amount <= 0:
+		return 0
+
+	var previous_rank_index := _current_rank_index
+	var previous_title_index := _current_title_index
+	var previous_points := reputation_points
+	reputation_points = maxi(0, reputation_points - amount)
+	var actual_loss := previous_points - reputation_points
+	if actual_loss <= 0:
+		return 0
+
+	_refresh_rank()
+	_refresh_title()
+	_emit_reputation_changed()
+
+	if _current_rank_index != previous_rank_index:
+		reputation_rank_changed.emit(get_current_rank_name(), reputation_points)
+	if _current_title_index != previous_title_index:
+		pirate_title_changed.emit(get_current_pirate_title(), get_title_score())
+
+	_show_reputation_loss_feedback(actual_loss)
+	return actual_loss
 
 
 func record_enemy_destroyed(enemy_type_id: String) -> void:
@@ -134,6 +161,10 @@ func record_ally_recruited(fleet_count: int, max_allies: int) -> void:
 	if not _full_fleet_reputation_claimed and max_allies > 0 and fleet_count >= max_allies:
 		_full_fleet_reputation_claimed = true
 		add_reputation(FULL_FLEET_REPUTATION, "full_fleet")
+
+
+func record_player_defeat() -> int:
+	return remove_reputation(PLAYER_DEFEAT_REPUTATION_LOSS, "player_defeat")
 
 
 func get_reputation_points() -> int:
@@ -273,6 +304,10 @@ func _show_reputation_feedback(amount: int, rank_changed: bool, title_changed: b
 		duration = 2.5
 
 	_show_hud_message(_join_messages(messages), duration)
+
+
+func _show_reputation_loss_feedback(amount: int) -> void:
+	_show_hud_message("Défaite : -%d renommée" % amount, 2.0)
 
 
 func _join_messages(messages: Array[String]) -> String:

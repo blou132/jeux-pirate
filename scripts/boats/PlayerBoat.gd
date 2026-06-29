@@ -229,6 +229,7 @@ func _handle_destroyed() -> void:
 	velocity = Vector3.ZERO
 	speed_changed.emit(current_speed)
 	destroyed.emit()
+	_record_defeat_renown_loss()
 	_show_destroyed_feedback()
 
 
@@ -236,6 +237,12 @@ func _show_destroyed_feedback() -> void:
 	var hud := get_tree().get_first_node_in_group("hud")
 	if hud != null and hud.has_method("set_context_message"):
 		hud.set_context_message("Bateau détruit\nAppuie sur R pour réapparaître au port")
+
+
+func _record_defeat_renown_loss() -> void:
+	var reputation_system := get_node_or_null("/root/ReputationSystem")
+	if reputation_system != null and reputation_system.has_method("record_player_defeat"):
+		reputation_system.record_player_defeat()
 
 
 func _show_respawn_feedback() -> void:
