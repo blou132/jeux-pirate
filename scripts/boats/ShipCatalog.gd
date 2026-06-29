@@ -6,6 +6,10 @@ const SHIP_CHALOUPE := "chaloupe"
 const SHIP_SLOOP := "sloop"
 const SHIP_GOELLETTE := "goelette"
 
+const UPGRADE_HULL := "hull"
+const UPGRADE_SAILS := "sails"
+const UPGRADE_CANNONS := "cannons"
+
 const STARTING_SHIP_ID := SHIP_BARQUE
 
 const PLAYER_SHIP_IDS: Array[String] = [
@@ -29,6 +33,7 @@ const PLAYER_SHIPS := {
 		"cannon_damage": 25,
 		"role": "débutant / exploration côtière",
 		"cost": {"gold": 0, "wood": 0, "map_fragments": 0},
+		"upgrade_limits": {"hull": 3, "sails": 3, "cannons": 3},
 	},
 	"chaloupe": {
 		"id": "chaloupe",
@@ -43,6 +48,7 @@ const PLAYER_SHIPS := {
 		"cannon_damage": 28,
 		"role": "rapide / missions légères",
 		"cost": {"gold": 400, "wood": 120, "map_fragments": 0},
+		"upgrade_limits": {"hull": 4, "sails": 4, "cannons": 4},
 	},
 	"sloop": {
 		"id": "sloop",
@@ -57,6 +63,7 @@ const PLAYER_SHIPS := {
 		"cannon_damage": 34,
 		"role": "polyvalent",
 		"cost": {"gold": 900, "wood": 250, "map_fragments": 0},
+		"upgrade_limits": {"hull": 5, "sails": 5, "cannons": 5},
 	},
 	"goelette": {
 		"id": "goelette",
@@ -71,20 +78,21 @@ const PLAYER_SHIPS := {
 		"cannon_damage": 38,
 		"role": "commerce / escorte",
 		"cost": {"gold": 1600, "wood": 400, "map_fragments": 1},
+		"upgrade_limits": {"hull": 6, "sails": 6, "cannons": 6},
 	},
 }
 
 const SHIP_HIERARCHY: Array[Dictionary] = [
-	{"id": "radeau", "name": "Radeau", "status": "à venir"},
-	{"id": "barque", "name": "Barque", "status": "jouable"},
-	{"id": "chaloupe", "name": "Chaloupe", "status": "jouable"},
-	{"id": "sloop", "name": "Sloop", "status": "jouable"},
-	{"id": "goelette", "name": "Goélette", "status": "jouable"},
-	{"id": "brick", "name": "Brick", "status": "à venir"},
-	{"id": "fregate", "name": "Frégate", "status": "à venir"},
-	{"id": "galion", "name": "Galion", "status": "à venir"},
-	{"id": "vaisseau_ligne", "name": "Vaisseau de ligne", "status": "à venir"},
-	{"id": "navire_legendaire", "name": "Navire légendaire", "status": "à venir"},
+	{"id": "radeau", "name": "Radeau", "status": "à venir", "upgrade_max": 2},
+	{"id": "barque", "name": "Barque", "status": "jouable", "upgrade_max": 3},
+	{"id": "chaloupe", "name": "Chaloupe", "status": "jouable", "upgrade_max": 4},
+	{"id": "sloop", "name": "Sloop", "status": "jouable", "upgrade_max": 5},
+	{"id": "goelette", "name": "Goélette", "status": "jouable", "upgrade_max": 6},
+	{"id": "brick", "name": "Brick", "status": "à venir", "upgrade_max": 7},
+	{"id": "fregate", "name": "Frégate", "status": "à venir", "upgrade_max": 8},
+	{"id": "galion", "name": "Galion", "status": "à venir", "upgrade_max": 9},
+	{"id": "vaisseau_ligne", "name": "Vaisseau de ligne", "status": "à venir", "upgrade_max": 10},
+	{"id": "navire_legendaire", "name": "Navire légendaire", "status": "à venir", "upgrade_max": 12},
 ]
 
 
@@ -113,6 +121,17 @@ static func get_ship_cost(ship_id: String) -> Dictionary:
 	var ship := get_ship(ship_id)
 	var cost: Dictionary = ship.get("cost", {})
 	return cost.duplicate()
+
+
+static func get_upgrade_limits(ship_id: String) -> Dictionary:
+	var ship := get_ship(ship_id)
+	var limits: Dictionary = ship.get("upgrade_limits", {})
+	return limits.duplicate()
+
+
+static func get_upgrade_limit(ship_id: String, upgrade_id: String) -> int:
+	var limits := get_upgrade_limits(ship_id)
+	return int(limits.get(upgrade_id, 3))
 
 
 static func is_free_ship(ship_id: String) -> bool:
@@ -149,6 +168,11 @@ static func get_ship_stat_lines(ship_id: String) -> Array[String]:
 		"Maniabilité : %s" % String(ship.get("maneuverability", "")),
 		"Stockage : %d" % int(ship.get("storage", 0)),
 		"Canons : %d" % int(ship.get("cannons", 0)),
+		"Améliorations : coque %d, voiles %d, canons %d" % [
+			get_upgrade_limit(ship_id, UPGRADE_HULL),
+			get_upgrade_limit(ship_id, UPGRADE_SAILS),
+			get_upgrade_limit(ship_id, UPGRADE_CANNONS),
+		],
 		"Coût : %s" % format_cost(ship_id),
 	]
 
