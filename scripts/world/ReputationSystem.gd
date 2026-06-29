@@ -195,10 +195,14 @@ func get_current_rank_threshold() -> int:
 	return int(rank["threshold"])
 
 
+func is_max_rank() -> bool:
+	return _current_rank_index >= REPUTATION_RANKS.size() - 1
+
+
 func get_next_rank_name() -> String:
 	var next_index := _current_rank_index + 1
 	if next_index >= REPUTATION_RANKS.size():
-		return "Rang maximum"
+		return "Maximum atteint"
 
 	var rank: Dictionary = REPUTATION_RANKS[next_index]
 	return String(rank["name"])
@@ -207,13 +211,16 @@ func get_next_rank_name() -> String:
 func get_next_rank_threshold() -> int:
 	var next_index := _current_rank_index + 1
 	if next_index >= REPUTATION_RANKS.size():
-		return get_current_rank_threshold()
+		return MAX_REPUTATION_POINTS
 
 	var rank: Dictionary = REPUTATION_RANKS[next_index]
 	return int(rank["threshold"])
 
 
 func get_rank_progress_text() -> String:
+	if is_max_rank():
+		return "MAX"
+
 	var next_threshold := get_next_rank_threshold()
 	if next_threshold <= get_current_rank_threshold():
 		return "%d / %d" % [reputation_points, get_current_rank_threshold()]
@@ -230,10 +237,14 @@ func get_title_score() -> int:
 	return _calculate_title_score()
 
 
+func is_max_title() -> bool:
+	return _current_title_index >= PIRATE_TITLES.size() - 1
+
+
 func get_next_pirate_title() -> String:
 	var next_index := _current_title_index + 1
 	if next_index >= PIRATE_TITLES.size():
-		return "Titre maximum"
+		return "Maximum atteint"
 
 	var title: Dictionary = PIRATE_TITLES[next_index]
 	return String(title["name"])
@@ -242,29 +253,35 @@ func get_next_pirate_title() -> String:
 func get_next_title_threshold() -> int:
 	var next_index := _current_title_index + 1
 	if next_index >= PIRATE_TITLES.size():
-		var current_title: Dictionary = PIRATE_TITLES[_current_title_index]
-		return int(current_title["threshold"])
+		return MAX_TITLE_SCORE
 
 	var title: Dictionary = PIRATE_TITLES[next_index]
 	return int(title["threshold"])
 
 
 func get_title_progress_text() -> String:
+	if is_max_title():
+		return "MAX"
+
 	return "%d / %d" % [get_title_score(), get_next_title_threshold()]
 
 
 func get_reputation_view() -> Dictionary:
 	return {
 		"points": reputation_points,
+		"max_points": MAX_REPUTATION_POINTS,
 		"rank_name": get_current_rank_name(),
 		"next_rank_name": get_next_rank_name(),
 		"current_threshold": get_current_rank_threshold(),
 		"next_threshold": get_next_rank_threshold(),
 		"progress_text": get_rank_progress_text(),
+		"rank_is_max": is_max_rank(),
 		"title_name": get_current_pirate_title(),
 		"title_score": get_title_score(),
+		"max_title_score": MAX_TITLE_SCORE,
 		"next_title_name": get_next_pirate_title(),
 		"title_progress_text": get_title_progress_text(),
+		"title_is_max": is_max_title(),
 	}
 
 

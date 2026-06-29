@@ -457,12 +457,27 @@ func _refresh_pirate_status_panel() -> void:
 		return
 
 	var view: Dictionary = reputation_system.get_reputation_view()
-	pirate_status_label.text = "Titre : %s\nRéputation : %s\nPoints : %d\nProchain rang : %s\nProgression : %s" % [
+	var rank_progress := String(view.get("progress_text", "0 / 100"))
+	var next_rank := String(view.get("next_rank_name", "Maximum atteint"))
+	if bool(view.get("rank_is_max", false)):
+		next_rank = "Maximum atteint"
+		rank_progress = "MAX"
+
+	var title_progress := String(view.get("title_progress_text", "0 / 120"))
+	var next_title := String(view.get("next_title_name", "Maximum atteint"))
+	if bool(view.get("title_is_max", false)):
+		next_title = "Maximum atteint"
+		title_progress = "MAX"
+
+	pirate_status_label.text = "Titre : %s\nRéputation : %s\nPoints : %d/%d\nProchain rang : %s\nProgression rang : %s\nTitre suivant : %s\nProgression titre : %s" % [
 		String(view.get("title_name", "Loup de mer")),
 		String(view.get("rank_name", "Inconnu")),
 		int(view.get("points", 0)),
-		String(view.get("next_rank_name", "Rang maximum")),
-		String(view.get("progress_text", "0 / 100")),
+		int(view.get("max_points", 3500)),
+		next_rank,
+		rank_progress,
+		next_title,
+		title_progress,
 	]
 
 

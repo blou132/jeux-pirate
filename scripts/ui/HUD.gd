@@ -407,29 +407,45 @@ func _refresh_reputation_labels() -> void:
 
 	var view: Dictionary = _reputation_system.get_reputation_view()
 	var points := int(view.get("points", 0))
+	var max_points := int(view.get("max_points", points))
 	var current_threshold := int(view.get("current_threshold", 0))
 	var next_threshold := int(view.get("next_threshold", current_threshold))
+	var rank_is_max := bool(view.get("rank_is_max", false))
+	var title_is_max := bool(view.get("title_is_max", false))
 	var rank_progress := 100.0
-	if next_threshold > current_threshold:
+	if not rank_is_max and next_threshold > current_threshold:
 		rank_progress = clampf(
 			(float(points - current_threshold) / float(next_threshold - current_threshold)) * 100.0,
 			0.0,
 			100.0
 		)
-	reputation_label.text = "Réputation : %s (%d)" % [
-		String(view.get("rank_name", "Inconnu")),
-		int(view.get("points", 0)),
-	]
+	if rank_is_max:
+		reputation_label.text = "Réputation : %s (%d/%d)" % [
+			String(view.get("rank_name", "Inconnu")),
+			points,
+			max_points,
+		]
+	else:
+		reputation_label.text = "Réputation : %s (%d)" % [
+			String(view.get("rank_name", "Inconnu")),
+			points,
+		]
 	pirate_title_label.text = "Titre : %s" % String(view.get("title_name", "Loup de mer"))
-	reputation_progress_label.text = "Prochain rang : %s - %s" % [
-		String(view.get("next_rank_name", "Rang maximum")),
-		String(view.get("progress_text", "0 / 100")),
-	]
+	if rank_is_max:
+		reputation_progress_label.text = "Prochain rang : Maximum atteint"
+	else:
+		reputation_progress_label.text = "Prochain rang : %s - %s" % [
+			String(view.get("next_rank_name", "Maximum atteint")),
+			String(view.get("progress_text", "0 / 100")),
+		]
 	reputation_progress_bar.value = rank_progress
-	title_progress_label.text = "Titre suivant : %s - %s" % [
-		String(view.get("next_title_name", "Titre maximum")),
-		String(view.get("title_progress_text", "0 / 120")),
-	]
+	if title_is_max:
+		title_progress_label.text = "Titre maximum atteint"
+	else:
+		title_progress_label.text = "Titre suivant : %s - %s" % [
+			String(view.get("next_title_name", "Maximum atteint")),
+			String(view.get("title_progress_text", "0 / 120")),
+		]
 	compact_reputation_label.text = "Renom: %s / %s" % [
 		_shorten_compact_text(String(view.get("rank_name", "Inconnu")), 10),
 		_shorten_compact_text(String(view.get("title_name", "Loup de mer")), 12),
