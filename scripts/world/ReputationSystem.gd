@@ -45,7 +45,8 @@ const FULL_FLEET_REPUTATION := 100
 var reputation_points: int = 0
 var _current_rank_index: int = 0
 var _current_title_index: int = 0
-var _full_fleet_bonus_awarded: bool = false
+var _highest_ally_slot_reputation_claimed: int = 0
+var _full_fleet_reputation_claimed: bool = false
 var _enemies_destroyed: int = 0
 var _missions_completed: int = 0
 var _treasures_found: int = 0
@@ -115,10 +116,17 @@ func record_ancient_relic_found(amount: int = 1) -> void:
 
 func record_ally_recruited(fleet_count: int, max_allies: int) -> void:
 	_max_fleet_size_reached = maxi(_max_fleet_size_reached, fleet_count)
-	add_reputation(ALLY_RECRUITED_REPUTATION, "ally_recruited")
 
-	if not _full_fleet_bonus_awarded and max_allies > 0 and fleet_count >= max_allies:
-		_full_fleet_bonus_awarded = true
+	var claimed_slot := fleet_count
+	if max_allies > 0:
+		claimed_slot = mini(fleet_count, max_allies)
+
+	if claimed_slot > _highest_ally_slot_reputation_claimed:
+		_highest_ally_slot_reputation_claimed = claimed_slot
+		add_reputation(ALLY_RECRUITED_REPUTATION, "ally_slot_filled")
+
+	if not _full_fleet_reputation_claimed and max_allies > 0 and fleet_count >= max_allies:
+		_full_fleet_reputation_claimed = true
 		add_reputation(FULL_FLEET_REPUTATION, "full_fleet")
 
 
@@ -211,7 +219,8 @@ func get_reputation_view() -> Dictionary:
 
 func reset_reputation() -> void:
 	reputation_points = 0
-	_full_fleet_bonus_awarded = false
+	_highest_ally_slot_reputation_claimed = 0
+	_full_fleet_reputation_claimed = false
 	_enemies_destroyed = 0
 	_missions_completed = 0
 	_treasures_found = 0
