@@ -17,6 +17,9 @@ signal destroyed
 @export var hit_feedback_cooldown: float = 0.8
 @export var fallback_respawn_position: Vector3 = Vector3.ZERO
 @export var respawn_offset_from_port: Vector3 = Vector3(8.0, 0.0, -8.0)
+@export var respawn_invulnerability_duration: float = 3.0
+@export var respawn_safe_radius: float = 28.0
+@export var respawn_enemy_push_distance: float = 42.0
 # Temporary v0.3.7 helper to inspect the real player aim point during tests.
 @export var debug_show_aim_points: bool = true
 
@@ -26,6 +29,7 @@ var _base_max_health: int
 var _base_max_forward_speed: float
 var _destroyed: bool = false
 var _hit_feedback_cooldown_remaining: float = 0.0
+var _respawn_invulnerability_remaining: float = 0.0
 
 
 func _ready() -> void:
@@ -41,6 +45,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	_hit_feedback_cooldown_remaining = maxf(0.0, _hit_feedback_cooldown_remaining - delta)
+	_respawn_invulnerability_remaining = maxf(0.0, _respawn_invulnerability_remaining - delta)
 
 	if _destroyed:
 		current_speed = move_toward(current_speed, 0.0, drag * 2.0 * delta)
@@ -81,6 +86,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func take_damage(amount: int) -> void:
 	if _destroyed or health <= 0:
+		return
+	if _respawn_invulnerability_remaining > 0.0:
 		return
 
 	var previous_health := health
@@ -147,6 +154,8 @@ func respawn_at_port() -> void:
 	velocity = Vector3.ZERO
 	global_position = respawn_position
 	global_rotation = Vector3.ZERO
+	_respawn_invulnerability_remaining = respawn_invulnerability_duration
+	_secure_respawn_area(respawn_position)
 
 	health_changed.emit(health, max_health)
 	speed_changed.emit(current_speed)
@@ -253,7 +262,7 @@ func _show_respawn_feedback() -> void:
 	if hud.has_method("set_context_message"):
 		hud.set_context_message("")
 	if hud.has_method("show_temporary_context_message"):
-		hud.show_temporary_context_message("Réapparition au port", 1.6)
+		hud.show_temporary_context_message("Réapparition au port\nZone sûre du port active", 2.2)
 
 
 func _get_respawn_position() -> Vector3:
@@ -262,6 +271,36 @@ func _get_respawn_position() -> Vector3:
 		return port.global_position + respawn_offset_from_port
 
 	return fallback_respawn_position
+
+
+func _secure_respawn_area(respawn_position: Vector3) -> void:
+	var safe_center := respawn_position
+	var port := get_tree().get_first_node_in_group("ports") as Node3D
+	if port != null:
+		safe_center = port.global_position
+
+	safe_center.y = 0.0
+	for enemy in get_tree().get_nodes_in_group("enemy_ships"):
+		if not enemy is Node3D:
+			continue
+		if enemy.has_method("is_destroyed") and enemy.is_destroyed():
+			continue
+
+		var enemy_node := enemy as Node3D
+		var offset := enemy_node.global_position - safe_center
+		offset.y = 0.0
+		if offset.length() > respawn_safe_radius:
+			continue
+
+		var push_direction := offset.normalized()
+		if push_direction.length_squared() < 0.01:
+			push_direction = Vector3.FORWARD
+
+		enemy_node.global_position = safe_center + (push_direction * respawn_enemy_push_distance)
+		enemy_node.global_position.y = 0.0
+		if enemy_node is CharacterBody3D:
+			var enemy_body := enemy_node as CharacterBody3D
+			enemy_body.velocity = Vector3.ZERO
 
 
 func _refresh_debug_markers() -> void:
