@@ -81,15 +81,16 @@ layout_mode = 2
 text = "Flotte: 0/3 - Suivre"
 
 [node name="CompactQuestLabel" type="Label" parent="HUDRoot/CompactSailingPanel/CompactRow"]
-custom_minimum_size = Vector2(255, 0)
+custom_minimum_size = Vector2(235, 0)
 layout_mode = 2
 text = "Missions: 0"
 clip_text = true
 
 [node name="CompactReputationLabel" type="Label" parent="HUDRoot/CompactSailingPanel/CompactRow"]
-custom_minimum_size = Vector2(280, 0)
+custom_minimum_size = Vector2(190, 0)
 layout_mode = 2
-text = "Rang: Inconnu | Titre: Loup"
+text = "Rang: Inconnu
+Titre: Loup"
 clip_text = true
 
 [node name="LeftStatusPanel" type="PanelContainer" parent="HUDRoot"]

@@ -446,7 +446,7 @@ func _refresh_reputation_labels() -> void:
 			String(view.get("next_title_name", "Maximum atteint")),
 			String(view.get("title_progress_text", "0 / 120")),
 		]
-	compact_reputation_label.text = "Rang: %s | Titre: %s" % [
+	compact_reputation_label.text = "Rang: %s\nTitre: %s" % [
 		_get_compact_rank_label(String(view.get("rank_name", "Inconnu"))),
 		_get_compact_title_label(String(view.get("title_name", "Loup de mer"))),
 	]
