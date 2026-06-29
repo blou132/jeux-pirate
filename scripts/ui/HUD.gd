@@ -446,18 +446,43 @@ func _refresh_reputation_labels() -> void:
 			String(view.get("next_title_name", "Maximum atteint")),
 			String(view.get("title_progress_text", "0 / 120")),
 		]
-	compact_reputation_label.text = "Renom: %s / %s" % [
-		_shorten_compact_text(String(view.get("rank_name", "Inconnu")), 10),
-		_shorten_compact_text(String(view.get("title_name", "Loup de mer")), 12),
+	compact_reputation_label.text = "Rang: %s | Titre: %s" % [
+		_get_compact_rank_label(String(view.get("rank_name", "Inconnu"))),
+		_get_compact_title_label(String(view.get("title_name", "Loup de mer"))),
 	]
 	_set_reputation_panel_visible(true)
 
 
-func _shorten_compact_text(text: String, max_length: int) -> String:
-	if text.length() <= max_length:
-		return text
+func _get_compact_rank_label(rank_name: String) -> String:
+	match rank_name:
+		"Roi des pirates":
+			return "Roi pirate"
+		"Fléau des mers":
+			return "Fléau mers"
+		_:
+			return rank_name
 
-	return "%s." % text.substr(0, maxi(1, max_length - 1))
+
+func _get_compact_title_label(title_name: String) -> String:
+	match title_name:
+		"Seigneur des vagues":
+			return "Seigneur vagues"
+		"Maître des flottes":
+			return "Maître flotte"
+		"Conquérant des océans":
+			return "Conquérant"
+		"Fléau des mers":
+			return "Fléau mers"
+		"Souverain des océans":
+			return "Souverain"
+		"Roi des pirates":
+			return "Roi pirate"
+		"Empereur des mers":
+			return "Empereur"
+		"Légende éternelle":
+			return "Légende"
+		_:
+			return title_name
 
 
 func _set_reputation_panel_visible(is_visible: bool) -> void:

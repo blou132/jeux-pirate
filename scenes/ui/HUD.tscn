@@ -56,7 +56,7 @@ text = "[PV] 100/100"
 layout_mode = 1
 offset_left = 18.0
 offset_top = 64.0
-offset_right = 940.0
+offset_right = 980.0
 offset_bottom = 108.0
 mouse_filter = 2
 
@@ -87,9 +87,9 @@ text = "Missions: 0"
 clip_text = true
 
 [node name="CompactReputationLabel" type="Label" parent="HUDRoot/CompactSailingPanel/CompactRow"]
-custom_minimum_size = Vector2(250, 0)
+custom_minimum_size = Vector2(280, 0)
 layout_mode = 2
-text = "Renom: Inconnu / Loup"
+text = "Rang: Inconnu | Titre: Loup"
 clip_text = true
 
 [node name="LeftStatusPanel" type="PanelContainer" parent="HUDRoot"]
