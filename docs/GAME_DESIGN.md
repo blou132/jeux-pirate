@@ -281,6 +281,14 @@ La premiere refonte UI doit rendre le prototype plus lisible sans changer les sy
 - Les gains de reputation de recrutement restent non farmables : chaque slot de flotte ne donne son bonus qu'une fois, et le bonus flotte complete ne se declenche qu'au premier 3/3.
 - Les controles gameplay ne doivent pas etre consommes par le HUD, sauf `TAB` pour la bascule d'affichage.
 
+### Correctifs v0.8.3
+
+- Les recompenses de mission sont le moment officiel du gain de renommee de mission.
+- Une defaite du bateau principal fait perdre de la renommee, avec clamp a 0 et recalcul du rang/titre.
+- Les tirs du joueur et de la flotte ignorent les navires amis ; les ennemis restent capables de toucher joueur et allies.
+- Le respawn au port cree une courte fenetre d'invulnerabilite et libere la zone sure autour du port.
+- Les aides debug de visee et de lignes de bordee sont desactivees par defaut pour le jeu normal.
+
 ## Piliers a long terme
 
 - Navigation lisible : le joueur doit toujours comprendre son cap, sa vitesse et les menaces proches.

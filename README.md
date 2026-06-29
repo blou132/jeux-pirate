@@ -220,6 +220,15 @@ La refonte UI pirate ajoute une premiere direction visuelle dark fantasy : barre
 - Le HUD detaille separe mieux les sections Navire, Ameliorations, Mer et combat, Flotte et Missions.
 - L'anti-farm de reputation alliee reste base sur le premier remplissage de chaque emplacement de flotte et sur le premier 3/3.
 
+## Correctifs v0.8.3
+
+- `F3` ajoute temporairement 50 renommee pour les tests de progression.
+- Les recompenses de mission donnent maintenant leur renommee a la recuperation au port, une seule fois.
+- La destruction du bateau joueur retire 25 renommee sans passer sous 0.
+- Les boulets joueur/flotte ne blessent plus les navires allies.
+- Le respawn au port donne 3 secondes d'invulnerabilite et repousse les ennemis trop proches de la zone sure.
+- Le HUD compact abrege le renom et les aides debug de visee sont masquees par defaut.
+
 ## Lancement
 
 1. Installer Godot 4.x.
@@ -253,6 +262,7 @@ Outil temporaire pour tester les améliorations sans farmer les ressources :
 
 - `F1` : ajoute 100 or
 - `F2` : ajoute 100 bois
+- `F3` : ajoute 50 renommee
 
 Ces raccourcis sont activés via `DebugTools` et doivent rester identifiés comme aide de développement.
 
