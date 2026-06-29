@@ -68,6 +68,7 @@ func add_reputation(amount: int, _reason: String = "") -> void:
 
 	var previous_rank_index := _current_rank_index
 	var previous_title_index := _current_title_index
+	var previous_title_score := get_title_score()
 	reputation_points += amount
 	_refresh_rank()
 	_refresh_title()
@@ -75,14 +76,19 @@ func add_reputation(amount: int, _reason: String = "") -> void:
 
 	if _current_rank_index != previous_rank_index:
 		reputation_rank_changed.emit(get_current_rank_name(), reputation_points)
-	if _current_title_index != previous_title_index:
-		pirate_title_changed.emit(get_current_pirate_title(), get_title_score())
+	var title_score := get_title_score()
+	if _current_title_index != previous_title_index or title_score != previous_title_score:
+		pirate_title_changed.emit(get_current_pirate_title(), title_score)
 
 	_show_reputation_feedback(
 		amount,
 		_current_rank_index != previous_rank_index,
 		_current_title_index != previous_title_index
 	)
+
+
+func record_debug_reputation(amount: int) -> void:
+	add_reputation(amount, "debug_renown")
 
 
 func remove_reputation(amount: int, _reason: String = "") -> int:
@@ -92,6 +98,7 @@ func remove_reputation(amount: int, _reason: String = "") -> int:
 
 	var previous_rank_index := _current_rank_index
 	var previous_title_index := _current_title_index
+	var previous_title_score := get_title_score()
 	var previous_points := reputation_points
 	reputation_points = maxi(0, reputation_points - amount)
 	var actual_loss := previous_points - reputation_points
@@ -104,8 +111,9 @@ func remove_reputation(amount: int, _reason: String = "") -> int:
 
 	if _current_rank_index != previous_rank_index:
 		reputation_rank_changed.emit(get_current_rank_name(), reputation_points)
-	if _current_title_index != previous_title_index:
-		pirate_title_changed.emit(get_current_pirate_title(), get_title_score())
+	var title_score := get_title_score()
+	if _current_title_index != previous_title_index or title_score != previous_title_score:
+		pirate_title_changed.emit(get_current_pirate_title(), title_score)
 
 	_show_reputation_loss_feedback(actual_loss)
 	return actual_loss

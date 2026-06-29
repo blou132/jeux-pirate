@@ -30,6 +30,7 @@ const REPAIR_HEALTH_PER_WOOD := 5
 @onready var quit_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/QuitButton
 
 var _player: Node
+var _reputation_system: Node
 var _previous_pause_state: bool = false
 var _mission_ids: Array[String] = []
 var _selected_mission_id: String = ""
@@ -54,6 +55,7 @@ func _ready() -> void:
 	pirate_status_button.pressed.connect(_on_pirate_status_pressed)
 	recruit_ally_button.pressed.connect(_on_recruit_ally_pressed)
 	quit_button.pressed.connect(close)
+	_connect_reputation_system()
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -223,6 +225,41 @@ func _get_quest_system() -> Node:
 
 func _get_reputation_system() -> Node:
 	return get_node_or_null("/root/ReputationSystem")
+
+
+func _connect_reputation_system() -> void:
+	_reputation_system = _get_reputation_system()
+	if _reputation_system == null:
+		return
+
+	var reputation_callback := Callable(self, "_on_reputation_changed")
+	if _reputation_system.has_signal("reputation_changed") and not _reputation_system.is_connected("reputation_changed", reputation_callback):
+		_reputation_system.connect("reputation_changed", reputation_callback)
+
+	var rank_callback := Callable(self, "_on_reputation_rank_changed")
+	if _reputation_system.has_signal("reputation_rank_changed") and not _reputation_system.is_connected("reputation_rank_changed", rank_callback):
+		_reputation_system.connect("reputation_rank_changed", rank_callback)
+
+	var title_callback := Callable(self, "_on_pirate_title_changed")
+	if _reputation_system.has_signal("pirate_title_changed") and not _reputation_system.is_connected("pirate_title_changed", title_callback):
+		_reputation_system.connect("pirate_title_changed", title_callback)
+
+
+func _on_reputation_changed(_points: int, _rank_name: String, _next_rank_name: String, _current_threshold: int, _next_threshold: int) -> void:
+	_refresh_pirate_status_if_visible()
+
+
+func _on_reputation_rank_changed(_rank_name: String, _points: int) -> void:
+	_refresh_pirate_status_if_visible()
+
+
+func _on_pirate_title_changed(_title_name: String, _title_score: int) -> void:
+	_refresh_pirate_status_if_visible()
+
+
+func _refresh_pirate_status_if_visible() -> void:
+	if is_open() and pirate_status_container.visible:
+		_refresh_pirate_status_panel()
 
 
 func _get_ally_ship() -> Node:

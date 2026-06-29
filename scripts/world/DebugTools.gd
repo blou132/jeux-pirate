@@ -38,7 +38,9 @@ func _add_debug_resources(gold_amount: int, wood_amount: int) -> void:
 
 func _add_debug_renown(amount: int) -> void:
 	var reputation_system := get_node_or_null("/root/ReputationSystem")
-	if reputation_system != null and reputation_system.has_method("add_reputation"):
+	if reputation_system != null and reputation_system.has_method("record_debug_reputation"):
+		reputation_system.record_debug_reputation(amount)
+	elif reputation_system != null and reputation_system.has_method("add_reputation"):
 		reputation_system.add_reputation(amount, "debug_renown")
 
 	_show_debug_message("Debug : +%d renommée" % amount)
