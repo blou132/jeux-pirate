@@ -17,6 +17,10 @@ extends Node
 @export var broadside_min_maneuver_speed_scale: float = 0.35
 @export var broadside_line_correction_weight: float = 0.7
 @export var broadside_side_lock_duration: float = 1.5
+@export var port_safe_radius: float = 55.0
+@export var port_expulsion_radius: float = 70.0
+@export var safe_zone_reengage_cooldown: float = 5.0
+@export var safe_zone_escape_speed_scale: float = 1.0
 # Temporary v0.3.5 console helper to verify enemy broadside selection during tests.
 @export var debug_broadside_fire: bool = false
 @export var debug_broadside_fire_interval: float = 1.5
@@ -34,6 +38,9 @@ var _attack_cooldown_remaining: float = 0.0
 var _debug_message_cooldown_remaining: float = 0.0
 var _locked_broadside_side: int = BROADSIDE_SIDE_NONE
 var _side_lock_remaining: float = 0.0
+var _safe_zone_cooldown_remaining: float = 0.0
+var _safe_zone_escape_position: Vector3 = Vector3.ZERO
+var _has_safe_zone_escape_position: bool = false
 var _debug_line_instance: MeshInstance3D
 var _debug_line_material: StandardMaterial3D
 
@@ -45,6 +52,17 @@ func _physics_process(delta: float) -> void:
 	_attack_cooldown_remaining = maxf(0.0, _attack_cooldown_remaining - delta)
 	_debug_message_cooldown_remaining = maxf(0.0, _debug_message_cooldown_remaining - delta)
 	_side_lock_remaining = maxf(0.0, _side_lock_remaining - delta)
+	_safe_zone_cooldown_remaining = maxf(0.0, _safe_zone_cooldown_remaining - delta)
+
+	if _is_ship_inside_port_safe_zone():
+		_begin_port_safe_zone_escape()
+
+	if _safe_zone_cooldown_remaining > 0.0:
+		_clear_broadside_debug_lines()
+		_clear_broadside_side_lock()
+		_player = null
+		_move_to_safe_zone_escape(delta)
+		return
 
 	_player = _get_or_find_hostile_target()
 
@@ -174,6 +192,9 @@ func _is_valid_chase_target(target: Node) -> bool:
 		return false
 
 	var target_node := target as Node3D
+	if _is_position_inside_port_safe_zone(target_node.global_position):
+		return false
+
 	var chase_leash := _get_chase_leash_distance()
 	return ship.global_position.distance_squared_to(target_node.global_position) <= chase_leash * chase_leash
 
@@ -187,8 +208,90 @@ func _is_valid_hostile_target(target: Node) -> bool:
 		return false
 
 	var target_node := target as Node3D
+	if _is_position_inside_port_safe_zone(target_node.global_position):
+		return false
+
 	var active_detection_range := _get_detection_range()
 	return ship.global_position.distance_squared_to(target_node.global_position) <= active_detection_range * active_detection_range
+
+
+func _is_ship_inside_port_safe_zone() -> bool:
+	if ship == null:
+		return false
+
+	return _is_position_inside_port_safe_zone(ship.global_position)
+
+
+func _is_position_inside_port_safe_zone(position: Vector3) -> bool:
+	var safe_radius_squared := port_safe_radius * port_safe_radius
+	for port in get_tree().get_nodes_in_group("ports"):
+		if not port is Node3D:
+			continue
+
+		var port_node := port as Node3D
+		var offset := position - port_node.global_position
+		offset.y = 0.0
+		if offset.length_squared() <= safe_radius_squared:
+			return true
+
+	return false
+
+
+func _begin_port_safe_zone_escape() -> void:
+	var port := _get_closest_port()
+	if port == null:
+		return
+
+	var offset := ship.global_position - port.global_position
+	offset.y = 0.0
+	var escape_direction := offset.normalized()
+	if escape_direction.length_squared() < 0.01:
+		escape_direction = -ship.global_transform.basis.z
+		escape_direction.y = 0.0
+		escape_direction = escape_direction.normalized()
+	if escape_direction.length_squared() < 0.01:
+		escape_direction = Vector3.FORWARD
+
+	_safe_zone_escape_position = port.global_position + (escape_direction * port_expulsion_radius)
+	_safe_zone_escape_position.y = 0.0
+	_has_safe_zone_escape_position = true
+	_safe_zone_cooldown_remaining = safe_zone_reengage_cooldown
+	_player = null
+
+
+func _get_closest_port() -> Node3D:
+	var closest_port: Node3D
+	var closest_distance_squared := INF
+	for port in get_tree().get_nodes_in_group("ports"):
+		if not port is Node3D:
+			continue
+
+		var port_node := port as Node3D
+		var distance_squared := ship.global_position.distance_squared_to(port_node.global_position)
+		if distance_squared < closest_distance_squared:
+			closest_distance_squared = distance_squared
+			closest_port = port_node
+
+	return closest_port
+
+
+func _move_to_safe_zone_escape(delta: float) -> void:
+	if not _has_safe_zone_escape_position:
+		ship.brake(delta)
+		return
+
+	var offset := _safe_zone_escape_position - ship.global_position
+	offset.y = 0.0
+	if offset.length_squared() <= 1.0:
+		ship.brake(delta)
+		return
+
+	if ship.has_method("steer_along_direction_with_speed"):
+		ship.steer_along_direction_with_speed(offset.normalized(), delta, safe_zone_escape_speed_scale)
+	elif ship.has_method("steer_along_direction"):
+		ship.steer_along_direction(offset.normalized(), delta)
+	else:
+		ship.steer_toward(_safe_zone_escape_position, delta)
 
 
 func _get_confirmed_broadside_fire_direction(candidate_direction: Vector3) -> Vector3:
