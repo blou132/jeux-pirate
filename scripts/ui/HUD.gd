@@ -7,6 +7,12 @@ extends CanvasLayer
 @onready var wood_label: Label = $HUDRoot/TopResourceBar/ResourceRow/WoodLabel
 @onready var map_fragments_label: Label = $HUDRoot/TopResourceBar/ResourceRow/MapFragmentsLabel
 @onready var ancient_relics_label: Label = $HUDRoot/TopResourceBar/ResourceRow/AncientRelicsLabel
+@onready var compact_panel: Control = $HUDRoot/CompactSailingPanel
+@onready var compact_speed_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactSpeedLabel
+@onready var compact_danger_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactDangerLabel
+@onready var compact_fleet_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactFleetLabel
+@onready var compact_quest_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactQuestLabel
+@onready var compact_reputation_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactReputationLabel
 @onready var hull_level_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/HullLevelLabel
 @onready var sails_level_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/SailsLevelLabel
 @onready var cannons_level_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/CannonsLevelLabel
@@ -225,6 +231,7 @@ func _refresh_ally_status() -> void:
 		if _fleet_manager.has_method("get_fleet_status_lines"):
 			var fleet_lines: Array = _fleet_manager.get_fleet_status_lines(3)
 			ally_label.text = _join_quest_lines(fleet_lines)
+			_refresh_compact_fleet_label()
 			return
 
 	if _ally_ship == null or not is_instance_valid(_ally_ship):
@@ -251,6 +258,28 @@ func _refresh_ally_status() -> void:
 	ally_label.text = "Allié : %s — %d/%d PV" % [ally_name, current_health, max_health]
 
 
+func _refresh_compact_fleet_label() -> void:
+	if _fleet_manager != null and is_instance_valid(_fleet_manager):
+		var fleet_count := 0
+		var max_allies := 3
+		var order_label := "Suivre"
+		if _fleet_manager.has_method("get_fleet_count"):
+			fleet_count = int(_fleet_manager.get_fleet_count())
+		if _fleet_manager.has_method("get_max_allies"):
+			max_allies = int(_fleet_manager.get_max_allies())
+		if _fleet_manager.has_method("get_current_order_label"):
+			order_label = String(_fleet_manager.get_current_order_label())
+
+		compact_fleet_label.text = "Flotte: %d/%d - %s" % [fleet_count, max_allies, order_label]
+		return
+
+	if _ally_ship == null or not is_instance_valid(_ally_ship):
+		compact_fleet_label.text = "Flotte: 0/3 - Suivre"
+		return
+
+	compact_fleet_label.text = "Flotte: 1/3 - Suivre"
+
+
 func _on_health_changed(current_health: int, max_health: int) -> void:
 	health_label.text = "[PV] %d/%d" % [current_health, max_health]
 	ship_health_label.text = "Coque: %d/%d PV" % [current_health, max_health]
@@ -258,6 +287,7 @@ func _on_health_changed(current_health: int, max_health: int) -> void:
 
 func _on_speed_changed(speed: float) -> void:
 	speed_label.text = "Vitesse: %.1f nd" % absf(speed)
+	compact_speed_label.text = "Vitesse: %.1f nd" % absf(speed)
 
 
 func _connect_game_state() -> void:
@@ -299,6 +329,7 @@ func _on_treasure_resources_changed(map_fragments: int, ancient_relics: int) -> 
 
 func _on_danger_changed(danger_level: int, enemies_defeated: int) -> void:
 	danger_label.text = "Danger: %d" % danger_level
+	compact_danger_label.text = "Danger: %d" % danger_level
 	enemies_defeated_label.text = "Ennemis détruits: %d" % enemies_defeated
 
 
@@ -368,6 +399,10 @@ func _refresh_reputation_labels() -> void:
 	title_progress_label.text = "Titre suivant : %s - %s" % [
 		String(view.get("next_title_name", "Titre maximum")),
 		String(view.get("title_progress_text", "0 / 120")),
+	]
+	compact_reputation_label.text = "Renom: %s - %s" % [
+		String(view.get("rank_name", "Inconnu")),
+		String(view.get("title_name", "Loup de mer")),
 	]
 	_set_reputation_panel_visible(true)
 
@@ -513,11 +548,30 @@ func _on_quest_reward_claimed(_quest_id: String, _quest_name: String) -> void:
 func _refresh_quest_label() -> void:
 	if _quest_system == null:
 		quest_label.visible = false
+		compact_quest_label.text = "Missions: 0"
 		return
 
 	var quest_summary := _get_quest_summary_text()
 	quest_label.text = quest_summary
 	quest_label.visible = not quest_summary.is_empty()
+	_refresh_compact_quest_label(quest_summary)
+
+
+func _refresh_compact_quest_label(quest_summary: String) -> void:
+	if quest_summary.is_empty():
+		compact_quest_label.text = "Missions: 0"
+		return
+
+	var active_count := 0
+	if _quest_system != null and _quest_system.has_method("get_active_quest_count"):
+		active_count = int(_quest_system.get_active_quest_count())
+
+	if active_count > 1:
+		compact_quest_label.text = "Missions: %d actives" % active_count
+		return
+
+	var summary_lines := quest_summary.split("\n", false)
+	compact_quest_label.text = String(summary_lines[0])
 
 
 func _get_quest_summary_text() -> String:

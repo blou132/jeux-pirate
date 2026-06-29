@@ -51,12 +51,48 @@ text = "[Reliques] 0"
 layout_mode = 2
 text = "[PV] 100/100"
 
+[node name="CompactSailingPanel" type="PanelContainer" parent="HUDRoot"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 18.0
+offset_top = 64.0
+offset_right = -18.0
+offset_bottom = 108.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="CompactRow" type="HBoxContainer" parent="HUDRoot/CompactSailingPanel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="CompactSpeedLabel" type="Label" parent="HUDRoot/CompactSailingPanel/CompactRow"]
+layout_mode = 2
+text = "Vitesse: 0.0 nd"
+
+[node name="CompactDangerLabel" type="Label" parent="HUDRoot/CompactSailingPanel/CompactRow"]
+layout_mode = 2
+text = "Danger: 1"
+
+[node name="CompactFleetLabel" type="Label" parent="HUDRoot/CompactSailingPanel/CompactRow"]
+layout_mode = 2
+text = "Flotte: 0/3 - Suivre"
+
+[node name="CompactQuestLabel" type="Label" parent="HUDRoot/CompactSailingPanel/CompactRow"]
+layout_mode = 2
+text = "Missions: 0"
+
+[node name="CompactReputationLabel" type="Label" parent="HUDRoot/CompactSailingPanel/CompactRow"]
+layout_mode = 2
+text = "Renom: Inconnu - Loup de mer"
+
 [node name="LeftStatusPanel" type="PanelContainer" parent="HUDRoot"]
 layout_mode = 0
 offset_left = 16.0
-offset_top = 74.0
+offset_top = 116.0
 offset_right = 364.0
-offset_bottom = 590.0
+offset_bottom = 632.0
 mouse_filter = 2
 
 [node name="LeftVBox" type="VBoxContainer" parent="HUDRoot/LeftStatusPanel"]
@@ -128,9 +164,9 @@ layout_mode = 1
 anchor_left = 1.0
 anchor_right = 1.0
 offset_left = -374.0
-offset_top = 74.0
+offset_top = 116.0
 offset_right = -16.0
-offset_bottom = 290.0
+offset_bottom = 332.0
 grow_horizontal = 0
 mouse_filter = 2
 
