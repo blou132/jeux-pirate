@@ -1,7 +1,7 @@
 extends Node
 
 @export var enemy_cannon_ball_scene: PackedScene = preload("res://scenes/projectiles/EnemyCannonBall.tscn")
-@export var detection_range: float = 55.0
+@export var detection_range: float = 32.0
 @export var stop_distance: float = 7.0
 @export var projectile_speed: float = 13.0
 @export var broadside_fire_alignment_degrees: float = 25.0
@@ -59,9 +59,10 @@ func _physics_process(delta: float) -> void:
 	offset.y = 0.0
 	var distance_squared: float = offset.length_squared()
 	var attack_range: float = _get_attack_range()
+	var active_detection_range := _get_detection_range()
 	var distance_to_player: float = sqrt(distance_squared)
 
-	if distance_squared > detection_range * detection_range:
+	if distance_squared > active_detection_range * active_detection_range:
 		_clear_broadside_debug_lines()
 		_clear_broadside_side_lock()
 		ship.brake(delta)
@@ -117,9 +118,17 @@ func _get_attack_cooldown() -> float:
 	return 2.0
 
 
+func _get_detection_range() -> float:
+	if ship.has_method("get_detection_range"):
+		return ship.get_detection_range()
+
+	return detection_range
+
+
 func _get_closest_hostile_target() -> Node3D:
 	var closest_target: Node3D
-	var closest_distance_squared := detection_range * detection_range
+	var active_detection_range := _get_detection_range()
+	var closest_distance_squared := active_detection_range * active_detection_range
 
 	var player := get_tree().get_first_node_in_group("player") as Node3D
 	if _is_valid_hostile_target(player):
@@ -150,7 +159,8 @@ func _is_valid_hostile_target(target: Node) -> bool:
 		return false
 
 	var target_node := target as Node3D
-	return ship.global_position.distance_squared_to(target_node.global_position) <= detection_range * detection_range
+	var active_detection_range := _get_detection_range()
+	return ship.global_position.distance_squared_to(target_node.global_position) <= active_detection_range * active_detection_range
 
 
 func _get_confirmed_broadside_fire_direction(candidate_direction: Vector3) -> Vector3:

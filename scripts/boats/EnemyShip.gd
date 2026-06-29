@@ -14,6 +14,8 @@ signal destroyed(world_position: Vector3, gold_reward: int, wood_reward: int)
 @export var contact_damage: int = 12
 @export var attack_range: float = 20.0
 @export var attack_cooldown: float = 2.2
+@export var detection_range: float = 32.0
+@export var chase_leash_distance: float = 45.0
 @export var reward_gold: int = 12
 @export var reward_wood: int = 8
 @export var cannon_point_base_half_width: float = 1.35
@@ -47,6 +49,8 @@ func configure_variant(config: Dictionary) -> void:
 	contact_damage = int(config.get("contact_damage", contact_damage))
 	attack_range = float(config.get("attack_range", attack_range))
 	attack_cooldown = float(config.get("attack_cooldown", attack_cooldown))
+	detection_range = float(config.get("detection_range", detection_range))
+	chase_leash_distance = float(config.get("chase_leash_distance", chase_leash_distance))
 	reward_gold = int(config.get("reward_gold", reward_gold))
 	reward_wood = int(config.get("reward_wood", reward_wood))
 
@@ -175,6 +179,14 @@ func get_attack_range() -> float:
 
 func get_attack_cooldown() -> float:
 	return attack_cooldown
+
+
+func get_detection_range() -> float:
+	return detection_range
+
+
+func get_chase_leash_distance() -> float:
+	return chase_leash_distance
 
 
 func get_turn_load() -> float:
