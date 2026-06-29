@@ -1,9 +1,10 @@
 extends Node
 
-# Temporary development helper for testing upgrades without farming resources.
+# Temporary development helper for testing upgrades and renown without farming.
 # Disable debug_enabled or remove this node before turning this into normal gameplay.
 @export var debug_enabled: bool = true
 @export var resource_amount: int = 100
+@export var renown_amount: int = 50
 @export var hud_message_duration: float = 1.6
 
 
@@ -22,6 +23,9 @@ func _input(event: InputEvent) -> void:
 		elif event.keycode == KEY_F2:
 			_add_debug_resources(0, resource_amount)
 			get_viewport().set_input_as_handled()
+		elif event.keycode == KEY_F3:
+			_add_debug_renown(renown_amount)
+			get_viewport().set_input_as_handled()
 
 
 func _add_debug_resources(gold_amount: int, wood_amount: int) -> void:
@@ -29,15 +33,23 @@ func _add_debug_resources(gold_amount: int, wood_amount: int) -> void:
 	if game_state != null and game_state.has_method("add_resources"):
 		game_state.add_resources(gold_amount, wood_amount)
 
-	_show_debug_message()
+	_show_debug_message("Debug: ressources ajoutées")
 
 
-func _show_debug_message() -> void:
+func _add_debug_renown(amount: int) -> void:
+	var reputation_system := get_node_or_null("/root/ReputationSystem")
+	if reputation_system != null and reputation_system.has_method("add_reputation"):
+		reputation_system.add_reputation(amount, "debug_renown")
+
+	_show_debug_message("Debug : +%d renommée" % amount)
+
+
+func _show_debug_message(message: String) -> void:
 	var hud := get_tree().get_first_node_in_group("hud")
 	if hud == null:
 		return
 
 	if hud.has_method("show_temporary_context_message"):
-		hud.show_temporary_context_message("Debug: ressources ajoutées", hud_message_duration)
+		hud.show_temporary_context_message(message, hud_message_duration)
 	elif hud.has_method("set_context_message"):
-		hud.set_context_message("Debug: ressources ajoutées")
+		hud.set_context_message(message)
