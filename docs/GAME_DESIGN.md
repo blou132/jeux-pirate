@@ -271,6 +271,19 @@ La v0.9 introduit une progression de coque sans lancer encore le commerce comple
 
 La hierarchie affiche aussi les paliers futurs : Radeau, Brick, Fregate, Galion, Vaisseau de ligne et Navire legendaire.
 
+## Ameliorations variables par navire v0.9
+
+Les petits navires restent peu chers et vite lisibles, tandis que les navires plus puissants ouvrent plus de progression :
+
+- Barque : coque, voiles et canons jusqu'au niveau 3.
+- Chaloupe : coque, voiles et canons jusqu'au niveau 4.
+- Sloop : coque, voiles et canons jusqu'au niveau 5.
+- Goelette : coque, voiles et canons jusqu'au niveau 6.
+
+Les niveaux sont stockes par navire. Une Barque amelioree ne transfere pas ses niveaux au Sloop, et revenir a la Barque retrouve sa progression propre. Cette regle evite les pertes definitives quand un navire plus petit a un plafond plus bas.
+
+Les couts montent avec le niveau d'amelioration : niveau 1 a 20 or / 10 bois, niveau 2 a 40 / 20, niveau 3 a 80 / 40, niveau 4 a 140 / 70, niveau 5 a 220 / 110 et niveau 6 a 320 / 160.
+
 ## Réputation et titres v0.8
 
 La réputation donne une progression sociale simple sans ajouter encore de contrôle de territoire ou de hiérarchie de ports :

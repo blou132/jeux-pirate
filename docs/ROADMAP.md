@@ -94,6 +94,7 @@
 - Appliquer les stats du navire joueur : PV, vitesse, maniabilite, stockage prepare et degats de canon.
 - Afficher le navire actif dans le HUD.
 - Afficher la hierarchie complete avec les navires futurs marques `a venir`.
+- Donner a chaque navire ses propres plafonds d'amelioration et ses propres niveaux conserves.
 
 ## v0.10 - Equilibrage navires, stockage et commerce
 

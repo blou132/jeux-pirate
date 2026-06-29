@@ -266,6 +266,15 @@ La refonte UI pirate ajoute une premiere direction visuelle dark fantasy : barre
 - Le bateau joueur applique les stats du navire equipe : PV, vitesse, maniabilite, stockage prepare et degats de canon de base.
 - Le HUD compact et detaille affiche le navire actif.
 
+## Ameliorations par navire v0.9
+
+- Chaque navire garde ses propres niveaux de coque, voiles et canons.
+- Changer de navire ne supprime pas les niveaux deja achetes sur un autre navire.
+- Plafonds v0.9 : Barque 3/3/3, Chaloupe 4/4/4, Sloop 5/5/5, Goelette 6/6/6.
+- Le menu d'ameliorations affiche le navire actif et ses plafonds.
+- Le HUD affiche les niveaux avec le maximum actif, par exemple `Coque: niv. 3/5`.
+- Couts par niveau : 20/10, 40/20, 80/40, 140/70, 220/110, 320/160 en or/bois.
+
 ## Lancement
 
 1. Installer Godot 4.x.
