@@ -240,24 +240,18 @@ func _is_ship_inside_safe_zone() -> bool:
 
 
 func _is_position_inside_safe_zone(position: Vector3) -> bool:
+	return _is_position_inside_port_safe_zone(position)
+
+
+func _is_position_inside_port_safe_zone(position: Vector3) -> bool:
 	for port in get_tree().get_nodes_in_group("ports"):
 		if not port is Node3D:
 			continue
 
-		var port_node := port as Node3D
-		var offset := position - port_node.global_position
+		var port_node: Node3D = port as Node3D
+		var offset: Vector3 = position - port_node.global_position
 		offset.y = 0.0
 		if offset.length_squared() <= port_safe_radius * port_safe_radius:
-			return true
-
-	for island in get_tree().get_nodes_in_group("islands"):
-		if not island is Node3D:
-			continue
-
-		var island_node := island as Node3D
-		var island_offset := position - island_node.global_position
-		island_offset.y = 0.0
-		if island_offset.length_squared() <= island_safe_radius * island_safe_radius:
 			return true
 
 	return false
@@ -293,33 +287,21 @@ func _begin_disengage_from_position(threat_position: Vector3) -> void:
 
 
 func _get_closest_safe_zone_escape_position() -> Vector3:
-	var closest_center := Vector3.ZERO
-	var closest_expulsion_radius := port_expulsion_radius
-	var closest_distance_squared := INF
-	var found_anchor := false
+	var closest_center: Vector3 = Vector3.ZERO
+	var closest_expulsion_radius: float = port_expulsion_radius
+	var closest_distance_squared: float = INF
+	var found_anchor: bool = false
 
 	for port in get_tree().get_nodes_in_group("ports"):
 		if not port is Node3D:
 			continue
 
-		var port_node := port as Node3D
-		var distance_squared := ship.global_position.distance_squared_to(port_node.global_position)
+		var port_node: Node3D = port as Node3D
+		var distance_squared: float = ship.global_position.distance_squared_to(port_node.global_position)
 		if distance_squared < closest_distance_squared:
 			closest_distance_squared = distance_squared
 			closest_center = port_node.global_position
 			closest_expulsion_radius = port_expulsion_radius
-			found_anchor = true
-
-	for island in get_tree().get_nodes_in_group("islands"):
-		if not island is Node3D:
-			continue
-
-		var island_node := island as Node3D
-		var island_distance_squared := ship.global_position.distance_squared_to(island_node.global_position)
-		if island_distance_squared < closest_distance_squared:
-			closest_distance_squared = island_distance_squared
-			closest_center = island_node.global_position
-			closest_expulsion_radius = island_expulsion_radius
 			found_anchor = true
 
 	if not found_anchor:
