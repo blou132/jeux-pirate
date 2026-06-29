@@ -22,7 +22,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.35)
+color = Color(0.01, 0.007, 0.004, 0.58)
 
 [node name="CenterContainer" type="CenterContainer" parent="Root"]
 layout_mode = 1
@@ -34,37 +34,57 @@ grow_vertical = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="Root/CenterContainer"]
 layout_mode = 2
-custom_minimum_size = Vector2(560, 0)
+custom_minimum_size = Vector2(720, 0)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 10
 
 [node name="TitleLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
 text = "Port du Pavillon"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 24
+
+[node name="SubtitleLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Taverne, chantier naval et contrats de capitaine"
 horizontal_alignment = 1
 
 [node name="StatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
 text = ""
 horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="HarborActionsLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Services du port"
+horizontal_alignment = 1
 
 [node name="RepairButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 text = "Réparer le bateau"
 
 [node name="RepairAllyButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 text = "Aucun allié à réparer"
 
 [node name="UpgradesButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 text = "Améliorations"
 
 [node name="UpgradesContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 6
+
+[node name="UpgradesIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
+layout_mode = 2
+text = "Atelier du charpentier"
+horizontal_alignment = 1
 
 [node name="HullStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
 layout_mode = 2
@@ -72,6 +92,7 @@ text = "Coque renforcée: niveau 0/3"
 autowrap_mode = 3
 
 [node name="HullUpgradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
+custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 text = "Améliorer la coque"
 
@@ -81,6 +102,7 @@ text = "Voiles rapides: niveau 0/3"
 autowrap_mode = 3
 
 [node name="SailsUpgradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
+custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 text = "Améliorer les voiles"
 
@@ -90,16 +112,18 @@ text = "Canons améliorés: niveau 0/3"
 autowrap_mode = 3
 
 [node name="CannonsUpgradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
+custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 text = "Améliorer les canons"
 
 [node name="MissionsButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 text = "Missions"
 
 [node name="MissionsContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 6
 
 [node name="MissionsIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer"]
 layout_mode = 2
@@ -107,7 +131,7 @@ text = "Missions disponibles"
 horizontal_alignment = 1
 
 [node name="MissionList" type="ItemList" parent="Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer"]
-custom_minimum_size = Vector2(0, 120)
+custom_minimum_size = Vector2(0, 160)
 layout_mode = 2
 
 [node name="MissionStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer"]
@@ -116,20 +140,28 @@ text = "Aucune mission sélectionnée"
 autowrap_mode = 3
 
 [node name="AcceptMissionButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer"]
+custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 text = "Accepter"
 
 [node name="ClaimMissionRewardButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer"]
+custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 text = "Récupérer la récompense"
 
 [node name="PirateStatusButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 text = "Statut pirate"
 
 [node name="PirateStatusContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 6
+
+[node name="PirateStatusIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/PirateStatusContainer"]
+layout_mode = 2
+text = "Renom du capitaine"
+horizontal_alignment = 1
 
 [node name="PirateStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/PirateStatusContainer"]
 layout_mode = 2
@@ -137,9 +169,11 @@ text = "Titre : Loup de mer\nRéputation : Inconnu\nPoints : 0\nProchain rang : 
 autowrap_mode = 3
 
 [node name="RecruitAllyButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 text = "Recruter un allié"
 
 [node name="QuitButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 text = "Quitter"
