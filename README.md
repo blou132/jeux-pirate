@@ -245,6 +245,16 @@ La refonte UI pirate ajoute une premiere direction visuelle dark fantasy : barre
 - Les iles servent aussi de petites zones de decrochage pour eviter une redetection immediate pendant l'exploration.
 - `debug_show_enemy_detection` peut afficher le rayon de detection ennemi pendant les tests, desactive par defaut.
 
+## Correctifs v0.8.5
+
+- Les ennemis retrouvent une detection plus agressive : Petit pirate 40, Brigantin pirate 48, Patrouilleur lourd 55.
+- Le leash de poursuite est augmente : Petit pirate 65, Brigantin pirate 75, Patrouilleur lourd 85.
+- La zone sure portuaire protege le port sans vider la mer : rayon de protection 45, expulsion 60, cooldown de reengagement 3 secondes.
+- La densite de rencontre remonte legerement avec 5 ennemis actifs maximum et 5 secondes de delai de respawn.
+- Rangs de renom officiels : Inconnu, Recherché, Craint, Redouté, Célèbre, Légendaire, Fléau des mers, Roi des pirates.
+- Titres pirates officiels : Loup de mer, Capitaine, Seigneur des vagues, Maître des flottes, Conquérant des mers, Fléau des mers, Souverain des mers, Roi des océans, Empereur des océans, Légende éternelle.
+- L'UI distingue le `Renom` du `Titre pirate`, avec des libelles courts propres dans le HUD compact.
+
 ## Lancement
 
 1. Installer Godot 4.x.

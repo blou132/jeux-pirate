@@ -304,6 +304,16 @@ La premiere refonte UI doit rendre le prototype plus lisible sans changer les sy
 - La zone sure du port force les ennemis a decrocher, a s'eloigner et a attendre avant de reengager.
 - Une aide debug desactivee par defaut peut afficher le cercle de detection ennemi.
 
+### Correctifs v0.8.5
+
+- Les ennemis doivent redevenir menacants sans attaquer depuis toute la carte : detection 40 pour le Petit pirate, 48 pour le Brigantin pirate et 55 pour le Patrouilleur lourd.
+- Le leash de poursuite laisse le combat respirer : 65 pour le Petit pirate, 75 pour le Brigantin pirate et 85 pour le Patrouilleur lourd.
+- La zone sure du port garde un rayon de protection de 45, repousse a 60 et autorise un reengagement apres 3 secondes quand le joueur repart.
+- La densite de rencontre vise un rythme plus present : 5 ennemis actifs maximum, respawn toutes les 5 secondes.
+- Les rangs de renom sont : Inconnu, Recherché, Craint, Redouté, Célèbre, Légendaire, Fléau des mers, Roi des pirates.
+- Les titres pirates sont : Loup de mer, Capitaine, Seigneur des vagues, Maître des flottes, Conquérant des mers, Fléau des mers, Souverain des mers, Roi des océans, Empereur des océans, Légende éternelle.
+- L'interface doit nommer clairement `Renom` ou `Réputation` pour la premiere liste, et `Titre pirate` pour la deuxieme.
+
 ## Piliers a long terme
 
 - Navigation lisible : le joueur doit toujours comprendre son cap, sa vitesse et les menaces proches.
