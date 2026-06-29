@@ -29,6 +29,8 @@ extends Node
 @export var debug_show_broadside_lines: bool = false
 @export var debug_broadside_line_length: float = 28.0
 @export var debug_show_enemy_detection: bool = false
+@export var debug_enemy_ai: bool = false
+@export var debug_enemy_ai_interval: float = 1.0
 @export var debug_detection_segments: int = 48
 @export var debug_detection_height: float = 0.08
 
@@ -46,6 +48,7 @@ var _side_lock_remaining: float = 0.0
 var _safe_zone_cooldown_remaining: float = 0.0
 var _safe_zone_escape_position: Vector3 = Vector3.ZERO
 var _has_safe_zone_escape_position: bool = false
+var _debug_enemy_ai_cooldown_remaining: float = 0.0
 var _debug_line_instance: MeshInstance3D
 var _debug_detection_instance: MeshInstance3D
 var _debug_line_material: StandardMaterial3D
@@ -57,17 +60,20 @@ func _physics_process(delta: float) -> void:
 
 	_attack_cooldown_remaining = maxf(0.0, _attack_cooldown_remaining - delta)
 	_debug_message_cooldown_remaining = maxf(0.0, _debug_message_cooldown_remaining - delta)
+	_debug_enemy_ai_cooldown_remaining = maxf(0.0, _debug_enemy_ai_cooldown_remaining - delta)
 	_side_lock_remaining = maxf(0.0, _side_lock_remaining - delta)
 	_safe_zone_cooldown_remaining = maxf(0.0, _safe_zone_cooldown_remaining - delta)
 	_update_detection_debug()
 
 	if _is_ship_inside_safe_zone():
+		_debug_enemy_ai("port safe escape")
 		_begin_safe_zone_escape()
 
 	if _safe_zone_cooldown_remaining > 0.0:
 		_clear_broadside_debug_lines()
 		_clear_broadside_side_lock()
 		_player = null
+		_debug_enemy_ai("port safe cooldown")
 		_move_to_safe_zone_escape(delta)
 		return
 
@@ -76,6 +82,7 @@ func _physics_process(delta: float) -> void:
 	if _player == null:
 		_clear_broadside_debug_lines()
 		_clear_broadside_side_lock()
+		_debug_enemy_ai("no target")
 		ship.brake(delta)
 		return
 
@@ -90,6 +97,7 @@ func _physics_process(delta: float) -> void:
 	if distance_squared > active_chase_leash * active_chase_leash:
 		_clear_broadside_debug_lines()
 		_clear_broadside_side_lock()
+		_debug_enemy_ai("leash disengage", _player, distance_to_player)
 		_begin_disengage_from_position(player_aim_position)
 		return
 
@@ -98,10 +106,12 @@ func _physics_process(delta: float) -> void:
 	if distance_squared <= attack_range * attack_range:
 		var fire_direction: Vector3 = _get_ready_broadside_fire_direction(offset)
 		if fire_direction == Vector3.ZERO:
+			_debug_enemy_ai("aligning broadside", _player, distance_to_player)
 			_maneuver_for_broadside(offset, distance_to_player, attack_range, delta)
 			return
 
 		ship.brake(delta)
+		_debug_enemy_ai("firing", _player, distance_to_player)
 		_try_attack_player(fire_direction)
 		return
 
@@ -579,6 +589,41 @@ func _get_broadside_muzzle_position(fire_direction: Vector3) -> Vector3:
 	var side_direction: Vector3 = fire_direction.normalized()
 	side_direction.y = 0.0
 	return ship.global_position + (side_direction * broadside_muzzle_offset) + Vector3(0.0, broadside_muzzle_height, 0.0)
+
+
+func _debug_enemy_ai(message: String, target: Node = null, distance: float = -1.0) -> void:
+	if not debug_enemy_ai:
+		return
+	if _debug_enemy_ai_cooldown_remaining > 0.0:
+		return
+
+	var ship_name: String = "Enemy"
+	if ship != null:
+		ship_name = String(ship.name)
+
+	var target_name: String = "none"
+	var port_safe_text: String = "port_safe=false"
+	if target != null and is_instance_valid(target):
+		target_name = String(target.name)
+		if target is Node3D:
+			var target_node: Node3D = target as Node3D
+			port_safe_text = "port_safe=%s" % str(_is_position_inside_port_safe_zone(target_node.global_position))
+
+	var distance_text: String = "-"
+	if distance >= 0.0:
+		distance_text = "%.1f" % distance
+
+	var debug_text: String = "EnemyAI[%s] %s target=%s distance=%s detect=%.1f leash=%.1f %s" % [
+		ship_name,
+		message,
+		target_name,
+		distance_text,
+		_get_detection_range(),
+		_get_chase_leash_distance(),
+		port_safe_text,
+	]
+	print(debug_text)
+	_debug_enemy_ai_cooldown_remaining = debug_enemy_ai_interval
 
 
 func _show_broadside_debug(fire_direction: Vector3) -> void:
