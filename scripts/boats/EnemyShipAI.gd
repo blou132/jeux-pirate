@@ -166,10 +166,10 @@ func _get_or_find_hostile_target() -> Node3D:
 
 func _get_closest_hostile_target() -> Node3D:
 	var closest_target: Node3D
-	var active_detection_range := _get_detection_range()
-	var closest_distance_squared := active_detection_range * active_detection_range
+	var active_detection_range: float = _get_detection_range()
+	var closest_distance_squared: float = active_detection_range * active_detection_range
 
-	var player := get_tree().get_first_node_in_group("player") as Node3D
+	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
 	if _is_valid_hostile_target(player):
 		closest_target = player
 		closest_distance_squared = ship.global_position.distance_squared_to(player.global_position)
@@ -180,8 +180,8 @@ func _get_closest_hostile_target() -> Node3D:
 		if not _is_valid_hostile_target(ally):
 			continue
 
-		var ally_node := ally as Node3D
-		var distance_squared := ship.global_position.distance_squared_to(ally_node.global_position)
+		var ally_node: Node3D = ally as Node3D
+		var distance_squared: float = ship.global_position.distance_squared_to(ally_node.global_position)
 		if distance_squared <= closest_distance_squared:
 			closest_distance_squared = distance_squared
 			closest_target = ally_node
@@ -192,33 +192,44 @@ func _get_closest_hostile_target() -> Node3D:
 func _is_valid_chase_target(target: Node) -> bool:
 	if target == null or not is_instance_valid(target):
 		return false
-	if target.has_method("is_destroyed") and target.is_destroyed():
+	if not _is_target_combat_ready(target):
 		return false
 	if not target is Node3D:
 		return false
 
-	var target_node := target as Node3D
+	var target_node: Node3D = target as Node3D
 	if _is_position_inside_safe_zone(target_node.global_position):
 		return false
 
-	var chase_leash := _get_chase_leash_distance()
+	var chase_leash: float = _get_chase_leash_distance()
 	return ship.global_position.distance_squared_to(target_node.global_position) <= chase_leash * chase_leash
 
 
 func _is_valid_hostile_target(target: Node) -> bool:
 	if target == null or not is_instance_valid(target):
 		return false
-	if target.has_method("is_destroyed") and target.is_destroyed():
+	if not _is_target_combat_ready(target):
 		return false
 	if not target is Node3D:
 		return false
 
-	var target_node := target as Node3D
+	var target_node: Node3D = target as Node3D
 	if _is_position_inside_safe_zone(target_node.global_position):
 		return false
 
-	var active_detection_range := _get_detection_range()
+	var active_detection_range: float = _get_detection_range()
 	return ship.global_position.distance_squared_to(target_node.global_position) <= active_detection_range * active_detection_range
+
+
+func _is_target_combat_ready(target: Node) -> bool:
+	if target.has_method("can_be_targeted") and not bool(target.call("can_be_targeted")):
+		return false
+	if target.has_method("is_alive") and not bool(target.call("is_alive")):
+		return false
+	if target.has_method("is_destroyed") and bool(target.call("is_destroyed")):
+		return false
+
+	return true
 
 
 func _is_ship_inside_safe_zone() -> bool:
