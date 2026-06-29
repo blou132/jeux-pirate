@@ -289,6 +289,14 @@ La premiere refonte UI doit rendre le prototype plus lisible sans changer les sy
 - Le respawn au port cree une courte fenetre d'invulnerabilite et libere la zone sure autour du port.
 - Les aides debug de visee et de lignes de bordee sont desactivees par defaut pour le jeu normal.
 
+### Correctifs v0.8.4
+
+- La renommee ne depasse plus 3500 points et le score de titre ne depasse plus 7000 points.
+- Les gains debug `F3` passent par le meme pipeline que les gains normaux : ajout, recalcul, signaux et rafraichissement UI.
+- Le statut pirate du port se synchronise avec les changements de renommee pendant que le panneau est ouvert.
+- Les affichages de maximum privilegient `Maximum atteint`, `MAX` ou une valeur plafonnee.
+- Le HUD compact utilise des libelles courts definis par rang/titre au lieu d'une coupure automatique.
+
 ## Piliers a long terme
 
 - Navigation lisible : le joueur doit toujours comprendre son cap, sa vitesse et les menaces proches.

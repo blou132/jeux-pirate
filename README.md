@@ -229,6 +229,14 @@ La refonte UI pirate ajoute une premiere direction visuelle dark fantasy : barre
 - Le respawn au port donne 3 secondes d'invulnerabilite et repousse les ennemis trop proches de la zone sure.
 - Le HUD compact abrege le renom et les aides debug de visee sont masquees par defaut.
 
+## Correctifs v0.8.4
+
+- `F3` utilise le meme flux de renommee que les gains normaux et rafraichit HUD compact, HUD detaille et statut pirate.
+- La renommee est plafonnee a 3500 points.
+- Le score de titre pirate est plafonne a 7000 points.
+- Au maximum, les panneaux affichent `Maximum atteint`, `MAX` ou `3500/3500` au lieu de valeurs depassant les seuils.
+- Le HUD compact utilise des libelles courts propres : `Rang: Roi pirate | Titre: Legende`.
+
 ## Lancement
 
 1. Installer Godot 4.x.
@@ -262,7 +270,7 @@ Outil temporaire pour tester les améliorations sans farmer les ressources :
 
 - `F1` : ajoute 100 or
 - `F2` : ajoute 100 bois
-- `F3` : ajoute 50 renommee
+- `F3` : ajoute jusqu'a 50 renommee, sans depasser le plafond
 
 Ces raccourcis sont activés via `DebugTools` et doivent rester identifiés comme aide de développement.
 
