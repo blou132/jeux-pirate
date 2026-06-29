@@ -46,7 +46,7 @@ func _physics_process(delta: float) -> void:
 	_debug_message_cooldown_remaining = maxf(0.0, _debug_message_cooldown_remaining - delta)
 	_side_lock_remaining = maxf(0.0, _side_lock_remaining - delta)
 
-	_player = _get_closest_hostile_target()
+	_player = _get_or_find_hostile_target()
 
 	if _player == null:
 		_clear_broadside_debug_lines()
@@ -59,12 +59,13 @@ func _physics_process(delta: float) -> void:
 	offset.y = 0.0
 	var distance_squared: float = offset.length_squared()
 	var attack_range: float = _get_attack_range()
-	var active_detection_range := _get_detection_range()
+	var active_chase_leash := _get_chase_leash_distance()
 	var distance_to_player: float = sqrt(distance_squared)
 
-	if distance_squared > active_detection_range * active_detection_range:
+	if distance_squared > active_chase_leash * active_chase_leash:
 		_clear_broadside_debug_lines()
 		_clear_broadside_side_lock()
+		_player = null
 		ship.brake(delta)
 		return
 
@@ -120,9 +121,23 @@ func _get_attack_cooldown() -> float:
 
 func _get_detection_range() -> float:
 	if ship.has_method("get_detection_range"):
-		return ship.get_detection_range()
+		return float(ship.get_detection_range())
 
 	return detection_range
+
+
+func _get_chase_leash_distance() -> float:
+	if ship.has_method("get_chase_leash_distance"):
+		return maxf(float(ship.get_chase_leash_distance()), _get_detection_range())
+
+	return _get_detection_range()
+
+
+func _get_or_find_hostile_target() -> Node3D:
+	if _is_valid_chase_target(_player):
+		return _player
+
+	return _get_closest_hostile_target()
 
 
 func _get_closest_hostile_target() -> Node3D:
@@ -148,6 +163,19 @@ func _get_closest_hostile_target() -> Node3D:
 			closest_target = ally_node
 
 	return closest_target
+
+
+func _is_valid_chase_target(target: Node) -> bool:
+	if target == null or not is_instance_valid(target):
+		return false
+	if target.has_method("is_destroyed") and target.is_destroyed():
+		return false
+	if not target is Node3D:
+		return false
+
+	var target_node := target as Node3D
+	var chase_leash := _get_chase_leash_distance()
+	return ship.global_position.distance_squared_to(target_node.global_position) <= chase_leash * chase_leash
 
 
 func _is_valid_hostile_target(target: Node) -> bool:
