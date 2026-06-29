@@ -11,6 +11,7 @@ extends CanvasLayer
 @onready var compact_speed_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactSpeedLabel
 @onready var compact_danger_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactDangerLabel
 @onready var compact_fleet_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactFleetLabel
+@onready var compact_order_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactOrderLabel
 @onready var compact_quest_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactQuestLabel
 @onready var compact_reputation_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactReputationLabel
 @onready var left_status_panel: Control = $HUDRoot/LeftStatusPanel
@@ -300,14 +301,17 @@ func _refresh_compact_fleet_label() -> void:
 		if _fleet_manager.has_method("get_current_order_label"):
 			order_label = String(_fleet_manager.get_current_order_label())
 
-		compact_fleet_label.text = "Flotte: %d/%d - %s" % [fleet_count, max_allies, order_label]
+		compact_fleet_label.text = "Flotte: %d/%d" % [fleet_count, max_allies]
+		compact_order_label.text = "Ordre: %s" % order_label
 		return
 
 	if _ally_ship == null or not is_instance_valid(_ally_ship):
-		compact_fleet_label.text = "Flotte: 0/3 - Suivre"
+		compact_fleet_label.text = "Flotte: 0/3"
+		compact_order_label.text = "Ordre: Suivre"
 		return
 
-	compact_fleet_label.text = "Flotte: 1/3 - Suivre"
+	compact_fleet_label.text = "Flotte: 1/3"
+	compact_order_label.text = "Ordre: Suivre"
 
 
 func _on_health_changed(current_health: int, max_health: int) -> void:
