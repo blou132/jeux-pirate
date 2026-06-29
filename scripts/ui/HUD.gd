@@ -1,22 +1,23 @@
 extends CanvasLayer
 
-@onready var speed_label: Label = $MarginContainer/PanelContainer/VBoxContainer/SpeedLabel
-@onready var health_label: Label = $MarginContainer/PanelContainer/VBoxContainer/HealthLabel
-@onready var gold_label: Label = $MarginContainer/PanelContainer/VBoxContainer/GoldLabel
-@onready var wood_label: Label = $MarginContainer/PanelContainer/VBoxContainer/WoodLabel
-@onready var map_fragments_label: Label = $MarginContainer/PanelContainer/VBoxContainer/MapFragmentsLabel
-@onready var ancient_relics_label: Label = $MarginContainer/PanelContainer/VBoxContainer/AncientRelicsLabel
-@onready var hull_level_label: Label = $MarginContainer/PanelContainer/VBoxContainer/HullLevelLabel
-@onready var sails_level_label: Label = $MarginContainer/PanelContainer/VBoxContainer/SailsLevelLabel
-@onready var cannons_level_label: Label = $MarginContainer/PanelContainer/VBoxContainer/CannonsLevelLabel
-@onready var danger_label: Label = $MarginContainer/PanelContainer/VBoxContainer/DangerLabel
-@onready var enemies_defeated_label: Label = $MarginContainer/PanelContainer/VBoxContainer/EnemiesDefeatedLabel
-@onready var ally_label: Label = $MarginContainer/PanelContainer/VBoxContainer/AllyLabel
-@onready var reputation_label: Label = $MarginContainer/PanelContainer/VBoxContainer/ReputationLabel
-@onready var pirate_title_label: Label = $MarginContainer/PanelContainer/VBoxContainer/PirateTitleLabel
-@onready var quest_label: Label = $MarginContainer/PanelContainer/VBoxContainer/QuestLabel
-@onready var context_label: Label = $MarginContainer/PanelContainer/VBoxContainer/ContextLabel
-@onready var zone_notification_label: Label = $ZoneNotificationContainer/ZoneNotificationLabel
+@onready var speed_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/SpeedLabel
+@onready var health_label: Label = $HUDRoot/TopResourceBar/ResourceRow/HealthLabel
+@onready var gold_label: Label = $HUDRoot/TopResourceBar/ResourceRow/GoldLabel
+@onready var wood_label: Label = $HUDRoot/TopResourceBar/ResourceRow/WoodLabel
+@onready var map_fragments_label: Label = $HUDRoot/TopResourceBar/ResourceRow/MapFragmentsLabel
+@onready var ancient_relics_label: Label = $HUDRoot/TopResourceBar/ResourceRow/AncientRelicsLabel
+@onready var hull_level_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/HullLevelLabel
+@onready var sails_level_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/SailsLevelLabel
+@onready var cannons_level_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/CannonsLevelLabel
+@onready var danger_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/DangerLabel
+@onready var enemies_defeated_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/EnemiesDefeatedLabel
+@onready var ally_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/AllyLabel
+@onready var reputation_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/ReputationLabel
+@onready var pirate_title_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/PirateTitleLabel
+@onready var quest_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/QuestLabel
+@onready var context_panel: Control = $HUDRoot/MessagePanel
+@onready var context_label: Label = $HUDRoot/MessagePanel/ContextLabel
+@onready var zone_notification_label: Label = $HUDRoot/ZoneNotificationContainer/ZoneNotificationLabel
 
 var _player: Node
 var _ally_ship: Node
@@ -34,6 +35,7 @@ var _zone_notification_version: int = 0
 
 func _ready() -> void:
 	add_to_group("hud")
+	context_panel.visible = false
 	context_label.visible = false
 	zone_notification_label.visible = false
 	_connect_game_state()
@@ -245,7 +247,7 @@ func _refresh_ally_status() -> void:
 
 
 func _on_health_changed(current_health: int, max_health: int) -> void:
-	health_label.text = "PV: %d/%d" % [current_health, max_health]
+	health_label.text = "[PV] %d/%d" % [current_health, max_health]
 
 
 func _on_speed_changed(speed: float) -> void:
@@ -280,13 +282,13 @@ func _connect_game_state() -> void:
 
 
 func _on_resources_changed(gold: int, wood: int) -> void:
-	gold_label.text = "Or: %d" % gold
-	wood_label.text = "Bois: %d" % wood
+	gold_label.text = "[Or] %d" % gold
+	wood_label.text = "[Bois] %d" % wood
 
 
 func _on_treasure_resources_changed(map_fragments: int, ancient_relics: int) -> void:
-	map_fragments_label.text = "Fragments: %d" % map_fragments
-	ancient_relics_label.text = "Reliques: %d" % ancient_relics
+	map_fragments_label.text = "[Fragments] %d" % map_fragments
+	ancient_relics_label.text = "[Reliques] %d" % ancient_relics
 
 
 func _on_danger_changed(danger_level: int, enemies_defeated: int) -> void:
@@ -376,6 +378,7 @@ func _refresh_context_label() -> void:
 
 	context_label.text = message
 	context_label.visible = not message.is_empty()
+	context_panel.visible = context_label.visible
 
 
 func show_zone_notification(message: String, duration: float = 2.5) -> void:
