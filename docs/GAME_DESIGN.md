@@ -296,6 +296,11 @@ La premiere refonte UI doit rendre le prototype plus lisible sans changer les sy
 - Le statut pirate du port se synchronise avec les changements de renommee pendant que le panneau est ouvert.
 - Les affichages de maximum privilegient `Maximum atteint`, `MAX` ou une valeur plafonnee.
 - Le HUD compact utilise des libelles courts definis par rang/titre au lieu d'une coupure automatique.
+- Les notifications de zone occupent leur propre ligne sous les ressources, separee du HUD compact.
+- Les ennemis utilisent un rayon de detection court par type et une distance de poursuite separee.
+- Les cibles detruites, au port ou proches d'une ile sont ignorees par l'acquisition ennemie.
+- La zone sure du port force les ennemis a decrocher, a s'eloigner et a attendre avant de reengager.
+- Une aide debug desactivee par defaut peut afficher le cercle de detection ennemi.
 
 ## Piliers a long terme
 

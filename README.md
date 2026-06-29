@@ -235,7 +235,13 @@ La refonte UI pirate ajoute une premiere direction visuelle dark fantasy : barre
 - La renommee est plafonnee a 3500 points.
 - Le score de titre pirate est plafonne a 7000 points.
 - Au maximum, les panneaux affichent `Maximum atteint`, `MAX` ou `3500/3500` au lieu de valeurs depassant les seuils.
-- Le HUD compact utilise des libelles courts propres : `Rang: Roi pirate | Titre: Legende`.
+- Le HUD compact utilise deux lignes courtes pour le rang et le titre, par exemple `Rang: Roi pirate` puis `Titre: Legende`.
+- Les notifications de zone sont deplacees sous la barre de ressources pour ne plus chevaucher le HUD compact.
+- Les ennemis ont un rayon de detection par variante : 28, 32 ou 36 unites.
+- Les ennemis abandonnent la poursuite si la cible sort du leash : 40, 45 ou 50 unites.
+- La zone portuaire reste sure : les ennemis n'engagent pas les cibles au port, s'eloignent a 70 unites et attendent avant de reengager.
+- Les iles servent aussi de petites zones de decrochage pour eviter une redetection immediate pendant l'exploration.
+- `debug_show_enemy_detection` peut afficher le rayon de detection ennemi pendant les tests, desactive par defaut.
 
 ## Lancement
 
