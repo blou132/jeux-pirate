@@ -42,6 +42,8 @@ const ANCIENT_RELIC_REPUTATION := 75
 const ALLY_RECRUITED_REPUTATION := 20
 const FULL_FLEET_REPUTATION := 100
 const PLAYER_DEFEAT_REPUTATION_LOSS := 25
+const MAX_REPUTATION_POINTS := 3500
+const MAX_TITLE_SCORE := 7000
 
 var reputation_points: int = 0
 var _current_rank_index: int = 0
@@ -61,15 +63,17 @@ func _ready() -> void:
 	_emit_reputation_changed()
 
 
-func add_reputation(amount: int, _reason: String = "") -> void:
+func add_reputation(amount: int, _reason: String = "") -> int:
 	amount = maxi(0, amount)
 	if amount <= 0:
-		return
+		return 0
 
 	var previous_rank_index := _current_rank_index
 	var previous_title_index := _current_title_index
 	var previous_title_score := get_title_score()
-	reputation_points += amount
+	var previous_points := reputation_points
+	reputation_points = mini(MAX_REPUTATION_POINTS, reputation_points + amount)
+	var actual_gain := reputation_points - previous_points
 	_refresh_rank()
 	_refresh_title()
 	_emit_reputation_changed()
@@ -80,15 +84,18 @@ func add_reputation(amount: int, _reason: String = "") -> void:
 	if _current_title_index != previous_title_index or title_score != previous_title_score:
 		pirate_title_changed.emit(get_current_pirate_title(), title_score)
 
-	_show_reputation_feedback(
-		amount,
-		_current_rank_index != previous_rank_index,
-		_current_title_index != previous_title_index
-	)
+	if actual_gain > 0:
+		_show_reputation_feedback(
+			actual_gain,
+			_current_rank_index != previous_rank_index,
+			_current_title_index != previous_title_index
+		)
+
+	return actual_gain
 
 
-func record_debug_reputation(amount: int) -> void:
-	add_reputation(amount, "debug_renown")
+func record_debug_reputation(amount: int) -> int:
+	return add_reputation(amount, "debug_renown")
 
 
 func remove_reputation(amount: int, _reason: String = "") -> int:
@@ -135,8 +142,7 @@ func record_mission_completed(_quest_id: String) -> void:
 
 func record_mission_reward_claimed(_quest_id: String) -> int:
 	_missions_completed += 1
-	add_reputation(MISSION_COMPLETED_REPUTATION, "mission_reward_claimed")
-	return MISSION_COMPLETED_REPUTATION
+	return add_reputation(MISSION_COMPLETED_REPUTATION, "mission_reward_claimed")
 
 
 func record_chest_opened(is_quest_objective: bool) -> void:
@@ -297,7 +303,8 @@ func _refresh_title() -> void:
 
 
 func _calculate_title_score() -> int:
-	return reputation_points + (_missions_completed * 20) + (_enemies_destroyed * 5) + (_treasures_found * 10) + (_max_fleet_size_reached * 20)
+	var raw_score := reputation_points + (_missions_completed * 20) + (_enemies_destroyed * 5) + (_treasures_found * 10) + (_max_fleet_size_reached * 20)
+	return mini(MAX_TITLE_SCORE, raw_score)
 
 
 func _show_reputation_feedback(amount: int, rank_changed: bool, title_changed: bool) -> void:

@@ -38,12 +38,22 @@ func _add_debug_resources(gold_amount: int, wood_amount: int) -> void:
 
 func _add_debug_renown(amount: int) -> void:
 	var reputation_system := get_node_or_null("/root/ReputationSystem")
+	var applied := false
+	var actual_gain := 0
 	if reputation_system != null and reputation_system.has_method("record_debug_reputation"):
-		reputation_system.record_debug_reputation(amount)
+		actual_gain = int(reputation_system.record_debug_reputation(amount))
+		applied = true
 	elif reputation_system != null and reputation_system.has_method("add_reputation"):
-		reputation_system.add_reputation(amount, "debug_renown")
+		actual_gain = int(reputation_system.add_reputation(amount, "debug_renown"))
+		applied = true
 
-	_show_debug_message("Debug : +%d renommée" % amount)
+	if not applied:
+		return
+
+	if actual_gain <= 0:
+		_show_debug_message("Debug : renommée maximale atteinte")
+	else:
+		_show_debug_message("Debug : +%d renommée" % actual_gain)
 
 
 func _show_debug_message(message: String) -> void:
