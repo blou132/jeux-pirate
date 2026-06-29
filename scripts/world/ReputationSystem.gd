@@ -98,6 +98,12 @@ func record_mission_completed(_quest_id: String) -> void:
 	add_reputation(MISSION_COMPLETED_REPUTATION, "mission_completed")
 
 
+func record_mission_reward_claimed(_quest_id: String) -> int:
+	_missions_completed += 1
+	add_reputation(MISSION_COMPLETED_REPUTATION, "mission_reward_claimed")
+	return MISSION_COMPLETED_REPUTATION
+
+
 func record_chest_opened(is_quest_objective: bool) -> void:
 	_treasures_found += 1
 	if is_quest_objective:

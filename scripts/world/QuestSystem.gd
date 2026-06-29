@@ -131,6 +131,7 @@ func claim_reward(quest_id: String) -> String:
 
 	var quest: Dictionary = _get_quest_config(quest_id)
 	_grant_quest_reward(quest)
+	var renown_reward := _record_mission_reward_reputation(quest_id)
 
 	state["reward_claimed"] = true
 	_quest_states[quest_id] = state
@@ -146,6 +147,8 @@ func claim_reward(quest_id: String) -> String:
 		_get_quest_name(quest_id),
 		_build_reward_text(quest_id),
 	]
+	if renown_reward > 0:
+		reward_message += "\nRécompense de mission : +%d renommée" % renown_reward
 	_show_hud_message(reward_message, 2.4)
 	return reward_message
 
@@ -328,7 +331,6 @@ func _complete_quest(quest_id: String) -> void:
 	state["progress"] = int(quest.get("target", 1))
 	state["completed"] = true
 	_quest_states[quest_id] = state
-	_record_mission_reputation(quest_id)
 	quest_completed.emit(quest_id, _get_quest_name(quest_id))
 	quests_changed.emit()
 	_show_hud_message(
@@ -481,10 +483,12 @@ func _get_game_state() -> Node:
 	return get_node_or_null("/root/GameState")
 
 
-func _record_mission_reputation(quest_id: String) -> void:
+func _record_mission_reward_reputation(quest_id: String) -> int:
 	var reputation_system := get_node_or_null("/root/ReputationSystem")
-	if reputation_system != null and reputation_system.has_method("record_mission_completed"):
-		reputation_system.record_mission_completed(quest_id)
+	if reputation_system != null and reputation_system.has_method("record_mission_reward_claimed"):
+		return int(reputation_system.record_mission_reward_claimed(quest_id))
+
+	return 0
 
 
 func _spawn_quest_objective(quest_id: String) -> void:
