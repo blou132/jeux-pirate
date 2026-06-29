@@ -8,6 +8,7 @@ signal destroyed(world_position: Vector3, gold_reward: int, wood_reward: int)
 @export var display_name: String = "Brigantin pirate"
 @export var max_health: int = 60
 @export var move_speed: float = 7.0
+@export var chase_speed_multiplier: float = 1.15
 @export var turn_speed: float = 1.15
 @export var turn_acceleration: float = 2.8
 @export var turn_deceleration: float = 3.2
@@ -43,6 +44,7 @@ func configure_variant(config: Dictionary) -> void:
 	display_name = String(config.get("display_name", display_name))
 	max_health = int(config.get("max_health", max_health))
 	move_speed = float(config.get("move_speed", move_speed))
+	chase_speed_multiplier = float(config.get("chase_speed_multiplier", chase_speed_multiplier))
 	turn_speed = float(config.get("turn_speed", turn_speed))
 	turn_acceleration = float(config.get("turn_acceleration", turn_acceleration))
 	turn_deceleration = float(config.get("turn_deceleration", turn_deceleration))
@@ -141,7 +143,7 @@ func steer_along_direction_with_speed(desired_forward: Vector3, delta: float, sp
 		turn_amount = signed_angle
 		angular_velocity = 0.0
 
-	var clamped_speed_scale: float = clampf(speed_scale, 0.0, 1.0)
+	var clamped_speed_scale: float = clampf(speed_scale, 0.0, maxf(1.0, chase_speed_multiplier))
 
 	rotate_y(turn_amount)
 	velocity = -global_transform.basis.z * move_speed * clamped_speed_scale
@@ -187,6 +189,10 @@ func get_detection_range() -> float:
 
 func get_chase_leash_distance() -> float:
 	return chase_leash_distance
+
+
+func get_chase_speed_multiplier() -> float:
+	return chase_speed_multiplier
 
 
 func get_turn_load() -> float:

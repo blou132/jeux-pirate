@@ -116,7 +116,7 @@ func _physics_process(delta: float) -> void:
 		return
 
 	_clear_broadside_side_lock()
-	ship.steer_toward(player_aim_position, delta)
+	_steer_toward_chase_target(player_aim_position, delta)
 
 
 func _try_attack_player(fire_direction: Vector3) -> void:
@@ -165,6 +165,13 @@ func _get_chase_leash_distance() -> float:
 		return maxf(float(ship.get_chase_leash_distance()), _get_detection_range())
 
 	return _get_detection_range()
+
+
+func _get_chase_speed_multiplier() -> float:
+	if ship.has_method("get_chase_speed_multiplier"):
+		return maxf(1.0, float(ship.get_chase_speed_multiplier()))
+
+	return 1.0
 
 
 func _get_or_find_hostile_target() -> Node3D:
@@ -340,6 +347,19 @@ func _move_to_safe_zone_escape(delta: float) -> void:
 		ship.steer_toward(_safe_zone_escape_position, delta)
 
 
+func _steer_toward_chase_target(target_position: Vector3, delta: float) -> void:
+	var desired_forward: Vector3 = target_position - ship.global_position
+	desired_forward.y = 0.0
+	if desired_forward.length_squared() < 0.25:
+		ship.brake(delta)
+		return
+
+	if ship.has_method("steer_along_direction_with_speed"):
+		ship.steer_along_direction_with_speed(desired_forward.normalized(), delta, _get_chase_speed_multiplier())
+	else:
+		ship.steer_toward(target_position, delta)
+
+
 func _get_confirmed_broadside_fire_direction(candidate_direction: Vector3) -> Vector3:
 	if not is_instance_valid(_player):
 		return Vector3.ZERO
@@ -473,6 +493,11 @@ func _maneuver_for_broadside(offset_to_player: Vector3, distance_to_player: floa
 		desired_forward = (desired_forward + (line_error.normalized() * broadside_line_correction_weight)).normalized()
 
 	speed_scale = _apply_broadside_turn_slowdown(speed_scale)
+	speed_scale = clampf(
+		speed_scale * _get_chase_speed_multiplier(),
+		broadside_min_maneuver_speed_scale,
+		_get_chase_speed_multiplier()
+	)
 
 	if ship.has_method("steer_along_direction_with_speed"):
 		ship.steer_along_direction_with_speed(desired_forward, delta, speed_scale)
@@ -613,13 +638,14 @@ func _debug_enemy_ai(message: String, target: Node = null, distance: float = -1.
 	if distance >= 0.0:
 		distance_text = "%.1f" % distance
 
-	var debug_text: String = "EnemyAI[%s] %s target=%s distance=%s detect=%.1f leash=%.1f %s" % [
+	var debug_text: String = "EnemyAI[%s] %s target=%s distance=%s detect=%.1f leash=%.1f chase=%.2f %s" % [
 		ship_name,
 		message,
 		target_name,
 		distance_text,
 		_get_detection_range(),
 		_get_chase_leash_distance(),
+		_get_chase_speed_multiplier(),
 		port_safe_text,
 	]
 	print(debug_text)
