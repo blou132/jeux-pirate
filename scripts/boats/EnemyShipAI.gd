@@ -28,6 +28,9 @@ extends Node
 @export var debug_broadside_fire_interval: float = 1.5
 @export var debug_show_broadside_lines: bool = false
 @export var debug_broadside_line_length: float = 28.0
+@export var debug_show_enemy_detection: bool = false
+@export var debug_detection_segments: int = 48
+@export var debug_detection_height: float = 0.08
 
 const BROADSIDE_SIDE_NONE := 0
 const BROADSIDE_SIDE_PORT := -1
@@ -44,6 +47,7 @@ var _safe_zone_cooldown_remaining: float = 0.0
 var _safe_zone_escape_position: Vector3 = Vector3.ZERO
 var _has_safe_zone_escape_position: bool = false
 var _debug_line_instance: MeshInstance3D
+var _debug_detection_instance: MeshInstance3D
 var _debug_line_material: StandardMaterial3D
 
 
@@ -55,6 +59,7 @@ func _physics_process(delta: float) -> void:
 	_debug_message_cooldown_remaining = maxf(0.0, _debug_message_cooldown_remaining - delta)
 	_side_lock_remaining = maxf(0.0, _side_lock_remaining - delta)
 	_safe_zone_cooldown_remaining = maxf(0.0, _safe_zone_cooldown_remaining - delta)
+	_update_detection_debug()
 
 	if _is_ship_inside_safe_zone():
 		_begin_safe_zone_escape()
@@ -656,6 +661,43 @@ func _clear_broadside_debug_lines() -> void:
 		_debug_line_instance.visible = false
 
 
+func _update_detection_debug() -> void:
+	if not debug_show_enemy_detection:
+		_clear_detection_debug()
+		return
+
+	var radius := _get_detection_range()
+	if radius <= 0.0:
+		_clear_detection_debug()
+		return
+
+	var segment_count := maxi(12, debug_detection_segments)
+	var center := ship.global_position + Vector3(0.0, debug_detection_height, 0.0)
+	var ring_mesh := ImmediateMesh.new()
+	ring_mesh.surface_begin(Mesh.PRIMITIVE_LINES, _get_debug_line_material())
+	ring_mesh.surface_set_color(Color(1.0, 0.82, 0.2, 1.0))
+
+	for index in range(segment_count):
+		var angle_a := (float(index) / float(segment_count)) * TAU
+		var angle_b := (float(index + 1) / float(segment_count)) * TAU
+		var point_a := center + Vector3(cos(angle_a) * radius, 0.0, sin(angle_a) * radius)
+		var point_b := center + Vector3(cos(angle_b) * radius, 0.0, sin(angle_b) * radius)
+		ring_mesh.surface_add_vertex(point_a)
+		ring_mesh.surface_add_vertex(point_b)
+
+	ring_mesh.surface_end()
+
+	var ring_instance := _get_debug_detection_instance()
+	ring_instance.global_transform = Transform3D.IDENTITY
+	ring_instance.mesh = ring_mesh
+	ring_instance.visible = true
+
+
+func _clear_detection_debug() -> void:
+	if _debug_detection_instance != null and is_instance_valid(_debug_detection_instance):
+		_debug_detection_instance.visible = false
+
+
 func _clear_broadside_side_lock() -> void:
 	_locked_broadside_side = BROADSIDE_SIDE_NONE
 	_side_lock_remaining = 0.0
@@ -670,6 +712,17 @@ func _get_debug_line_instance() -> MeshInstance3D:
 	_debug_line_instance.top_level = true
 	ship.add_child(_debug_line_instance)
 	return _debug_line_instance
+
+
+func _get_debug_detection_instance() -> MeshInstance3D:
+	if _debug_detection_instance != null and is_instance_valid(_debug_detection_instance):
+		return _debug_detection_instance
+
+	_debug_detection_instance = MeshInstance3D.new()
+	_debug_detection_instance.name = "DetectionDebugRing"
+	_debug_detection_instance.top_level = true
+	ship.add_child(_debug_detection_instance)
+	return _debug_detection_instance
 
 
 func _get_debug_line_material() -> StandardMaterial3D:
