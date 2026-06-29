@@ -13,6 +13,7 @@ extends CanvasLayer
 @onready var compact_fleet_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactFleetLabel
 @onready var compact_quest_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactQuestLabel
 @onready var compact_reputation_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactReputationLabel
+@onready var left_status_panel: Control = $HUDRoot/LeftStatusPanel
 @onready var hull_level_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/HullLevelLabel
 @onready var sails_level_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/SailsLevelLabel
 @onready var cannons_level_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/CannonsLevelLabel
@@ -26,6 +27,7 @@ extends CanvasLayer
 @onready var reputation_progress_bar: ProgressBar = $HUDRoot/RightReputationPanel/ReputationVBox/ReputationProgressBar
 @onready var pirate_title_label: Label = $HUDRoot/RightReputationPanel/ReputationVBox/PirateTitleLabel
 @onready var title_progress_label: Label = $HUDRoot/RightReputationPanel/ReputationVBox/TitleProgressLabel
+@onready var bottom_navigation_bar: Control = $HUDRoot/BottomNavigationBar
 @onready var context_panel: Control = $HUDRoot/MessagePanel
 @onready var context_label: Label = $HUDRoot/MessagePanel/ContextLabel
 @onready var zone_notification_label: Label = $HUDRoot/ZoneNotificationContainer/ZoneNotificationLabel
@@ -42,19 +44,47 @@ var _temporary_context_message: String = ""
 var _temporary_message_version: int = 0
 var _current_zone_message: String = ""
 var _zone_notification_version: int = 0
+var _detailed_hud_requested: bool = false
+var _detailed_hud_forced: bool = false
 
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	add_to_group("hud")
 	context_panel.visible = false
 	context_label.visible = false
 	zone_notification_label.visible = false
+	_apply_hud_mode()
 	_connect_game_state()
 	_connect_upgrade_system()
 	_connect_quest_system()
 	_connect_reputation_system()
 	call_deferred("_bind_player_from_tree")
 	call_deferred("_bind_fleet_from_tree")
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_TAB:
+		_detailed_hud_requested = not _detailed_hud_requested
+		_apply_hud_mode()
+		get_viewport().set_input_as_handled()
+
+
+func set_detail_hud_forced(is_forced: bool) -> void:
+	_detailed_hud_forced = is_forced
+	_apply_hud_mode()
+
+
+func _is_detailed_hud_visible() -> bool:
+	return _detailed_hud_requested or _detailed_hud_forced
+
+
+func _apply_hud_mode() -> void:
+	var show_details := _is_detailed_hud_visible()
+	compact_panel.visible = not show_details
+	left_status_panel.visible = show_details
+	reputation_panel.visible = show_details and _reputation_system != null
+	bottom_navigation_bar.visible = show_details
 
 
 func set_player(player: Node) -> void:
@@ -408,7 +438,7 @@ func _refresh_reputation_labels() -> void:
 
 
 func _set_reputation_panel_visible(is_visible: bool) -> void:
-	reputation_panel.visible = is_visible
+	reputation_panel.visible = is_visible and _is_detailed_hud_visible()
 	reputation_label.visible = is_visible
 	reputation_progress_label.visible = is_visible
 	reputation_progress_bar.visible = is_visible

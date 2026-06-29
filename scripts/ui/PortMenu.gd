@@ -67,6 +67,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func open(player: Node) -> void:
 	_player = player
+	_set_hud_detail_mode(true)
 	status_label.text = ""
 	upgrades_container.visible = false
 	missions_container.visible = false
@@ -87,6 +88,7 @@ func close() -> void:
 		return
 
 	root_control.visible = false
+	_set_hud_detail_mode(false)
 	if not _previous_pause_state:
 		get_tree().paused = false
 	closed.emit()
@@ -94,6 +96,12 @@ func close() -> void:
 
 func is_open() -> bool:
 	return root_control.visible
+
+
+func _set_hud_detail_mode(is_forced: bool) -> void:
+	var hud := get_tree().get_first_node_in_group("hud")
+	if hud != null and hud.has_method("set_detail_hud_forced"):
+		hud.set_detail_hud_forced(is_forced)
 
 
 func _on_repair_pressed() -> void:
