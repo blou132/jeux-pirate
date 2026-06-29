@@ -10,6 +10,7 @@ const REPAIR_HEALTH_PER_WOOD := 5
 @onready var repair_ally_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/RepairAllyButton
 @onready var upgrades_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesButton
 @onready var upgrades_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer
+@onready var upgrades_ship_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/UpgradesShipLabel
 @onready var hull_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/HullStatusLabel
 @onready var sails_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/SailsStatusLabel
 @onready var cannons_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/CannonsStatusLabel
@@ -428,11 +429,13 @@ func _purchase_upgrade(upgrade_id: String) -> void:
 func _refresh_upgrade_rows() -> void:
 	var upgrade_system := _get_upgrade_system()
 	if upgrade_system == null:
+		upgrades_ship_label.text = "Navire : indisponible"
 		hull_status_label.text = "Coque renforcée: indisponible"
 		sails_status_label.text = "Voiles rapides: indisponible"
 		cannons_status_label.text = "Canons améliorés: indisponible"
 		return
 
+	upgrades_ship_label.text = _get_upgrade_ship_context_text()
 	_set_upgrade_row(upgrade_system, "hull", hull_status_label, hull_upgrade_button)
 	_set_upgrade_row(upgrade_system, "sails", sails_status_label, sails_upgrade_button)
 	_set_upgrade_row(upgrade_system, "cannons", cannons_status_label, cannons_upgrade_button)
@@ -444,6 +447,20 @@ func _set_upgrade_row(upgrade_system: Node, upgrade_id: String, label: Label, bu
 
 	if upgrade_system.has_method("is_max_level"):
 		button.disabled = upgrade_system.is_max_level(upgrade_id)
+
+
+func _get_upgrade_ship_context_text() -> String:
+	var game_state := _get_game_state()
+	var ship_id := ShipCatalog.STARTING_SHIP_ID
+	if game_state != null and game_state.has_method("get_active_player_ship_id"):
+		ship_id = String(game_state.get_active_player_ship_id())
+
+	return "Navire : %s — max coque %d, voiles %d, canons %d" % [
+		ShipCatalog.get_ship_name(ship_id),
+		ShipCatalog.get_upgrade_limit(ship_id, "hull"),
+		ShipCatalog.get_upgrade_limit(ship_id, "sails"),
+		ShipCatalog.get_upgrade_limit(ship_id, "cannons"),
+	]
 
 
 func _on_shipyard_pressed() -> void:

@@ -86,6 +86,12 @@ layout_mode = 2
 text = "Atelier du charpentier"
 horizontal_alignment = 1
 
+[node name="UpgradesShipLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
+layout_mode = 2
+text = "Navire : Barque — améliorations max 3/3/3"
+horizontal_alignment = 1
+autowrap_mode = 3
+
 [node name="HullStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
 layout_mode = 2
 text = "Coque renforcée: niveau 0/3"
