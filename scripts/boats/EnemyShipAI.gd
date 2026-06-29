@@ -1,7 +1,7 @@
 extends Node
 
 @export var enemy_cannon_ball_scene: PackedScene = preload("res://scenes/projectiles/EnemyCannonBall.tscn")
-@export var detection_range: float = 32.0
+@export var detection_range: float = 48.0
 @export var stop_distance: float = 7.0
 @export var projectile_speed: float = 13.0
 @export var broadside_fire_alignment_degrees: float = 25.0
