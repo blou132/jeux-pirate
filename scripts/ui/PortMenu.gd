@@ -2,6 +2,7 @@ extends CanvasLayer
 
 signal closed
 
+const PortCatalog = preload("res://scripts/world/PortCatalog.gd")
 const REPAIR_HEALTH_PER_WOOD := 5
 
 @onready var root_control: Control = $Root

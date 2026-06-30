@@ -4,6 +4,8 @@ signal interaction_requested(port: Node)
 signal player_entered(port: Node)
 signal player_exited(port: Node)
 
+const PortCatalog = preload("res://scripts/world/PortCatalog.gd")
+
 @export var prompt_message: String = "Appuie sur E pour ouvrir le port"
 @export var port_id: String = PortCatalog.STARTING_PORT_ID
 

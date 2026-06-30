@@ -1,5 +1,5 @@
-class_name PortCatalog
 extends RefCounted
+class_name PortCatalog
 
 const SERVICE_REPAIR := "repair"
 const SERVICE_FLEET := "fleet"
