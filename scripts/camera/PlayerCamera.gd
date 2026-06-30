@@ -52,6 +52,7 @@ func _process(delta: float) -> void:
 	var rotation_weight: float = _get_smoothing_weight(rotation_smoothing, delta)
 	var zoom_weight: float = _get_smoothing_weight(zoom_smoothing, delta)
 	var look_offset_weight: float = _get_smoothing_weight(look_offset_smoothing, delta)
+	_refresh_free_look_target()
 	_current_zoom_factor = lerpf(_current_zoom_factor, _target_zoom_factor, zoom_weight)
 	_current_look_offset = _current_look_offset.lerp(_target_look_offset, look_offset_weight)
 	global_position = global_position.lerp(_get_desired_position(), position_weight)
@@ -85,8 +86,6 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 
 	elif event is InputEventMouseMotion and is_free_look_unlocked:
-		var motion_event: InputEventMouseMotion = event as InputEventMouseMotion
-		_add_look_offset(motion_event.relative)
 		get_viewport().set_input_as_handled()
 
 
@@ -122,11 +121,18 @@ func recenter() -> void:
 	_target_look_offset = Vector3.ZERO
 
 
-func _add_look_offset(mouse_delta: Vector2) -> void:
-	var next_offset: Vector3 = _target_look_offset
-	next_offset.x += mouse_delta.x * look_offset_sensitivity
-	next_offset.z += mouse_delta.y * look_offset_sensitivity
-	_target_look_offset = _clamp_look_offset(next_offset)
+func _refresh_free_look_target() -> void:
+	if not is_free_look_unlocked:
+		return
+
+	var viewport: Viewport = get_viewport()
+	var viewport_center: Vector2 = viewport.get_visible_rect().size * 0.5
+	var mouse_from_center: Vector2 = viewport.get_mouse_position() - viewport_center
+	var planar_offset: Vector2 = mouse_from_center * look_offset_sensitivity
+	if planar_offset.length() > look_offset_max_distance:
+		planar_offset = planar_offset.normalized() * look_offset_max_distance
+
+	_target_look_offset = Vector3(planar_offset.x, 0.0, planar_offset.y)
 
 
 func _clamp_look_offset(offset: Vector3) -> Vector3:
