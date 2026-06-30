@@ -1,7 +1,8 @@
-[gd_scene load_steps=14 format=3 uid="uid://player_boat_v01"]
+[gd_scene load_steps=15 format=3 uid="uid://player_boat_v01"]
 
 [ext_resource type="Script" path="res://scripts/boats/PlayerBoat.gd" id="1_player_boat"]
 [ext_resource type="Script" path="res://scripts/combat/CannonSystem.gd" id="2_cannon_system"]
+[ext_resource type="Script" path="res://scripts/camera/PlayerCamera.gd" id="3_player_camera"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hull"]
 albedo_color = Color(0.34, 0.18, 0.08, 1)
@@ -96,3 +97,4 @@ position = Vector3(0, 7.5, 11)
 rotation_degrees = Vector3(-35, 0, 0)
 current = true
 fov = 60.0
+script = ExtResource("3_player_camera")
