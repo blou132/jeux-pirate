@@ -327,6 +327,7 @@ La v0.10 donne un premier role concret au stockage sans lancer encore les ports 
 - Prix achat/vente : Rhum 60/45, Epices 90/65, Tissu 45/30, Minerai 80/55, Perles 160/120.
 - Si la cargaison est pleine ou l'or insuffisant, le joueur recoit un feedback simple.
 - La Goelette est volontairement la meilleure option commerciale de v0.10 grace a son stockage de 260.
+- Correctif v0.10.1 : le joueur ne peut pas equiper un navire dont la capacite cargo est inferieure a la cargaison actuelle. Le jeu n'efface ni ne vend rien automatiquement ; le joueur doit d'abord vendre ou vider des marchandises.
 
 ## Réputation et titres v0.8
 

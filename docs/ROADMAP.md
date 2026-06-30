@@ -105,6 +105,7 @@
 - Ajouter une section `Commerce` au port avec achat et vente.
 - Afficher la cargaison dans le HUD.
 - Donner un premier role clair a la Goelette comme navire marchand.
+- Correctif v0.10.1 : interdire l'equipement d'un navire trop petit pour la cargaison actuelle, sans vente ni suppression automatique.
 
 ## v0.11 - Ports avances
 

@@ -304,6 +304,7 @@ La refonte UI pirate ajoute une premiere direction visuelle dark fantasy : barre
 - Acheter consomme de l'or et de la place en cargaison ; vendre rend de l'or.
 - La Goelette devient le meilleur navire de commerce grace a sa grande capacite.
 - Le HUD affiche la cargaison utilisee et la capacite du navire actif.
+- Correctif v0.10.1 : le chantier naval bloque l'equipement d'un navire dont la capacite est inferieure a la cargaison actuelle. Il faut vendre ou vider assez de marchandises avant de repasser sur un navire plus petit.
 
 ## Lancement
 
