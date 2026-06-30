@@ -25,6 +25,13 @@ const REPAIR_HEALTH_PER_WOOD := 5
 @onready var ship_hierarchy_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer/ShipHierarchyLabel
 @onready var buy_ship_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer/BuyShipButton
 @onready var equip_ship_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer/EquipShipButton
+@onready var trade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/TradeButton
+@onready var trade_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer
+@onready var cargo_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer/CargoStatusLabel
+@onready var trade_list: ItemList = $Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer/TradeList
+@onready var trade_details_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer/TradeDetailsLabel
+@onready var buy_trade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer/BuyTradeButton
+@onready var sell_trade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer/SellTradeButton
 @onready var missions_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsButton
 @onready var missions_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer
 @onready var missions_intro_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/MissionsIntroLabel
@@ -45,6 +52,8 @@ var _mission_ids: Array[String] = []
 var _selected_mission_id: String = ""
 var _ship_ids: Array[String] = []
 var _selected_ship_id: String = ""
+var _trade_good_ids: Array[String] = []
+var _selected_trade_good_id: String = ""
 
 
 func _ready() -> void:
@@ -52,6 +61,7 @@ func _ready() -> void:
 	root_control.visible = false
 	upgrades_container.visible = false
 	shipyard_container.visible = false
+	trade_container.visible = false
 	missions_container.visible = false
 	pirate_status_container.visible = false
 	repair_button.pressed.connect(_on_repair_pressed)
@@ -64,6 +74,10 @@ func _ready() -> void:
 	ship_list.item_selected.connect(_on_ship_selected)
 	buy_ship_button.pressed.connect(_on_buy_ship_pressed)
 	equip_ship_button.pressed.connect(_on_equip_ship_pressed)
+	trade_button.pressed.connect(_on_trade_pressed)
+	trade_list.item_selected.connect(_on_trade_good_selected)
+	buy_trade_button.pressed.connect(_on_buy_trade_pressed)
+	sell_trade_button.pressed.connect(_on_sell_trade_pressed)
 	missions_button.pressed.connect(_on_missions_pressed)
 	mission_list.item_selected.connect(_on_mission_selected)
 	accept_mission_button.pressed.connect(_on_accept_mission_pressed)
@@ -89,6 +103,7 @@ func open(player: Node) -> void:
 	status_label.text = ""
 	upgrades_container.visible = false
 	shipyard_container.visible = false
+	trade_container.visible = false
 	missions_container.visible = false
 	pirate_status_container.visible = false
 	_refresh_repair_button()
@@ -96,6 +111,7 @@ func open(player: Node) -> void:
 	_refresh_recruit_ally_button()
 	_refresh_upgrade_rows()
 	_refresh_shipyard_rows()
+	_refresh_trade_rows()
 	_refresh_mission_rows()
 	_refresh_pirate_status_panel()
 	root_control.visible = true
@@ -222,6 +238,7 @@ func _on_upgrades_pressed() -> void:
 	upgrades_container.visible = not upgrades_container.visible
 	if upgrades_container.visible:
 		shipyard_container.visible = false
+		trade_container.visible = false
 		missions_container.visible = false
 		pirate_status_container.visible = false
 		status_label.text = "Choisis une amélioration"
@@ -467,6 +484,7 @@ func _on_shipyard_pressed() -> void:
 	shipyard_container.visible = not shipyard_container.visible
 	if shipyard_container.visible:
 		upgrades_container.visible = false
+		trade_container.visible = false
 		missions_container.visible = false
 		pirate_status_container.visible = false
 		status_label.text = "Chantier naval"
@@ -638,11 +656,164 @@ func _build_ship_hierarchy_text() -> String:
 	return "Hiérarchie : %s" % " -> ".join(parts)
 
 
+func _on_trade_pressed() -> void:
+	trade_container.visible = not trade_container.visible
+	if trade_container.visible:
+		upgrades_container.visible = false
+		shipyard_container.visible = false
+		missions_container.visible = false
+		pirate_status_container.visible = false
+		status_label.text = "Commerce"
+		_refresh_trade_rows()
+	else:
+		status_label.text = ""
+
+
+func _refresh_trade_rows() -> void:
+	trade_list.clear()
+	_trade_good_ids.clear()
+
+	var game_state: Node = _get_game_state()
+	if game_state == null:
+		cargo_status_label.text = "Cargaison indisponible"
+		trade_details_label.text = "Commerce indisponible"
+		buy_trade_button.disabled = true
+		sell_trade_button.disabled = true
+		return
+
+	_refresh_cargo_status(game_state)
+	var views: Array = []
+	if game_state.has_method("get_trade_good_views"):
+		var raw_views: Variant = game_state.call("get_trade_good_views")
+		if raw_views is Array:
+			views = raw_views
+
+	for trade_view in views:
+		if not (trade_view is Dictionary):
+			continue
+
+		var view: Dictionary = trade_view
+		var item_id: String = String(view.get("id", ""))
+		if item_id.is_empty():
+			continue
+
+		_trade_good_ids.append(item_id)
+		trade_list.add_item(_build_trade_row_text(view))
+
+	if _trade_good_ids.is_empty():
+		_selected_trade_good_id = ""
+		trade_details_label.text = "Aucune marchandise disponible"
+		buy_trade_button.disabled = true
+		sell_trade_button.disabled = true
+		return
+
+	var selected_index: int = _get_trade_good_index(_selected_trade_good_id)
+	if selected_index < 0:
+		selected_index = 0
+		_selected_trade_good_id = _trade_good_ids[selected_index]
+
+	trade_list.select(selected_index)
+	_refresh_selected_trade_good()
+
+
+func _refresh_cargo_status(game_state: Node) -> void:
+	if not game_state.has_method("get_cargo_used") or not game_state.has_method("get_cargo_capacity") or not game_state.has_method("get_cargo_free"):
+		cargo_status_label.text = "Cargaison indisponible"
+		return
+
+	cargo_status_label.text = "Cargaison : %d/%d - libre : %d" % [
+		int(game_state.call("get_cargo_used")),
+		int(game_state.call("get_cargo_capacity")),
+		int(game_state.call("get_cargo_free")),
+	]
+
+
+func _build_trade_row_text(view: Dictionary) -> String:
+	return "%s - x%d - achat %d / vente %d - poids %d" % [
+		String(view.get("name", "Marchandise")),
+		int(view.get("quantity", 0)),
+		int(view.get("buy_price", 0)),
+		int(view.get("sell_price", 0)),
+		int(view.get("weight", 0)),
+	]
+
+
+func _on_trade_good_selected(index: int) -> void:
+	if index < 0 or index >= _trade_good_ids.size():
+		return
+
+	_selected_trade_good_id = _trade_good_ids[index]
+	_refresh_selected_trade_good()
+
+
+func _refresh_selected_trade_good() -> void:
+	var game_state: Node = _get_game_state()
+	if game_state == null or _selected_trade_good_id.is_empty() or not game_state.has_method("get_trade_good_view"):
+		trade_details_label.text = "Marchandise indisponible"
+		buy_trade_button.disabled = true
+		sell_trade_button.disabled = true
+		return
+
+	_refresh_cargo_status(game_state)
+	var raw_view: Variant = game_state.call("get_trade_good_view", _selected_trade_good_id)
+	if not (raw_view is Dictionary):
+		trade_details_label.text = "Marchandise indisponible"
+		buy_trade_button.disabled = true
+		sell_trade_button.disabled = true
+		return
+
+	var view: Dictionary = raw_view
+	trade_details_label.text = "%s\nQuantite : %d\nPoids unitaire : %d\nAchat : %d or\nVente : %d or\nPlace utilisee : %d" % [
+		String(view.get("name", "Marchandise")),
+		int(view.get("quantity", 0)),
+		int(view.get("weight", 0)),
+		int(view.get("buy_price", 0)),
+		int(view.get("sell_price", 0)),
+		int(view.get("used_space", 0)),
+	]
+	buy_trade_button.text = "Acheter 1 : %d or" % int(view.get("buy_price", 0))
+	sell_trade_button.text = "Vendre 1 : %d or" % int(view.get("sell_price", 0))
+	buy_trade_button.disabled = not bool(view.get("can_buy", false))
+	sell_trade_button.disabled = not bool(view.get("can_sell", false))
+
+
+func _on_buy_trade_pressed() -> void:
+	var game_state: Node = _get_game_state()
+	if game_state == null or _selected_trade_good_id.is_empty() or not game_state.has_method("buy_trade_good"):
+		status_label.text = "Commerce indisponible"
+		return
+
+	status_label.text = String(game_state.call("buy_trade_good", _selected_trade_good_id, 1))
+	_refresh_trade_rows()
+
+
+func _on_sell_trade_pressed() -> void:
+	var game_state: Node = _get_game_state()
+	if game_state == null or _selected_trade_good_id.is_empty() or not game_state.has_method("sell_trade_good"):
+		status_label.text = "Commerce indisponible"
+		return
+
+	status_label.text = String(game_state.call("sell_trade_good", _selected_trade_good_id, 1))
+	_refresh_trade_rows()
+
+
+func _get_trade_good_index(item_id: String) -> int:
+	if item_id.is_empty():
+		return -1
+
+	for index in range(_trade_good_ids.size()):
+		if _trade_good_ids[index] == item_id:
+			return index
+
+	return -1
+
+
 func _on_missions_pressed() -> void:
 	missions_container.visible = not missions_container.visible
 	if missions_container.visible:
 		upgrades_container.visible = false
 		shipyard_container.visible = false
+		trade_container.visible = false
 		pirate_status_container.visible = false
 		status_label.text = "Choisis une mission"
 		_refresh_mission_rows()
@@ -655,6 +826,7 @@ func _on_pirate_status_pressed() -> void:
 	if pirate_status_container.visible:
 		upgrades_container.visible = false
 		shipyard_container.visible = false
+		trade_container.visible = false
 		missions_container.visible = false
 		status_label.text = "Statut pirate"
 		_refresh_pirate_status_panel()

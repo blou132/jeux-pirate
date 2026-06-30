@@ -165,6 +165,45 @@ custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 text = "Équiper"
 
+[node name="TradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+text = "Commerce"
+
+[node name="TradeContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="TradeIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer"]
+layout_mode = 2
+text = "Marchandises du port"
+horizontal_alignment = 1
+
+[node name="CargoStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer"]
+layout_mode = 2
+text = "Cargaison : 0/100"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="TradeList" type="ItemList" parent="Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer"]
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+
+[node name="TradeDetailsLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer"]
+layout_mode = 2
+text = "Selectionne une marchandise"
+autowrap_mode = 3
+
+[node name="BuyTradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "Acheter"
+
+[node name="SellTradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "Vendre"
+
 [node name="MissionsButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
