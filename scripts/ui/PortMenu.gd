@@ -635,8 +635,33 @@ func _set_upgrade_row(upgrade_system: Node, upgrade_id: String, label: Label, bu
 	if upgrade_system.has_method("get_upgrade_status"):
 		label.text = upgrade_system.get_upgrade_status(upgrade_id)
 
+	var block_reason: String = _get_upgrade_service_block_reason(upgrade_system, upgrade_id)
+	if not block_reason.is_empty():
+		label.text += " - %s" % block_reason
+		button.disabled = true
+		return
+
 	if upgrade_system.has_method("is_max_level"):
 		button.disabled = upgrade_system.is_max_level(upgrade_id)
+
+
+func _get_upgrade_service_block_reason(upgrade_system: Node, upgrade_id: String) -> String:
+	if not _is_service_available(PortCatalog.SERVICE_UPGRADES):
+		return "Service indisponible dans ce port"
+	if not upgrade_system.has_method("get_level") or not upgrade_system.has_method("get_max_level"):
+		return ""
+
+	var level: int = int(upgrade_system.call("get_level", upgrade_id))
+	var max_level: int = int(upgrade_system.call("get_max_level", upgrade_id))
+	if level >= max_level:
+		return ""
+
+	var next_level: int = level + 1
+	var port_upgrade_limit: int = PortCatalog.get_shipyard_level(_active_port_id)
+	if next_level > port_upgrade_limit:
+		return "Atelier trop bas dans ce port (max niv. %d)" % port_upgrade_limit
+
+	return ""
 
 
 func _get_upgrade_ship_context_text() -> String:
@@ -645,11 +670,12 @@ func _get_upgrade_ship_context_text() -> String:
 	if game_state != null and game_state.has_method("get_active_player_ship_id"):
 		ship_id = String(game_state.call("get_active_player_ship_id"))
 
-	return "Navire : %s — max coque %d, voiles %d, canons %d" % [
+	return "Navire : %s - max coque %d, voiles %d, canons %d | Atelier port niv. %d" % [
 		ShipCatalog.get_ship_name(ship_id),
 		ShipCatalog.get_upgrade_limit(ship_id, "hull"),
 		ShipCatalog.get_upgrade_limit(ship_id, "sails"),
 		ShipCatalog.get_upgrade_limit(ship_id, "cannons"),
+		PortCatalog.get_shipyard_level(_active_port_id),
 	]
 
 
