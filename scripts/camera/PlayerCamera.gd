@@ -4,10 +4,16 @@ extends Camera3D
 @export var follow_target_path: NodePath
 @export var follow_smoothing: float = 8.0
 @export var rotation_smoothing: float = 10.0
+@export var zoom_min_factor: float = 0.65
+@export var zoom_max_factor: float = 1.75
+@export var zoom_step: float = 0.12
+@export var zoom_smoothing: float = 10.0
 
 var _target: Node3D
 var _base_local_offset: Vector3
 var _base_pitch_degrees: float
+var _current_zoom_factor: float = 1.0
+var _target_zoom_factor: float = 1.0
 
 
 func _ready() -> void:
@@ -29,8 +35,24 @@ func _process(delta: float) -> void:
 
 	var position_weight: float = _get_smoothing_weight(follow_smoothing, delta)
 	var rotation_weight: float = _get_smoothing_weight(rotation_smoothing, delta)
+	var zoom_weight: float = _get_smoothing_weight(zoom_smoothing, delta)
+	_current_zoom_factor = lerpf(_current_zoom_factor, _target_zoom_factor, zoom_weight)
 	global_position = global_position.lerp(_get_desired_position(), position_weight)
 	global_rotation = global_rotation.lerp(_get_desired_rotation(), rotation_weight)
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		var mouse_event: InputEventMouseButton = event as InputEventMouseButton
+		if not mouse_event.pressed:
+			return
+
+		if mouse_event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_adjust_zoom(-zoom_step)
+			get_viewport().set_input_as_handled()
+		elif mouse_event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_adjust_zoom(zoom_step)
+			get_viewport().set_input_as_handled()
 
 
 func _find_follow_target() -> Node3D:
@@ -47,7 +69,13 @@ func _find_follow_target() -> Node3D:
 
 
 func _get_desired_position() -> Vector3:
-	return _target.global_transform * _base_local_offset
+	return _target.global_transform * (_base_local_offset * _current_zoom_factor)
+
+
+func _adjust_zoom(delta_factor: float) -> void:
+	var min_zoom: float = minf(zoom_min_factor, zoom_max_factor)
+	var max_zoom: float = maxf(zoom_min_factor, zoom_max_factor)
+	_target_zoom_factor = clampf(_target_zoom_factor + delta_factor, min_zoom, max_zoom)
 
 
 func _get_desired_rotation() -> Vector3:
