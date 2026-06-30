@@ -315,6 +315,9 @@ La refonte UI pirate ajoute une premiere direction visuelle dark fantasy : barre
 - Le menu du port affiche une liste de ports simules v0.11 pour tester les services sans creer une grande carte.
 - Chaque port definit sa categorie, sa zone de danger, ses services, ses niveaux de commerce/reparation/chantier naval, ses navires, ses marchandises et ses missions.
 - Les services du menu sont limites par le port actif : commerce, chantier naval, missions, flotte, reparations et ameliorations.
+- Quatre ports physiques sont places dans `World.tscn` : `starter_quay`, `merchant_port`, `great_port` et `naval_arsenal`.
+- Repartition physique : Quai en Eaux sures pres du spawn, Port marchand en Zone surveillee, Grand port en Zone contestee, Arsenal naval en Zone hostile.
+- Chaque port physique transmet son `port_id` au menu et affiche sa categorie plus sa zone dans le prompt d'interaction.
 
 ## Lancement
 

@@ -331,7 +331,7 @@ La v0.10 donne un premier role concret au stockage sans lancer encore les ports 
 
 ## Ports et zones de danger v0.11
 
-La v0.11 relie les ports a la progression de danger sans creer encore une carte immense. Le menu du port permet de tester des ports simules, puis les vrais ports pourront etre places dans la scene plus tard.
+La v0.11 relie les ports a la progression de danger sans creer encore une carte immense. Le monde contient une premiere serie de ports physiques interactifs, et le menu garde une liste de ports simules pour tester rapidement les categories futures.
 
 Hierarchie des zones de danger :
 
@@ -355,6 +355,15 @@ Hierarchie des ports :
 8. Sanctuaire pirate
 
 Le port de depart reste dans les Eaux sures. Les ports faibles offrent peu de services mais sont faciles d'acces ; les ports avances offrent plus de commerce, de reparations et de chantier naval, mais ils sont associes a des zones plus dangereuses. Chaque port declare son nom, niveau, categorie, zone de danger, services, niveaux de commerce/reparation/chantier naval, navires accessibles, marchandises et missions.
+
+Ports physiques v0.11 :
+
+- `starter_quay` : Quai du Pavillon, Eaux sures, proche du spawn, reparations et commerce limite.
+- `merchant_port` : Port marchand des Alizes, Zone surveillee, plus de marchandises et chantier intermediaire.
+- `great_port` : Grand port de Briselame, Zone contestee, chantier plus complet et acces a la Goelette.
+- `naval_arsenal` : Arsenal naval de Ferhoule, Zone hostile, meilleur atelier de combat de cette premiere carte.
+
+Les ports physiques utilisent `Port.gd` avec un `port_id` exporte. `World.gd` transmet le port actif au menu, et `PortMenu.gd` lit `PortCatalog` pour afficher la zone, les services, les marchandises, les missions et les navires accessibles.
 
 ## Réputation et titres v0.8
 
