@@ -8,8 +8,8 @@ extends Camera3D
 @export var zoom_max_factor: float = 1.75
 @export var zoom_step: float = 0.12
 @export var zoom_smoothing: float = 10.0
-@export var look_offset_sensitivity: float = 0.035
-@export var look_offset_max_distance: float = 22.0
+@export var look_offset_sensitivity: float = 0.025
+@export var look_offset_max_distance: float = 12.0
 @export var look_offset_smoothing: float = 8.0
 @export var clamp_to_world_bounds: bool = true
 @export var fallback_world_limit: Vector2 = Vector2(112.0, 112.0)
@@ -123,6 +123,7 @@ func recenter() -> void:
 
 func _refresh_free_look_target() -> void:
 	if not is_free_look_unlocked:
+		_target_look_offset = Vector3.ZERO
 		return
 
 	var viewport: Viewport = get_viewport()
@@ -133,16 +134,6 @@ func _refresh_free_look_target() -> void:
 		planar_offset = planar_offset.normalized() * look_offset_max_distance
 
 	_target_look_offset = Vector3(planar_offset.x, 0.0, planar_offset.y)
-
-
-func _clamp_look_offset(offset: Vector3) -> Vector3:
-	var planar_offset: Vector2 = Vector2(offset.x, offset.z)
-	var max_distance: float = maxf(0.0, look_offset_max_distance)
-	if planar_offset.length() > max_distance:
-		planar_offset = planar_offset.normalized() * max_distance
-
-	return Vector3(planar_offset.x, 0.0, planar_offset.y)
-
 
 func _clamp_to_world_bounds(world_position: Vector3) -> Vector3:
 	if not clamp_to_world_bounds:
