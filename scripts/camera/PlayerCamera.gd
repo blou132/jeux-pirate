@@ -64,6 +64,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		var key_event: InputEventKey = event as InputEventKey
 		if key_event.pressed and not key_event.echo and key_event.keycode == KEY_V:
 			is_free_look_unlocked = not is_free_look_unlocked
+			_show_lock_feedback()
 			get_viewport().set_input_as_handled()
 		elif key_event.pressed and not key_event.echo and key_event.keycode == KEY_C:
 			recenter()
@@ -156,6 +157,18 @@ func _get_camera_limit() -> Vector2:
 			return raw_limit
 
 	return fallback_world_limit
+
+
+func _show_lock_feedback() -> void:
+	var hud: Node = get_tree().get_first_node_in_group("hud")
+	if hud == null or not hud.has_method("show_temporary_context_message"):
+		return
+
+	var message: String = "Camera libre activee"
+	if not is_free_look_unlocked:
+		message = "Camera verrouillee"
+
+	hud.call("show_temporary_context_message", message, 1.1)
 
 
 func _are_camera_controls_blocked() -> bool:
