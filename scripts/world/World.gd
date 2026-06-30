@@ -40,7 +40,7 @@ func _on_port_interaction_requested(port: Node) -> void:
 		return
 
 	if port_menu.has_method("open"):
-		port_menu.open(player)
+		port_menu.open(player, port)
 
 
 func recruit_ally_ship() -> String:

@@ -5,7 +5,14 @@ signal closed
 const REPAIR_HEALTH_PER_WOOD := 5
 
 @onready var root_control: Control = $Root
+@onready var title_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/TitleLabel
+@onready var subtitle_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/SubtitleLabel
+@onready var port_info_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/PortInfoLabel
 @onready var status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/StatusLabel
+@onready var ports_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/PortsButton
+@onready var ports_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/PortsContainer
+@onready var port_list: ItemList = $Root/CenterContainer/PanelContainer/VBoxContainer/PortsContainer/PortList
+@onready var port_services_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/PortsContainer/PortServicesLabel
 @onready var repair_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/RepairButton
 @onready var repair_ally_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/RepairAllyButton
 @onready var upgrades_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesButton
@@ -48,6 +55,8 @@ const REPAIR_HEALTH_PER_WOOD := 5
 var _player: Node
 var _reputation_system: Node
 var _previous_pause_state: bool = false
+var _active_port_id: String = PortCatalog.STARTING_PORT_ID
+var _port_ids: Array[String] = []
 var _mission_ids: Array[String] = []
 var _selected_mission_id: String = ""
 var _ship_ids: Array[String] = []
@@ -59,11 +68,14 @@ var _selected_trade_good_id: String = ""
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	root_control.visible = false
+	ports_container.visible = false
 	upgrades_container.visible = false
 	shipyard_container.visible = false
 	trade_container.visible = false
 	missions_container.visible = false
 	pirate_status_container.visible = false
+	ports_button.pressed.connect(_on_ports_pressed)
+	port_list.item_selected.connect(_on_port_selected)
 	repair_button.pressed.connect(_on_repair_pressed)
 	repair_ally_button.pressed.connect(_on_repair_ally_pressed)
 	upgrades_button.pressed.connect(_on_upgrades_pressed)
@@ -97,15 +109,19 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 
-func open(player: Node) -> void:
+func open(player: Node, port: Node = null) -> void:
 	_player = player
+	_set_active_port_from_node(port)
 	_set_hud_detail_mode(true)
 	status_label.text = ""
+	ports_container.visible = false
 	upgrades_container.visible = false
 	shipyard_container.visible = false
 	trade_container.visible = false
 	missions_container.visible = false
 	pirate_status_container.visible = false
+	_refresh_port_header()
+	_refresh_port_rows()
 	_refresh_repair_button()
 	_refresh_ally_repair_button()
 	_refresh_recruit_ally_button()
@@ -134,6 +150,113 @@ func is_open() -> bool:
 	return root_control.visible
 
 
+func _set_active_port_from_node(port: Node) -> void:
+	if port != null and port.has_method("get_port_id"):
+		var port_id: String = String(port.call("get_port_id"))
+		if PortCatalog.has_port(port_id):
+			_active_port_id = port_id
+
+	if not PortCatalog.has_port(_active_port_id):
+		_active_port_id = PortCatalog.STARTING_PORT_ID
+
+
+func _is_service_available(service_id: String) -> bool:
+	return PortCatalog.has_service(_active_port_id, service_id)
+
+
+func _refresh_port_header() -> void:
+	title_label.text = PortCatalog.get_port_name(_active_port_id)
+	subtitle_label.text = "%s - niveau %d - %s" % [
+		PortCatalog.get_port_category(_active_port_id),
+		PortCatalog.get_port_level(_active_port_id),
+		PortCatalog.get_port_danger_zone(_active_port_id),
+	]
+	port_info_label.text = "Zone : %s | Commerce niv. %d | Reparation niv. %d | Chantier niv. %d" % [
+		PortCatalog.get_port_danger_zone(_active_port_id),
+		PortCatalog.get_trade_level(_active_port_id),
+		PortCatalog.get_repair_level(_active_port_id),
+		PortCatalog.get_shipyard_level(_active_port_id),
+	]
+	ports_button.text = "Ports disponibles : %s" % PortCatalog.get_port_category(_active_port_id)
+
+
+func _on_ports_pressed() -> void:
+	ports_container.visible = not ports_container.visible
+	if ports_container.visible:
+		upgrades_container.visible = false
+		shipyard_container.visible = false
+		trade_container.visible = false
+		missions_container.visible = false
+		pirate_status_container.visible = false
+		status_label.text = "Choisis un port"
+		_refresh_port_rows()
+	else:
+		status_label.text = ""
+
+
+func _refresh_port_rows() -> void:
+	port_list.clear()
+	_port_ids.clear()
+
+	var catalog_port_ids: Array[String] = PortCatalog.get_port_ids()
+	for port_id in catalog_port_ids:
+		_port_ids.append(port_id)
+		port_list.add_item(PortCatalog.get_port_row_text(port_id))
+
+	if _port_ids.is_empty():
+		port_services_label.text = "Aucun port disponible"
+		return
+
+	var selected_index: int = _get_port_index(_active_port_id)
+	if selected_index < 0:
+		selected_index = 0
+		_active_port_id = _port_ids[selected_index]
+
+	port_list.select(selected_index)
+	port_services_label.text = PortCatalog.get_port_details_text(_active_port_id)
+
+
+func _on_port_selected(index: int) -> void:
+	if index < 0 or index >= _port_ids.size():
+		return
+
+	_active_port_id = _port_ids[index]
+	status_label.text = "Port actif : %s" % PortCatalog.get_port_name(_active_port_id)
+	_refresh_port_header()
+	_refresh_port_rows()
+	_refresh_after_port_change()
+
+
+func _refresh_after_port_change() -> void:
+	if upgrades_container.visible and not _is_service_available(PortCatalog.SERVICE_UPGRADES):
+		upgrades_container.visible = false
+	if shipyard_container.visible and not _is_service_available(PortCatalog.SERVICE_SHIPYARD):
+		shipyard_container.visible = false
+	if trade_container.visible and not _is_service_available(PortCatalog.SERVICE_TRADE):
+		trade_container.visible = false
+	if missions_container.visible and not _is_service_available(PortCatalog.SERVICE_MISSIONS):
+		missions_container.visible = false
+
+	_refresh_repair_button()
+	_refresh_ally_repair_button()
+	_refresh_recruit_ally_button()
+	_refresh_upgrade_rows()
+	_refresh_shipyard_rows()
+	_refresh_trade_rows()
+	_refresh_mission_rows()
+
+
+func _get_port_index(port_id: String) -> int:
+	if port_id.is_empty():
+		return -1
+
+	for index in range(_port_ids.size()):
+		if _port_ids[index] == port_id:
+			return index
+
+	return -1
+
+
 func _set_hud_detail_mode(is_forced: bool) -> void:
 	var hud := get_tree().get_first_node_in_group("hud")
 	if hud != null and hud.has_method("set_detail_hud_forced"):
@@ -141,6 +264,11 @@ func _set_hud_detail_mode(is_forced: bool) -> void:
 
 
 func _on_repair_pressed() -> void:
+	if not _is_service_available(PortCatalog.SERVICE_REPAIR):
+		status_label.text = "Reparation indisponible dans ce port"
+		_refresh_repair_button()
+		return
+
 	if _player == null or not _player.has_method("get_health") or not _player.has_method("get_max_health"):
 		status_label.text = "Bateau indisponible"
 		_refresh_repair_button()
@@ -182,6 +310,11 @@ func _on_repair_pressed() -> void:
 
 
 func _on_repair_ally_pressed() -> void:
+	if not _is_service_available(PortCatalog.SERVICE_FLEET):
+		status_label.text = "Service de flotte indisponible dans ce port"
+		_refresh_ally_repair_button()
+		return
+
 	var fleet_manager := _get_fleet_manager()
 	if fleet_manager != null and fleet_manager.has_method("repair_fleet"):
 		status_label.text = fleet_manager.repair_fleet()
@@ -235,8 +368,14 @@ func _on_repair_ally_pressed() -> void:
 
 
 func _on_upgrades_pressed() -> void:
+	if not _is_service_available(PortCatalog.SERVICE_UPGRADES):
+		upgrades_container.visible = false
+		status_label.text = "Atelier d'ameliorations indisponible dans ce port"
+		return
+
 	upgrades_container.visible = not upgrades_container.visible
 	if upgrades_container.visible:
+		ports_container.visible = false
 		shipyard_container.visible = false
 		trade_container.visible = false
 		missions_container.visible = false
@@ -315,6 +454,11 @@ func _get_fleet_manager() -> Node:
 
 
 func _refresh_repair_button() -> void:
+	if not _is_service_available(PortCatalog.SERVICE_REPAIR):
+		repair_button.text = "Reparation indisponible ici"
+		repair_button.disabled = true
+		return
+
 	if _player == null or not _player.has_method("get_health") or not _player.has_method("get_max_health"):
 		repair_button.text = "Réparer le bateau"
 		repair_button.disabled = true
@@ -335,6 +479,11 @@ func _refresh_repair_button() -> void:
 
 
 func _refresh_ally_repair_button() -> void:
+	if not _is_service_available(PortCatalog.SERVICE_FLEET):
+		repair_ally_button.text = "Flotte indisponible ici"
+		repair_ally_button.disabled = true
+		return
+
 	var fleet_manager := _get_fleet_manager()
 	if fleet_manager != null and _refresh_fleet_repair_button(fleet_manager):
 		return
@@ -388,6 +537,11 @@ func _refresh_fleet_repair_button(fleet_manager: Node) -> bool:
 
 
 func _refresh_recruit_ally_button() -> void:
+	if not _is_service_available(PortCatalog.SERVICE_FLEET):
+		recruit_ally_button.text = "Recrutement indisponible ici"
+		recruit_ally_button.disabled = true
+		return
+
 	var fleet_manager := _get_fleet_manager()
 	if fleet_manager == null:
 		recruit_ally_button.text = "Recrutement indisponible"
@@ -433,6 +587,11 @@ func _on_cannons_upgrade_pressed() -> void:
 
 
 func _purchase_upgrade(upgrade_id: String) -> void:
+	if not _is_service_available(PortCatalog.SERVICE_UPGRADES):
+		status_label.text = "Atelier d'ameliorations indisponible dans ce port"
+		_refresh_upgrade_rows()
+		return
+
 	var upgrade_system := _get_upgrade_system()
 	if upgrade_system == null or not upgrade_system.has_method("purchase_upgrade"):
 		status_label.text = "Améliorations indisponibles"
@@ -444,6 +603,20 @@ func _purchase_upgrade(upgrade_id: String) -> void:
 
 
 func _refresh_upgrade_rows() -> void:
+	if not _is_service_available(PortCatalog.SERVICE_UPGRADES):
+		upgrades_button.text = "Ameliorations indisponibles ici"
+		upgrades_button.disabled = true
+		upgrades_ship_label.text = "Atelier indisponible dans ce port"
+		hull_status_label.text = "Coque renforcee: indisponible"
+		sails_status_label.text = "Voiles rapides: indisponible"
+		cannons_status_label.text = "Canons ameliores: indisponible"
+		hull_upgrade_button.disabled = true
+		sails_upgrade_button.disabled = true
+		cannons_upgrade_button.disabled = true
+		return
+
+	upgrades_button.text = "Ameliorations"
+	upgrades_button.disabled = false
 	var upgrade_system := _get_upgrade_system()
 	if upgrade_system == null:
 		upgrades_ship_label.text = "Navire : indisponible"
@@ -481,8 +654,14 @@ func _get_upgrade_ship_context_text() -> String:
 
 
 func _on_shipyard_pressed() -> void:
+	if not _is_service_available(PortCatalog.SERVICE_SHIPYARD):
+		shipyard_container.visible = false
+		status_label.text = "Chantier naval indisponible dans ce port"
+		return
+
 	shipyard_container.visible = not shipyard_container.visible
 	if shipyard_container.visible:
+		ports_container.visible = false
 		upgrades_container.visible = false
 		trade_container.visible = false
 		missions_container.visible = false
@@ -497,6 +676,18 @@ func _refresh_shipyard_rows() -> void:
 	ship_list.clear()
 	_ship_ids.clear()
 
+	if not _is_service_available(PortCatalog.SERVICE_SHIPYARD):
+		shipyard_button.text = "Chantier naval indisponible ici"
+		shipyard_button.disabled = true
+		current_ship_label.text = "Chantier naval indisponible"
+		ship_details_label.text = "Ce port ne propose pas de chantier naval."
+		ship_hierarchy_label.text = _build_ship_hierarchy_text()
+		buy_ship_button.disabled = true
+		equip_ship_button.disabled = true
+		return
+
+	shipyard_button.text = "Chantier naval"
+	shipyard_button.disabled = false
 	var game_state: Node = _get_game_state()
 	if game_state == null:
 		current_ship_label.text = "Navire actuel indisponible"
@@ -512,8 +703,11 @@ func _refresh_shipyard_rows() -> void:
 
 	current_ship_label.text = "Navire actuel : %s" % ShipCatalog.get_ship_name(active_ship_id)
 	ship_hierarchy_label.text = _build_ship_hierarchy_text()
-	var ship_ids: Array[String] = ShipCatalog.get_player_ship_ids()
+	var ship_ids: Array[String] = PortCatalog.get_port_ship_ids(_active_port_id)
 	for ship_id in ship_ids:
+		if not ShipCatalog.has_ship(ship_id):
+			continue
+
 		_ship_ids.append(ship_id)
 		ship_list.add_item(_build_ship_row_text(game_state, ship_id))
 
@@ -581,6 +775,12 @@ func _refresh_selected_ship() -> void:
 		equip_ship_button.disabled = true
 		return
 
+	if not PortCatalog.has_ship(_active_port_id, _selected_ship_id):
+		ship_details_label.text = "Navire non accessible dans ce port"
+		buy_ship_button.disabled = true
+		equip_ship_button.disabled = true
+		return
+
 	var lines: Array[String] = ShipCatalog.get_ship_stat_lines(_selected_ship_id)
 
 	var owned: bool = false
@@ -625,6 +825,15 @@ func _refresh_selected_ship() -> void:
 
 
 func _on_buy_ship_pressed() -> void:
+	if not _is_service_available(PortCatalog.SERVICE_SHIPYARD):
+		status_label.text = "Chantier naval indisponible dans ce port"
+		_refresh_shipyard_rows()
+		return
+	if not PortCatalog.has_ship(_active_port_id, _selected_ship_id):
+		status_label.text = "Navire non accessible dans ce port"
+		_refresh_shipyard_rows()
+		return
+
 	var game_state: Node = _get_game_state()
 	if game_state == null or _selected_ship_id.is_empty() or not game_state.has_method("purchase_player_ship"):
 		status_label.text = "Achat indisponible"
@@ -637,6 +846,15 @@ func _on_buy_ship_pressed() -> void:
 
 
 func _on_equip_ship_pressed() -> void:
+	if not _is_service_available(PortCatalog.SERVICE_SHIPYARD):
+		status_label.text = "Chantier naval indisponible dans ce port"
+		_refresh_shipyard_rows()
+		return
+	if not PortCatalog.has_ship(_active_port_id, _selected_ship_id):
+		status_label.text = "Navire non accessible dans ce port"
+		_refresh_shipyard_rows()
+		return
+
 	var game_state: Node = _get_game_state()
 	if game_state == null or _selected_ship_id.is_empty() or not game_state.has_method("equip_player_ship"):
 		status_label.text = "Équipement indisponible"
@@ -674,8 +892,14 @@ func _build_ship_hierarchy_text() -> String:
 
 
 func _on_trade_pressed() -> void:
+	if not _is_service_available(PortCatalog.SERVICE_TRADE):
+		trade_container.visible = false
+		status_label.text = "Commerce indisponible dans ce port"
+		return
+
 	trade_container.visible = not trade_container.visible
 	if trade_container.visible:
+		ports_container.visible = false
 		upgrades_container.visible = false
 		shipyard_container.visible = false
 		missions_container.visible = false
@@ -690,6 +914,17 @@ func _refresh_trade_rows() -> void:
 	trade_list.clear()
 	_trade_good_ids.clear()
 
+	if not _is_service_available(PortCatalog.SERVICE_TRADE):
+		trade_button.text = "Commerce indisponible ici"
+		trade_button.disabled = true
+		cargo_status_label.text = "Commerce indisponible dans ce port"
+		trade_details_label.text = "Aucune marchandise disponible ici"
+		buy_trade_button.disabled = true
+		sell_trade_button.disabled = true
+		return
+
+	trade_button.text = "Commerce"
+	trade_button.disabled = false
 	var game_state: Node = _get_game_state()
 	if game_state == null:
 		cargo_status_label.text = "Cargaison indisponible"
@@ -712,6 +947,8 @@ func _refresh_trade_rows() -> void:
 		var view: Dictionary = trade_view
 		var item_id: String = String(view.get("id", ""))
 		if item_id.is_empty():
+			continue
+		if not PortCatalog.has_trade_good(_active_port_id, item_id):
 			continue
 
 		_trade_good_ids.append(item_id)
@@ -771,6 +1008,12 @@ func _refresh_selected_trade_good() -> void:
 		sell_trade_button.disabled = true
 		return
 
+	if not PortCatalog.has_trade_good(_active_port_id, _selected_trade_good_id):
+		trade_details_label.text = "Marchandise indisponible dans ce port"
+		buy_trade_button.disabled = true
+		sell_trade_button.disabled = true
+		return
+
 	_refresh_cargo_status(game_state)
 	var raw_view: Variant = game_state.call("get_trade_good_view", _selected_trade_good_id)
 	if not (raw_view is Dictionary):
@@ -795,6 +1038,15 @@ func _refresh_selected_trade_good() -> void:
 
 
 func _on_buy_trade_pressed() -> void:
+	if not _is_service_available(PortCatalog.SERVICE_TRADE):
+		_set_trade_status("Commerce indisponible dans ce port")
+		_refresh_trade_rows()
+		return
+	if not PortCatalog.has_trade_good(_active_port_id, _selected_trade_good_id):
+		_set_trade_status("Marchandise indisponible dans ce port")
+		_refresh_trade_rows()
+		return
+
 	var game_state: Node = _get_game_state()
 	if game_state == null or _selected_trade_good_id.is_empty() or not game_state.has_method("buy_trade_good"):
 		_set_trade_status("Commerce indisponible")
@@ -805,6 +1057,15 @@ func _on_buy_trade_pressed() -> void:
 
 
 func _on_sell_trade_pressed() -> void:
+	if not _is_service_available(PortCatalog.SERVICE_TRADE):
+		_set_trade_status("Commerce indisponible dans ce port")
+		_refresh_trade_rows()
+		return
+	if not PortCatalog.has_trade_good(_active_port_id, _selected_trade_good_id):
+		_set_trade_status("Marchandise indisponible dans ce port")
+		_refresh_trade_rows()
+		return
+
 	var game_state: Node = _get_game_state()
 	if game_state == null or _selected_trade_good_id.is_empty() or not game_state.has_method("sell_trade_good"):
 		_set_trade_status("Commerce indisponible")
@@ -833,8 +1094,14 @@ func _get_trade_good_index(item_id: String) -> int:
 
 
 func _on_missions_pressed() -> void:
+	if not _is_service_available(PortCatalog.SERVICE_MISSIONS):
+		missions_container.visible = false
+		status_label.text = "Missions indisponibles dans ce port"
+		return
+
 	missions_container.visible = not missions_container.visible
 	if missions_container.visible:
+		ports_container.visible = false
 		upgrades_container.visible = false
 		shipyard_container.visible = false
 		trade_container.visible = false
@@ -848,6 +1115,7 @@ func _on_missions_pressed() -> void:
 func _on_pirate_status_pressed() -> void:
 	pirate_status_container.visible = not pirate_status_container.visible
 	if pirate_status_container.visible:
+		ports_container.visible = false
 		upgrades_container.visible = false
 		shipyard_container.visible = false
 		trade_container.visible = false
@@ -898,6 +1166,15 @@ func _on_mission_selected(index: int) -> void:
 
 
 func _on_accept_mission_pressed() -> void:
+	if not _is_service_available(PortCatalog.SERVICE_MISSIONS):
+		status_label.text = "Missions indisponibles dans ce port"
+		_refresh_mission_rows()
+		return
+	if not PortCatalog.has_mission(_active_port_id, _selected_mission_id):
+		status_label.text = "Mission indisponible dans ce port"
+		_refresh_mission_rows()
+		return
+
 	var quest_system := _get_quest_system()
 	if quest_system == null or not quest_system.has_method("accept_quest"):
 		status_label.text = "Missions indisponibles"
@@ -908,6 +1185,15 @@ func _on_accept_mission_pressed() -> void:
 
 
 func _on_claim_mission_reward_pressed() -> void:
+	if not _is_service_available(PortCatalog.SERVICE_MISSIONS):
+		status_label.text = "Missions indisponibles dans ce port"
+		_refresh_mission_rows()
+		return
+	if not PortCatalog.has_mission(_active_port_id, _selected_mission_id):
+		status_label.text = "Mission indisponible dans ce port"
+		_refresh_mission_rows()
+		return
+
 	var quest_system := _get_quest_system()
 	if quest_system == null or not quest_system.has_method("claim_reward"):
 		status_label.text = "Missions indisponibles"
@@ -918,6 +1204,11 @@ func _on_claim_mission_reward_pressed() -> void:
 
 
 func _on_recruit_ally_pressed() -> void:
+	if not _is_service_available(PortCatalog.SERVICE_FLEET):
+		status_label.text = "Recrutement indisponible dans ce port"
+		_refresh_recruit_ally_button()
+		return
+
 	var world := get_tree().current_scene
 	if world == null or not world.has_method("recruit_ally_ship"):
 		status_label.text = "Recrutement indisponible"
@@ -932,6 +1223,17 @@ func _refresh_mission_rows() -> void:
 	mission_list.clear()
 	_mission_ids.clear()
 
+	if not _is_service_available(PortCatalog.SERVICE_MISSIONS):
+		missions_button.text = "Missions indisponibles ici"
+		missions_button.disabled = true
+		missions_intro_label.text = "Aucune mission disponible dans ce port"
+		mission_status_label.text = "Change de port pour trouver des contrats."
+		accept_mission_button.disabled = true
+		claim_mission_reward_button.disabled = true
+		return
+
+	missions_button.text = "Missions"
+	missions_button.disabled = false
 	var quest_system := _get_quest_system()
 	if quest_system == null or not quest_system.has_method("get_all_quest_views"):
 		missions_intro_label.text = "Missions indisponibles"
@@ -949,6 +1251,8 @@ func _refresh_mission_rows() -> void:
 		var view: Dictionary = quest_view
 		var quest_id: String = String(view.get("id", ""))
 		if quest_id.is_empty():
+			continue
+		if not PortCatalog.has_mission(_active_port_id, quest_id):
 			continue
 
 		_mission_ids.append(quest_id)
@@ -974,6 +1278,12 @@ func _refresh_selected_mission() -> void:
 	var quest_system := _get_quest_system()
 	if quest_system == null or not quest_system.has_method("get_quest_view") or _selected_mission_id.is_empty():
 		mission_status_label.text = "Missions indisponibles"
+		accept_mission_button.disabled = true
+		claim_mission_reward_button.disabled = true
+		return
+
+	if not PortCatalog.has_mission(_active_port_id, _selected_mission_id):
+		mission_status_label.text = "Mission indisponible dans ce port"
 		accept_mission_button.disabled = true
 		claim_mission_reward_button.disabled = true
 		return

@@ -5,6 +5,7 @@ signal player_entered(port: Node)
 signal player_exited(port: Node)
 
 @export var prompt_message: String = "Appuie sur E pour ouvrir le port"
+@export var port_id: String = PortCatalog.STARTING_PORT_ID
 
 @onready var interaction_area: Area3D = $InteractionArea
 
@@ -28,6 +29,13 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func is_player_in_range() -> bool:
 	return _player_in_range
+
+
+func get_port_id() -> String:
+	if not PortCatalog.has_port(port_id):
+		return PortCatalog.STARTING_PORT_ID
+
+	return port_id
 
 
 func _on_body_entered(body: Node) -> void:

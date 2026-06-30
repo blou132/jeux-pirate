@@ -306,6 +306,16 @@ La refonte UI pirate ajoute une premiere direction visuelle dark fantasy : barre
 - Le HUD affiche la cargaison utilisee et la capacite du navire actif.
 - Correctif v0.10.1 : le chantier naval bloque l'equipement d'un navire dont la capacite est inferieure a la cargaison actuelle. Il faut vendre ou vider assez de marchandises avant de repasser sur un navire plus petit.
 
+## Etat v0.11
+
+- `PortCatalog` prepare une hierarchie de ports liee aux zones de danger.
+- Zones de danger : Eaux sures, Zone surveillee, Zone contestee, Zone hostile, Zone mortelle, Territoire legendaire, Enfers des mers.
+- Ports : Quai, Petit port, Port marchand, Grand port, Arsenal naval, Capitale maritime, Port legendaire, Sanctuaire pirate.
+- Le port de depart reste en Eaux sures.
+- Le menu du port affiche une liste de ports simules v0.11 pour tester les services sans creer une grande carte.
+- Chaque port definit sa categorie, sa zone de danger, ses services, ses niveaux de commerce/reparation/chantier naval, ses navires, ses marchandises et ses missions.
+- Les services du menu sont limites par le port actif : commerce, chantier naval, missions, flotte, reparations et ameliorations.
+
 ## Lancement
 
 1. Installer Godot 4.x.

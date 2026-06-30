@@ -51,6 +51,12 @@ layout_mode = 2
 text = "Taverne, chantier naval et contrats de capitaine"
 horizontal_alignment = 1
 
+[node name="PortInfoLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Zone de danger : Eaux sures"
+horizontal_alignment = 1
+autowrap_mode = 3
+
 [node name="StatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
 text = ""
@@ -61,6 +67,29 @@ autowrap_mode = 3
 layout_mode = 2
 text = "Services du port"
 horizontal_alignment = 1
+
+[node name="PortsButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+text = "Ports disponibles"
+
+[node name="PortsContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PortsIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/PortsContainer"]
+layout_mode = 2
+text = "Ports simules v0.11"
+horizontal_alignment = 1
+
+[node name="PortList" type="ItemList" parent="Root/CenterContainer/PanelContainer/VBoxContainer/PortsContainer"]
+custom_minimum_size = Vector2(0, 96)
+layout_mode = 2
+
+[node name="PortServicesLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/PortsContainer"]
+layout_mode = 2
+text = "Selectionne un port"
+autowrap_mode = 3
 
 [node name="RepairButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 34)

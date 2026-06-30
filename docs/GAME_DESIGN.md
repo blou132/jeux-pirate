@@ -329,6 +329,33 @@ La v0.10 donne un premier role concret au stockage sans lancer encore les ports 
 - La Goelette est volontairement la meilleure option commerciale de v0.10 grace a son stockage de 260.
 - Correctif v0.10.1 : le joueur ne peut pas equiper un navire dont la capacite cargo est inferieure a la cargaison actuelle. Le jeu n'efface ni ne vend rien automatiquement ; le joueur doit d'abord vendre ou vider des marchandises.
 
+## Ports et zones de danger v0.11
+
+La v0.11 relie les ports a la progression de danger sans creer encore une carte immense. Le menu du port permet de tester des ports simules, puis les vrais ports pourront etre places dans la scene plus tard.
+
+Hierarchie des zones de danger :
+
+1. Eaux sures
+2. Zone surveillee
+3. Zone contestee
+4. Zone hostile
+5. Zone mortelle
+6. Territoire legendaire
+7. Enfers des mers
+
+Hierarchie des ports :
+
+1. Quai
+2. Petit port
+3. Port marchand
+4. Grand port
+5. Arsenal naval
+6. Capitale maritime
+7. Port legendaire
+8. Sanctuaire pirate
+
+Le port de depart reste dans les Eaux sures. Les ports faibles offrent peu de services mais sont faciles d'acces ; les ports avances offrent plus de commerce, de reparations et de chantier naval, mais ils sont associes a des zones plus dangereuses. Chaque port declare son nom, niveau, categorie, zone de danger, services, niveaux de commerce/reparation/chantier naval, navires accessibles, marchandises et missions.
+
 ## Réputation et titres v0.8
 
 La réputation donne une progression sociale simple sans ajouter encore de contrôle de territoire ou de hiérarchie de ports :
