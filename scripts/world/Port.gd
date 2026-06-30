@@ -38,12 +38,24 @@ func get_port_id() -> String:
 	return port_id
 
 
+func get_port_name() -> String:
+	return PortCatalog.get_port_name(get_port_id())
+
+
+func get_port_category() -> String:
+	return PortCatalog.get_port_category(get_port_id())
+
+
+func get_port_danger_zone() -> String:
+	return PortCatalog.get_port_danger_zone(get_port_id())
+
+
 func _on_body_entered(body: Node) -> void:
 	if not body.is_in_group("player"):
 		return
 
 	_player_in_range = true
-	_set_hud_message(prompt_message)
+	_set_hud_message(_build_prompt_message())
 	_record_port_visit()
 	player_entered.emit(self)
 
@@ -61,6 +73,18 @@ func _set_hud_message(message: String) -> void:
 	var hud := get_tree().get_first_node_in_group("hud")
 	if hud != null and hud.has_method("set_context_message"):
 		hud.set_context_message(message)
+
+
+func _build_prompt_message() -> String:
+	var base_message: String = prompt_message
+	if base_message.is_empty():
+		base_message = "Appuie sur E pour ouvrir le port"
+
+	return "%s\n%s - %s" % [
+		base_message,
+		get_port_category(),
+		get_port_danger_zone(),
+	]
 
 
 func _record_port_visit() -> void:
