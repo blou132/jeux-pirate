@@ -780,21 +780,28 @@ func _refresh_selected_trade_good() -> void:
 func _on_buy_trade_pressed() -> void:
 	var game_state: Node = _get_game_state()
 	if game_state == null or _selected_trade_good_id.is_empty() or not game_state.has_method("buy_trade_good"):
-		status_label.text = "Commerce indisponible"
+		_set_trade_status("Commerce indisponible")
 		return
 
-	status_label.text = String(game_state.call("buy_trade_good", _selected_trade_good_id, 1))
+	_set_trade_status(String(game_state.call("buy_trade_good", _selected_trade_good_id, 1)))
 	_refresh_trade_rows()
 
 
 func _on_sell_trade_pressed() -> void:
 	var game_state: Node = _get_game_state()
 	if game_state == null or _selected_trade_good_id.is_empty() or not game_state.has_method("sell_trade_good"):
-		status_label.text = "Commerce indisponible"
+		_set_trade_status("Commerce indisponible")
 		return
 
-	status_label.text = String(game_state.call("sell_trade_good", _selected_trade_good_id, 1))
+	_set_trade_status(String(game_state.call("sell_trade_good", _selected_trade_good_id, 1)))
 	_refresh_trade_rows()
+
+
+func _set_trade_status(message: String) -> void:
+	status_label.text = message
+	var hud: Node = get_tree().get_first_node_in_group("hud")
+	if hud != null and hud.has_method("show_temporary_context_message"):
+		hud.show_temporary_context_message(message, 1.8)
 
 
 func _get_trade_good_index(item_id: String) -> int:
