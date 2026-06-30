@@ -293,6 +293,18 @@ La refonte UI pirate ajoute une premiere direction visuelle dark fantasy : barre
 - La zone sure du port garde la priorite : elle coupe toujours l'engagement et force l'ennemi a s'eloigner.
 - Les boulets ennemis passent a 18.0 de vitesse pour rester coherents avec les nouvelles portees.
 
+## Etat v0.10
+
+- Premiere boucle de commerce simple au port avec une section `Commerce`.
+- La cargaison utilise la capacite `stockage` du navire actif.
+- Capacites : Barque 100, Chaloupe 130, Sloop 180, Goelette 260.
+- Marchandises : Rhum, Epices, Tissu, Minerai et Perles.
+- Poids : Rhum 10, Epices 5, Tissu 8, Minerai 15, Perles 3.
+- Prix achat/vente : Rhum 60/45, Epices 90/65, Tissu 45/30, Minerai 80/55, Perles 160/120.
+- Acheter consomme de l'or et de la place en cargaison ; vendre rend de l'or.
+- La Goelette devient le meilleur navire de commerce grace a sa grande capacite.
+- Le HUD affiche la cargaison utilisee et la capacite du navire actif.
+
 ## Lancement
 
 1. Installer Godot 4.x.

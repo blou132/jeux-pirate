@@ -9,75 +9,74 @@
 - Ennemi simple.
 - Loot et ressources simples.
 
-## v0.2 - Port, réparations et améliorations
+## v0.2 - Port, reparations et ameliorations
 
 - Ajouter un port de test.
 - Permettre au joueur de reparer le bateau contre du bois.
 - Ajouter une zone d'amarrage simple.
-- Ajouter trois améliorations : coque, voiles, canons.
+- Ajouter trois ameliorations : coque, voiles, canons.
 - Afficher la progression dans le HUD.
 
-## v0.3 - Respawn ennemis et difficulté progressive
+## v0.3 - Respawn ennemis et difficulte progressive
 
-- Faire réapparaître des ennemis après destruction.
-- Augmenter progressivement la difficulté.
+- Faire reapparaitre des ennemis apres destruction.
+- Augmenter progressivement la difficulte.
 - Ajouter des variantes d'ennemis.
-- Afficher danger et ennemis détruits dans le HUD.
+- Afficher danger et ennemis detruits dans le HUD.
 - Ajouter des zones de danger simples.
-- Correctif v0.3.2 : attaque ennemie, feedback de défaite joueur, variantes plus lisibles, nameplates, notifications de zone.
-- Correctif v0.3.3 : tirs ennemis visibles, feedback quand le joueur est touché, respawn avec `R` après destruction.
-- Correctif v0.3.4 : tirs ennemis limités aux bordées, tirs joueur désactivés après destruction, limites de carte et feedback de sortie.
-- Correctif v0.3.5 : direction des tirs ennemis corrigée, projectiles tirés depuis les côtés, manœuvre de flanc améliorée.
-- Correctif v0.3.6 : orientation ennemie avant tir améliorée, manœuvre de bordée ralentie, tir autorisé seulement avec un flanc bien aligné.
-- Correctif v0.3.7 : point de visée joueur, points de tir latéraux ennemis, alignement de bordée sur axes réels et debug visuel temporaire.
-- Correctif v0.3.8 : validation de tir par distance à la ligne de bordée, lignes debug de visée et réglage du positionnement ennemi.
-- Correctif v0.3.9 : rotation ennemie plus fluide avec inertie, valeurs de rotation par type, manœuvre de bordée moins rigide et verrouillage temporaire du côté de tir.
+- Correctif v0.3.2 : attaque ennemie, feedback de defaite joueur, variantes plus lisibles, nameplates, notifications de zone.
+- Correctif v0.3.3 : tirs ennemis visibles, feedback quand le joueur est touche, respawn avec `R` apres destruction.
+- Correctif v0.3.4 : tirs ennemis limites aux bordees, tirs joueur desactives apres destruction, limites de carte et feedback de sortie.
+- Correctif v0.3.5 : direction des tirs ennemis corrigee, projectiles tires depuis les cotes, manoeuvre de flanc amelioree.
+- Correctif v0.3.6 : orientation ennemie avant tir amelioree, manoeuvre de bordee ralentie, tir autorise seulement avec un flanc bien aligne.
+- Correctif v0.3.7 : point de visee joueur, points de tir lateraux ennemis, alignement de bordee sur axes reels et debug visuel temporaire.
+- Correctif v0.3.8 : validation de tir par distance a la ligne de bordee, lignes debug de visee et reglage du positionnement ennemi.
+- Correctif v0.3.9 : rotation ennemie plus fluide avec inertie, valeurs de rotation par type, manoeuvre de bordee moins rigide et verrouillage temporaire du cote de tir.
 
-## v0.4 - Îles explorables, coffres et trésors
+## v0.4 - Iles explorables, coffres et tresors
 
-- Ajouter trois îles explorables.
-- Ajouter une interaction avec `E` près du rivage.
+- Ajouter trois iles explorables.
+- Ajouter une interaction avec `E` pres du rivage.
 - Ajouter un menu simple de fouille.
-- Ajouter un coffre unique par île.
+- Ajouter un coffre unique par ile.
 - Ajouter fragments de carte et reliques anciennes.
 
 ## v0.5 - Missions simples
 
-- Ajouter un système de missions simple.
+- Ajouter un systeme de missions simple.
 - Ajouter une section `Missions` au port.
 - Ajouter des missions de combat, exploration, relique et retour au port.
 - Afficher les missions actives dans le HUD.
-- Ajouter des récompenses de missions récupérables au port.
-- Correctif v0.5.1 : plusieurs missions actives, objectifs de quête générés à l'acceptation, coffres de quête indépendants et nettoyage des objectifs terminés.
+- Ajouter des recompenses de missions recuperables au port.
+- Correctif v0.5.1 : plusieurs missions actives, objectifs de quete generes a l'acceptation, coffres de quete independants et nettoyage des objectifs termines.
 
-## v0.6 - Premier bateau allié
+## v0.6 - Premier bateau allie
 
-- Ajouter un Sloop allié de base.
+- Ajouter un Sloop allie de base.
 - Ajouter le recrutement au port contre ressources.
-- Lui faire suivre le joueur à distance lisible.
+- Lui faire suivre le joueur a distance lisible.
 - Ajouter un soutien de combat simple contre les ennemis proches.
-- Gérer sa destruction et permettre un nouveau recrutement.
-- Correctif v0.6.1 : coûts de port affichés, réparation dynamique joueur/allié, allié ciblable, vraie visée de bordée, dégâts garantis et kills alliés crédités au joueur.
+- Gerer sa destruction et permettre un nouveau recrutement.
+- Correctif v0.6.1 : couts de port affiches, reparation dynamique joueur/allie, allie ciblable, vraie visee de bordee, degats garantis et kills allies credites au joueur.
 
 ## v0.7 - Flotte basique avec ordres simples
 
-- Gérer jusqu'à 3 bateaux alliés.
+- Gerer jusqu'a 3 bateaux allies.
 - Ajouter un recrutement progressif au port.
 - Ajouter une formation simple de suivi.
-- Éviter les collisions les plus visibles entre alliés et joueur.
-- Ajouter des ordres simples : suivre, attaquer, protéger, fuir.
-- Afficher la flotte, l'ordre courant et les PV alliés dans le HUD.
-- Ajouter une réparation de flotte au port.
+- Eviter les collisions les plus visibles entre allies et joueur.
+- Ajouter des ordres simples : suivre, attaquer, proteger, fuir.
+- Afficher la flotte, l'ordre courant et les PV allies dans le HUD.
+- Ajouter une reparation de flotte au port.
 
-## v0.8 - Réputation et titres pirates
+## v0.8 - Reputation et titres pirates
 
-- Ajouter une réputation pirate simple.
-- Ajouter des rangs de réputation.
-- Débloquer des titres selon les actions du joueur.
-- Donner de la réputation via combat, missions, coffres, reliques et flotte.
-- Afficher réputation et titre dans le HUD.
+- Ajouter une reputation pirate simple.
+- Ajouter des rangs de reputation.
+- Debloquer des titres selon les actions du joueur.
+- Donner de la reputation via combat, missions, coffres, reliques et flotte.
+- Afficher reputation et titre dans le HUD.
 - Ajouter un panneau `Statut pirate` au port.
-
 - Correctif v0.8.1 : empecher le farm de reputation par rachat d'allies apres destruction.
 - Refonte UI pirate : theme sombre, barre de ressources haute, panneau navire/flotte, panneau reputation/titre, menu portuaire central et onglets bas.
 - Finition v0.8.2 : HUD compact en mer, HUD detaille avec `TAB`, sections plus lisibles et verification des entrees gameplay.
@@ -86,7 +85,7 @@
 - Ajustement HUD compact : retour a un panneau vertical gauche, barre de ressources conservee en haut et notifications de zone separees.
 - Correctifs v0.8.5 : detection ennemie 40/48/55, leash 65/75/85, zone portuaire 45/60/3s, densite de rencontres restauree et noms Renom/Titres clarifies.
 
-## v0.9 - Hiérarchie des navires
+## v0.9 - Hierarchie des navires
 
 - Ajouter `ShipCatalog` comme catalogue central des navires joueur.
 - Ajouter Barque, Chaloupe, Sloop et Goelette comme navires jouables.
@@ -98,34 +97,48 @@
 - Correctif v0.9.1 : restaurer le ciblage ennemi apres changement de navire, limiter la zone sure au port et separer leash de poursuite et cooldown portuaire.
 - Correctif v0.9.2 : augmenter detection, leash, portee d'engagement, bonus de vitesse en poursuite et vitesse des boulets ennemis contre les navires rapides.
 
-## v0.10 - Equilibrage navires, stockage et commerce
+## v0.10 - Cargaison et commerce
 
-- Equilibrer plus finement les couts, vitesses, PV et degats des navires.
-- Donner un vrai role au stockage.
-- Preparer une premiere boucle de commerce simple.
-- Relier les routes commerciales aux zones de danger.
+- Ajouter une cargaison limitee par le stockage du navire actif.
+- Ajouter les marchandises Rhum, Epices, Tissu, Minerai et Perles.
+- Ajouter poids, prix d'achat et prix de vente par marchandise.
+- Ajouter une section `Commerce` au port avec achat et vente.
+- Afficher la cargaison dans le HUD.
+- Donner un premier role clair a la Goelette comme navire marchand.
 
-## v1.0 - Démo jouable complète
-
-- Boucle complète : partir du port, naviguer, combattre, looter, réparer, améliorer, recruter et accomplir des missions.
-- Zone de jeu limitée mais cohérente.
-- Interface propre pour ressources, PV, missions, flotte et ordres.
-- Build exportable pour test externe.
-
-## v1.1 - Hiérarchie des ports et commerce
+## v0.11 - Ports avances
 
 - Ajouter plus d'options de port.
-- Préparer un commerce simple entre ressources.
-- Donner plus de rôle aux ports dans la progression.
+- Differencier progressivement les services et prix selon les ports.
+- Preparer des routes commerciales entre ports.
 
-## v1.2 - Hiérarchie des trésors avancée
+## v0.12 - Tresors et exploration
 
-- Différencier les types de trésors.
-- Relier les reliques et fragments à des récompenses plus rares.
-- Préparer des collections ou découvertes majeures.
+- Differencier les types de tresors.
+- Relier les reliques et fragments a des recompenses plus rares.
+- Preparer des collections ou decouvertes majeures.
 
-## v1.3 - Zones de danger avancées
+## v0.13 - Zones de danger
 
-- Rendre les zones de danger plus évolutives.
-- Relier danger, réputation et types d'ennemis.
-- Préparer des routes maritimes plus risquées.
+- Rendre les zones de danger plus evolutives.
+- Relier danger, reputation et types d'ennemis.
+- Preparer des routes maritimes plus risquees.
+
+## v0.14 - Creatures marines
+
+- Ajouter les premieres menaces non humaines.
+- Tester des comportements simples distincts des navires.
+- Garder les combats lisibles avec les regles de navigation existantes.
+
+## v0.15 - Controle de territoire
+
+- Preparer des zones controlables ou contestables.
+- Relier territoire, ports et reputation.
+- Garder une version simple avant toute strategie avancee.
+
+## v1.0 - Polish global
+
+- Boucle complete : partir du port, naviguer, combattre, looter, reparer, ameliorer, recruter, commercer et accomplir des missions.
+- Zone de jeu limitee mais coherente.
+- Interface propre pour ressources, PV, missions, flotte, commerce et ordres.
+- Build exportable pour test externe.

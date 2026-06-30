@@ -97,6 +97,15 @@ Le joueur incarne le capitaine d'un petit navire independant qui construit progr
 6. Le bateau joueur applique les stats du navire actif.
 7. Les ameliorations restent des bonus au-dessus du navire de base.
 
+## Boucle de jeu v0.10
+
+1. Le joueur gagne de l'or par combat, missions ou exploration.
+2. Il revient au port et ouvre la section `Commerce`.
+3. Il achete une marchandise si son or et sa cargaison le permettent.
+4. La cargaison consomme l'espace de stockage du navire actif.
+5. Il peut revendre les marchandises au port contre de l'or.
+6. Les navires avec plus de stockage, surtout la Goelette, deviennent plus utiles pour le commerce.
+
 ## Port et progression
 
 Le port sert de premier point sûr et de première interface de progression. Il établit le rythme attendu : partir en mer, obtenir des ressources, revenir au port, réparer, améliorer le bateau, accepter des missions et recruter un premier soutien allié.
@@ -305,6 +314,19 @@ Les navires joueur de v0.9 peuvent devenir nettement plus rapides avec les voile
 - Bonus de vitesse seulement en poursuite/combat : x1.10, x1.15 et x1.20.
 - La zone sure portuaire reste prioritaire sur la poursuite et coupe l'engagement quand le joueur revient au port.
 - La vitesse des boulets ennemis est augmentee a 18.0 pour couvrir les nouvelles portees tout en restant esquivable par manoeuvre.
+
+## Cargaison et commerce v0.10
+
+La v0.10 donne un premier role concret au stockage sans lancer encore les ports avances ni les routes commerciales dynamiques.
+
+- La cargaison est suivie par `GameState` en session.
+- La capacite vient de la stat `storage` du navire actif : Barque 100, Chaloupe 130, Sloop 180, Goelette 260.
+- Chaque marchandise a un poids unitaire : Rhum 10, Epices 5, Tissu 8, Minerai 15, Perles 3.
+- Le port affiche une section `Commerce` avec quantite possedee, poids, prix d'achat et prix de vente.
+- Acheter consomme de l'or et de l'espace libre ; vendre retire la marchandise et donne de l'or.
+- Prix achat/vente : Rhum 60/45, Epices 90/65, Tissu 45/30, Minerai 80/55, Perles 160/120.
+- Si la cargaison est pleine ou l'or insuffisant, le joueur recoit un feedback simple.
+- La Goelette est volontairement la meilleure option commerciale de v0.10 grace a son stockage de 260.
 
 ## Réputation et titres v0.8
 
