@@ -124,7 +124,8 @@
 
 - Ajouter une camera joueur dediee.
 - Ajouter le zoom a la molette.
-- Ajouter un decalage manuel limite autour du joueur.
+- Ajouter `V` pour verrouiller / deverrouiller la camera libre.
+- Deplacer la vue avec la souris seulement quand la camera libre est deverrouillee.
 - Ajouter `C` pour recentrer la camera.
 - Clamper la camera aux limites de carte.
 - Desactiver les controles camera quand les menus sont ouverts.

@@ -329,7 +329,8 @@ La v0.12 ajoute une camera joueur mobile pour rendre la navigation, l'exploratio
 - Camera joueur dediee dans `scripts/camera/PlayerCamera.gd`.
 - Suivi fluide du bateau joueur, sans camera rigide directement collee au parent.
 - Zoom molette borne entre une vue proche et une vue large.
-- Clic droit maintenu + mouvement souris pour observer autour du bateau avec offset limite.
+- `V` verrouille ou deverrouille la camera libre.
+- Souris pour observer autour du bateau avec offset limite quand la camera libre est deverrouillee.
 - `C` recentre la camera sur le joueur sans changer le zoom.
 - La camera respecte les limites de carte exposees par `WorldBounds`.
 - Les controles camera sont ignores quand le port ou le menu d'exploration est ouvert, pour laisser le scroll et les clics UI fonctionner.
@@ -352,7 +353,8 @@ Godot n'est pas inclus dans ce depot.
 - Clic gauche : canon gauche
 - Clic droit : canon droit
 - Molette souris : zoom camera
-- Clic droit maintenu + deplacement souris : observer autour du bateau
+- `V` : verrouiller / deverrouiller camera libre
+- Souris : observer autour du bateau quand la camera libre est deverrouillee
 - `C` : recentrer la camera sur le bateau
 - `E` : interagir avec le port ou explorer une île selon la zone
 - `Échap` : fermer le menu

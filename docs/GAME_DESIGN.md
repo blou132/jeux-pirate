@@ -110,10 +110,12 @@ Le joueur incarne le capitaine d'un petit navire independant qui construit progr
 
 1. Le joueur navigue avec une camera qui suit le bateau avec inertie.
 2. Il ajuste le zoom a la molette selon le besoin : combat rapproche ou exploration plus large.
-3. Il maintient le clic droit et deplace la souris pour observer autour du bateau sans perdre le joueur.
-4. Il appuie sur `C` pour recentrer la camera sur le navire.
-5. Les limites de carte empechent la camera de partir trop loin hors de la zone jouable.
-6. Les menus de port et d'exploration gardent la priorite sur les entrees souris et clavier.
+3. Il appuie sur `V` pour deverrouiller la camera libre.
+4. Il deplace la souris pour observer autour du bateau sans maintenir de bouton.
+5. Il appuie de nouveau sur `V` pour verrouiller la camera sur un suivi normal.
+6. Il appuie sur `C` pour recentrer la camera sur le navire.
+7. Les limites de carte empechent la camera de partir trop loin hors de la zone jouable.
+8. Les menus de port et d'exploration gardent la priorite sur les entrees souris et clavier.
 
 ## Port et progression
 
@@ -384,8 +386,10 @@ La camera doit ameliorer le confort d'exploration sans devenir un outil de trich
 
 - Le script `PlayerCamera.gd` suit le bateau avec un lissage de position et de rotation.
 - La molette ajuste un zoom borne pour passer d'une lecture proche du bateau a une vue plus large des environs.
-- Le clic droit maintenu permet un decalage manuel limite autour du joueur.
-- `C` annule le decalage manuel et recentre progressivement la camera sur le navire.
+- `V` verrouille ou deverrouille la camera libre.
+- Quand la camera libre est deverrouillee, le mouvement souris applique un decalage manuel limite autour du joueur.
+- Le clic droit reste reserve au combat et au canon tribord.
+- `C` annule le decalage manuel et recentre progressivement la camera sur le navire sans changer l'etat verrouille/deverrouille.
 - La position camera est clampée avec les limites de `WorldBounds`.
 - Si le port ou le menu d'exploration est ouvert, la camera ignore ses controles pour laisser les boutons et le scroll fonctionner.
 
