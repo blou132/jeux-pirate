@@ -114,8 +114,9 @@ Le joueur incarne le capitaine d'un petit navire independant qui construit progr
 4. Il deplace la souris pour observer autour du bateau sans maintenir de bouton.
 5. Il appuie de nouveau sur `V` pour verrouiller la camera sur un suivi normal.
 6. Il appuie sur `C` pour recentrer la camera sur le navire.
-7. Les limites de carte empechent la camera de partir trop loin hors de la zone jouable.
-8. Les menus de port et d'exploration gardent la priorite sur les entrees souris et clavier.
+7. Le bateau peut effectuer un 360 degres sans faire tourner l'ecran ni deriver le cadrage.
+8. Les limites de carte empechent la camera de partir trop loin hors de la zone jouable.
+9. Les menus de port et d'exploration gardent la priorite sur les entrees souris et clavier.
 
 ## Port et progression
 
@@ -385,9 +386,11 @@ Le catalogue contient maintenant plusieurs ports simules par zone de danger en p
 La camera doit ameliorer le confort d'exploration sans devenir un outil de triche ni masquer l'UI :
 
 - Le script `PlayerCamera.gd` suit le bateau avec un lissage de position et de rotation.
+- La rotation camera reste fixe en monde et ne reprend pas le yaw du bateau.
 - La molette ajuste un zoom borne pour passer d'une lecture proche du bateau a une vue plus large des environs.
 - `V` verrouille ou deverrouille la camera libre.
-- Quand la camera libre est deverrouillee, le mouvement souris applique un decalage manuel limite autour du joueur.
+- Quand la camera libre est deverrouillee, la position de souris par rapport au centre de l'ecran donne un decalage manuel limite autour du joueur.
+- L'offset de camera est applique en coordonnees monde stables, pas dans le repere tournant du bateau.
 - Le clic droit reste reserve au combat et au canon tribord.
 - `C` annule le decalage manuel et recentre progressivement la camera sur le navire sans changer l'etat verrouille/deverrouille.
 - La position camera est clampée avec les limites de `WorldBounds`.

@@ -123,6 +123,7 @@
 ## v0.12 - Camera mobile
 
 - Ajouter une camera joueur dediee.
+- Stabiliser la camera pendant les rotations completes du bateau.
 - Ajouter le zoom a la molette.
 - Ajouter `V` pour verrouiller / deverrouiller la camera libre.
 - Deplacer la vue avec la souris seulement quand la camera libre est deverrouillee.
