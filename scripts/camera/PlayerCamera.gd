@@ -108,7 +108,7 @@ func _find_world_bounds() -> Node:
 
 
 func _get_desired_position() -> Vector3:
-	var desired_position: Vector3 = _target.global_transform * ((_base_local_offset * _current_zoom_factor) + _current_look_offset)
+	var desired_position: Vector3 = _target.global_position + (_base_local_offset * _current_zoom_factor) + _current_look_offset
 	return _clamp_to_world_bounds(desired_position)
 
 
