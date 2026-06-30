@@ -5,6 +5,7 @@ signal treasure_resources_changed(map_fragments: int, ancient_relics: int)
 signal danger_changed(danger_level: int, enemies_defeated: int)
 signal player_ship_changed(ship_id: String, ship_name: String)
 signal owned_player_ships_changed(owned_ship_ids: Array[String])
+signal cargo_changed(cargo_items: Dictionary, used: int, capacity: int)
 
 const ENEMIES_PER_DANGER_LEVEL := 3
 const STARTING_PLAYER_SHIP_ID := "barque"
@@ -18,10 +19,12 @@ var ancient_relics: int = 0
 var opened_island_chests: Dictionary = {}
 var active_player_ship_id: String = STARTING_PLAYER_SHIP_ID
 var owned_player_ship_ids: Array[String] = [STARTING_PLAYER_SHIP_ID]
+var cargo_items: Dictionary = {}
 
 
 func _ready() -> void:
 	_ensure_valid_player_ship_state()
+	_emit_cargo_changed()
 
 
 func add_resources(gold_amount: int, wood_amount: int) -> void:
@@ -164,8 +167,74 @@ func get_active_player_ship_data() -> Dictionary:
 
 
 func get_player_storage_capacity() -> int:
-	var ship := get_active_player_ship_data()
+	var ship: Dictionary = get_active_player_ship_data()
 	return int(ship.get("storage", 0))
+
+
+func get_cargo_capacity() -> int:
+	return get_player_storage_capacity()
+
+
+func get_cargo_used() -> int:
+	var used: int = 0
+	for item_id in cargo_items.keys():
+		var item_key: String = String(item_id)
+		if not CargoCatalog.has_good(item_key):
+			continue
+
+		var quantity: int = maxi(0, int(cargo_items.get(item_key, 0)))
+		used += CargoCatalog.get_good_weight(item_key) * quantity
+
+	return used
+
+
+func get_cargo_free() -> int:
+	return maxi(0, get_cargo_capacity() - get_cargo_used())
+
+
+func get_cargo_quantity(item_id: String) -> int:
+	return maxi(0, int(cargo_items.get(item_id, 0)))
+
+
+func can_add_cargo(item_id: String, amount: int) -> bool:
+	if amount <= 0:
+		return false
+	if not CargoCatalog.has_good(item_id):
+		return false
+
+	var added_weight: int = CargoCatalog.get_good_weight(item_id) * amount
+	return added_weight <= get_cargo_free()
+
+
+func add_cargo(item_id: String, amount: int) -> bool:
+	if not can_add_cargo(item_id, amount):
+		return false
+
+	cargo_items[item_id] = get_cargo_quantity(item_id) + amount
+	_emit_cargo_changed()
+	return true
+
+
+func remove_cargo(item_id: String, amount: int) -> bool:
+	if amount <= 0:
+		return false
+	if not CargoCatalog.has_good(item_id):
+		return false
+	if get_cargo_quantity(item_id) < amount:
+		return false
+
+	var new_quantity: int = get_cargo_quantity(item_id) - amount
+	if new_quantity <= 0:
+		cargo_items.erase(item_id)
+	else:
+		cargo_items[item_id] = new_quantity
+
+	_emit_cargo_changed()
+	return true
+
+
+func get_cargo_items() -> Dictionary:
+	return cargo_items.duplicate(true)
 
 
 func get_owned_player_ship_ids() -> Array[String]:
@@ -211,6 +280,7 @@ func equip_player_ship(ship_id: String) -> String:
 
 	active_player_ship_id = ship_id
 	player_ship_changed.emit(active_player_ship_id, get_active_player_ship_name())
+	_emit_cargo_changed()
 	return "%s équipé" % get_active_player_ship_name()
 
 
@@ -225,3 +295,7 @@ func _ensure_valid_player_ship_state() -> void:
 		owned_player_ship_ids.insert(0, STARTING_PLAYER_SHIP_ID)
 	if not owned_player_ship_ids.has(active_player_ship_id):
 		owned_player_ship_ids.append(active_player_ship_id)
+
+
+func _emit_cargo_changed() -> void:
+	cargo_changed.emit(get_cargo_items(), get_cargo_used(), get_cargo_capacity())
