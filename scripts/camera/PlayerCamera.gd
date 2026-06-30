@@ -57,6 +57,10 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if _are_camera_controls_blocked():
+		_is_looking_around = false
+		return
+
 	if event is InputEventKey:
 		var key_event: InputEventKey = event as InputEventKey
 		if key_event.pressed and not key_event.echo and key_event.keycode == KEY_C:
@@ -153,6 +157,23 @@ func _get_camera_limit() -> Vector2:
 			return raw_limit
 
 	return fallback_world_limit
+
+
+func _are_camera_controls_blocked() -> bool:
+	if get_tree().paused:
+		return true
+
+	var current_scene: Node = get_tree().current_scene
+	if current_scene == null:
+		return false
+
+	var menu_names: Array[String] = ["PortMenu", "IslandExplorationMenu"]
+	for menu_name in menu_names:
+		var menu: Node = current_scene.get_node_or_null(menu_name)
+		if menu != null and menu.has_method("is_open") and bool(menu.call("is_open")):
+			return true
+
+	return false
 
 
 func _get_desired_rotation() -> Vector3:
