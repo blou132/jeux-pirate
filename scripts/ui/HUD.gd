@@ -9,6 +9,7 @@ extends CanvasLayer
 @onready var ancient_relics_label: Label = $HUDRoot/TopResourceBar/ResourceRow/AncientRelicsLabel
 @onready var compact_panel: Control = $HUDRoot/CompactSailingPanel
 @onready var compact_ship_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactShipLabel
+@onready var compact_cargo_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactCargoLabel
 @onready var compact_speed_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactSpeedLabel
 @onready var compact_danger_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactDangerLabel
 @onready var compact_fleet_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactFleetLabel
@@ -17,6 +18,7 @@ extends CanvasLayer
 @onready var compact_reputation_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactReputationLabel
 @onready var left_status_panel: Control = $HUDRoot/LeftStatusPanel
 @onready var ship_name_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/ShipNameLabel
+@onready var cargo_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/CargoLabel
 @onready var hull_level_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/HullLevelLabel
 @onready var sails_level_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/SailsLevelLabel
 @onready var cannons_level_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/CannonsLevelLabel
@@ -356,7 +358,12 @@ func _connect_game_state() -> void:
 	if _game_state.has_signal("player_ship_changed") and not _game_state.is_connected("player_ship_changed", player_ship_callback):
 		_game_state.connect("player_ship_changed", player_ship_callback)
 
+	var cargo_callback := Callable(self, "_on_cargo_changed")
+	if _game_state.has_signal("cargo_changed") and not _game_state.is_connected("cargo_changed", cargo_callback):
+		_game_state.connect("cargo_changed", cargo_callback)
+
 	_refresh_player_ship_label()
+	_refresh_cargo_from_game_state()
 
 
 func _on_resources_changed(gold: int, wood: int) -> void:
@@ -378,6 +385,7 @@ func _on_danger_changed(danger_level: int, enemies_defeated: int) -> void:
 func _on_player_ship_changed(_ship_id: String, _ship_name: String) -> void:
 	_refresh_player_ship_label()
 	_refresh_upgrade_levels_from_system()
+	_refresh_cargo_from_game_state()
 
 
 func _refresh_player_ship_label() -> void:
@@ -387,6 +395,27 @@ func _refresh_player_ship_label() -> void:
 
 	ship_name_label.text = "Navire : %s" % ship_name
 	compact_ship_label.text = "Navire: %s" % ship_name
+
+
+func _refresh_cargo_from_game_state() -> void:
+	if _game_state == null:
+		_on_cargo_changed({}, 0, 0)
+		return
+	if not _game_state.has_method("get_cargo_used") or not _game_state.has_method("get_cargo_capacity"):
+		_on_cargo_changed({}, 0, 0)
+		return
+
+	_on_cargo_changed(
+		{},
+		int(_game_state.call("get_cargo_used")),
+		int(_game_state.call("get_cargo_capacity"))
+	)
+
+
+func _on_cargo_changed(_cargo_items: Dictionary, used: int, capacity: int) -> void:
+	var free_space: int = maxi(0, capacity - used)
+	cargo_label.text = "Cargaison: %d/%d - libre %d" % [used, capacity, free_space]
+	compact_cargo_label.text = "Cargo: %d/%d" % [used, capacity]
 
 
 func _connect_reputation_system() -> void:

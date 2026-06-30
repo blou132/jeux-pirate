@@ -69,6 +69,10 @@ mouse_filter = 2
 layout_mode = 2
 text = "Navire: Barque"
 
+[node name="CompactCargoLabel" type="Label" parent="HUDRoot/CompactSailingPanel/CompactRow"]
+layout_mode = 2
+text = "Cargo: 0/100"
+
 [node name="CompactSpeedLabel" type="Label" parent="HUDRoot/CompactSailingPanel/CompactRow"]
 layout_mode = 2
 text = "Vitesse: 0.0 nd"
@@ -126,6 +130,10 @@ text = "Vitesse: 0.0 nd"
 [node name="ShipHealthLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
 text = "Coque: 100/100 PV"
+
+[node name="CargoLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
+layout_mode = 2
+text = "Cargaison: 0/100"
 
 [node name="UpgradeDivider" type="HSeparator" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
