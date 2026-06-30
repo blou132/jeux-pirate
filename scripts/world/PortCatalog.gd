@@ -9,16 +9,16 @@ const SERVICE_TRADE := "trade"
 const SERVICE_MISSIONS := "missions"
 const SERVICE_STATUS := "status"
 
-const PORT_QUAI := "quai"
+const PORT_QUAI := "starter_quay"
 const PORT_PETIT_PORT := "petit_port"
-const PORT_PORT_MARCHAND := "port_marchand"
-const PORT_GRAND_PORT := "grand_port"
-const PORT_ARSENAL_NAVAL := "arsenal_naval"
+const PORT_PORT_MARCHAND := "merchant_port"
+const PORT_GRAND_PORT := "great_port"
+const PORT_ARSENAL_NAVAL := "naval_arsenal"
 const PORT_CAPITALE_MARITIME := "capitale_maritime"
 const PORT_LEGENDAIRE := "port_legendaire"
 const PORT_SANCTUAIRE_PIRATE := "sanctuaire_pirate"
 
-const STARTING_PORT_ID := PORT_PETIT_PORT
+const STARTING_PORT_ID := PORT_QUAI
 
 const PORT_IDS: Array[String] = [
 	PORT_QUAI,
@@ -42,8 +42,8 @@ const DANGER_ZONES: Array[String] = [
 ]
 
 const PORTS := {
-	"quai": {
-		"id": "quai",
+	"starter_quay": {
+		"id": "starter_quay",
 		"name": "Quai du Pavillon",
 		"level": 1,
 		"category": "Quai",
@@ -70,8 +70,8 @@ const PORTS := {
 		"goods": ["rum", "cloth", "spices"],
 		"missions": ["pirate_hunt", "first_map_fragment", "ancient_relic", "return_to_port"],
 	},
-	"port_marchand": {
-		"id": "port_marchand",
+	"merchant_port": {
+		"id": "merchant_port",
 		"name": "Port marchand des Alizes",
 		"level": 3,
 		"category": "Port marchand",
@@ -84,8 +84,8 @@ const PORTS := {
 		"goods": ["rum", "spices", "cloth", "ore"],
 		"missions": ["pirate_hunt", "first_map_fragment", "ancient_relic", "return_to_port"],
 	},
-	"grand_port": {
-		"id": "grand_port",
+	"great_port": {
+		"id": "great_port",
 		"name": "Grand port de Briselame",
 		"level": 4,
 		"category": "Grand port",
@@ -98,8 +98,8 @@ const PORTS := {
 		"goods": ["rum", "spices", "cloth", "ore", "pearls"],
 		"missions": ["pirate_hunt", "first_map_fragment", "ancient_relic", "return_to_port"],
 	},
-	"arsenal_naval": {
-		"id": "arsenal_naval",
+	"naval_arsenal": {
+		"id": "naval_arsenal",
 		"name": "Arsenal naval de Ferhoule",
 		"level": 5,
 		"category": "Arsenal naval",

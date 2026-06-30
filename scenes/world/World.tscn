@@ -208,9 +208,56 @@ rotation_degrees = Vector3(0, 80, 0)
 script = ExtResource("9_enemy_spawn_point")
 danger_zone = "hostile"
 
-[node name="Port" parent="." instance=ExtResource("6_port")]
+[node name="StarterQuay" parent="." instance=ExtResource("6_port")]
 position = Vector3(-9, 0, 8)
 rotation_degrees = Vector3(0, 25, 0)
+port_id = "starter_quay"
+prompt_message = "Appuie sur E pour ouvrir : Quai du Pavillon"
+
+[node name="PortLabel" type="Label3D" parent="StarterQuay"]
+position = Vector3(0, 4.0, 0)
+text = "Quai - Eaux sures"
+font_size = 32
+billboard = 1
+
+[node name="MerchantPort" parent="." instance=ExtResource("6_port")]
+position = Vector3(58, 0, -34)
+rotation_degrees = Vector3(0, -45, 0)
+scale = Vector3(1.05, 1.05, 1.05)
+port_id = "merchant_port"
+prompt_message = "Appuie sur E pour ouvrir : Port marchand"
+
+[node name="PortLabel" type="Label3D" parent="MerchantPort"]
+position = Vector3(0, 4.2, 0)
+text = "Port marchand - Zone surveillee"
+font_size = 32
+billboard = 1
+
+[node name="GreatPort" parent="." instance=ExtResource("6_port")]
+position = Vector3(-38, 0, 56)
+rotation_degrees = Vector3(0, 140, 0)
+scale = Vector3(1.18, 1.18, 1.18)
+port_id = "great_port"
+prompt_message = "Appuie sur E pour ouvrir : Grand port"
+
+[node name="PortLabel" type="Label3D" parent="GreatPort"]
+position = Vector3(0, 4.5, 0)
+text = "Grand port - Zone contestee"
+font_size = 32
+billboard = 1
+
+[node name="NavalArsenal" parent="." instance=ExtResource("6_port")]
+position = Vector3(-78, 0, 54)
+rotation_degrees = Vector3(0, 110, 0)
+scale = Vector3(1.28, 1.28, 1.28)
+port_id = "naval_arsenal"
+prompt_message = "Appuie sur E pour ouvrir : Arsenal naval"
+
+[node name="PortLabel" type="Label3D" parent="NavalArsenal"]
+position = Vector3(0, 4.8, 0)
+text = "Arsenal naval - Zone hostile"
+font_size = 32
+billboard = 1
 
 [node name="Islands" type="Node3D" parent="."]
 
