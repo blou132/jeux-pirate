@@ -34,11 +34,11 @@ grow_vertical = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="Root/CenterContainer"]
 layout_mode = 2
-custom_minimum_size = Vector2(720, 0)
+custom_minimum_size = Vector2(760, 0)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
 
 [node name="TitleLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
 layout_mode = 2
@@ -63,229 +63,240 @@ text = ""
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="HarborActionsLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+[node name="ScrollContainer" type="ScrollContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 430)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ContentContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="HarborActionsLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
 layout_mode = 2
 text = "Services du port"
 horizontal_alignment = 1
 
-[node name="PortsButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+[node name="PortsButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 text = "Ports disponibles"
 
-[node name="PortsContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+[node name="PortsContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="PortsIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/PortsContainer"]
+[node name="PortsIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/PortsContainer"]
 layout_mode = 2
 text = "Ports simules v0.11"
 horizontal_alignment = 1
 
-[node name="PortList" type="ItemList" parent="Root/CenterContainer/PanelContainer/VBoxContainer/PortsContainer"]
-custom_minimum_size = Vector2(0, 96)
+[node name="PortList" type="ItemList" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/PortsContainer"]
+custom_minimum_size = Vector2(0, 84)
 layout_mode = 2
 
-[node name="PortServicesLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/PortsContainer"]
+[node name="PortServicesLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/PortsContainer"]
 layout_mode = 2
 text = "Selectionne un port"
 autowrap_mode = 3
 
-[node name="RepairButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+[node name="RepairButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 text = "Réparer le bateau"
 
-[node name="RepairAllyButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+[node name="RepairAllyButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 text = "Aucun allié à réparer"
 
-[node name="UpgradesButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+[node name="UpgradesButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 text = "Améliorations"
 
-[node name="UpgradesContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+[node name="UpgradesContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="UpgradesIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
+[node name="UpgradesIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/UpgradesContainer"]
 layout_mode = 2
 text = "Atelier du charpentier"
 horizontal_alignment = 1
 
-[node name="UpgradesShipLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
+[node name="UpgradesShipLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/UpgradesContainer"]
 layout_mode = 2
 text = "Navire : Barque — améliorations max 3/3/3"
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="HullStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
+[node name="HullStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/UpgradesContainer"]
 layout_mode = 2
 text = "Coque renforcée: niveau 0/3"
 autowrap_mode = 3
 
-[node name="HullUpgradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
+[node name="HullUpgradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/UpgradesContainer"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 text = "Améliorer la coque"
 
-[node name="SailsStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
+[node name="SailsStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/UpgradesContainer"]
 layout_mode = 2
 text = "Voiles rapides: niveau 0/3"
 autowrap_mode = 3
 
-[node name="SailsUpgradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
+[node name="SailsUpgradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/UpgradesContainer"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 text = "Améliorer les voiles"
 
-[node name="CannonsStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
+[node name="CannonsStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/UpgradesContainer"]
 layout_mode = 2
 text = "Canons améliorés: niveau 0/3"
 autowrap_mode = 3
 
-[node name="CannonsUpgradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer"]
+[node name="CannonsUpgradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/UpgradesContainer"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 text = "Améliorer les canons"
 
-[node name="ShipyardButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+[node name="ShipyardButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 text = "Chantier naval"
 
-[node name="ShipyardContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+[node name="ShipyardContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="ShipyardIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer"]
+[node name="ShipyardIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/ShipyardContainer"]
 layout_mode = 2
 text = "Navires jouables v0.9"
 horizontal_alignment = 1
 
-[node name="CurrentShipLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer"]
+[node name="CurrentShipLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/ShipyardContainer"]
 layout_mode = 2
 text = "Navire actuel : Barque"
 horizontal_alignment = 1
 
-[node name="ShipList" type="ItemList" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer"]
-custom_minimum_size = Vector2(0, 130)
+[node name="ShipList" type="ItemList" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/ShipyardContainer"]
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
 
-[node name="ShipDetailsLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer"]
+[node name="ShipDetailsLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/ShipyardContainer"]
 layout_mode = 2
 text = "Sélectionne un navire"
 autowrap_mode = 3
 
-[node name="ShipHierarchyLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer"]
-layout_mode = 2
-text = "Hiérarchie : Radeau à venir, Barque, Chaloupe, Sloop, Goélette"
-autowrap_mode = 3
-
-[node name="BuyShipButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer"]
+[node name="BuyShipButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/ShipyardContainer"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 text = "Acheter"
 
-[node name="EquipShipButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer"]
+[node name="EquipShipButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/ShipyardContainer"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 text = "Équiper"
 
-[node name="TradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+[node name="ShipHierarchyLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/ShipyardContainer"]
+layout_mode = 2
+text = "Hiérarchie : Radeau à venir, Barque, Chaloupe, Sloop, Goélette"
+autowrap_mode = 3
+
+[node name="TradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 text = "Commerce"
 
-[node name="TradeContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+[node name="TradeContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="TradeIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer"]
+[node name="TradeIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/TradeContainer"]
 layout_mode = 2
 text = "Marchandises du port"
 horizontal_alignment = 1
 
-[node name="CargoStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer"]
+[node name="CargoStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/TradeContainer"]
 layout_mode = 2
 text = "Cargaison : 0/100"
 horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="TradeList" type="ItemList" parent="Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer"]
-custom_minimum_size = Vector2(0, 140)
+[node name="TradeList" type="ItemList" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/TradeContainer"]
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
 
-[node name="TradeDetailsLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer"]
+[node name="TradeDetailsLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/TradeContainer"]
 layout_mode = 2
 text = "Selectionne une marchandise"
 autowrap_mode = 3
 
-[node name="BuyTradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer"]
+[node name="BuyTradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/TradeContainer"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 text = "Acheter"
 
-[node name="SellTradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer"]
+[node name="SellTradeButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/TradeContainer"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 text = "Vendre"
 
-[node name="MissionsButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+[node name="MissionsButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 text = "Missions"
 
-[node name="MissionsContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+[node name="MissionsContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="MissionsIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer"]
+[node name="MissionsIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/MissionsContainer"]
 layout_mode = 2
 text = "Missions disponibles"
 horizontal_alignment = 1
 
-[node name="MissionList" type="ItemList" parent="Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer"]
-custom_minimum_size = Vector2(0, 160)
+[node name="MissionList" type="ItemList" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/MissionsContainer"]
+custom_minimum_size = Vector2(0, 110)
 layout_mode = 2
 
-[node name="MissionStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer"]
+[node name="MissionStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/MissionsContainer"]
 layout_mode = 2
 text = "Aucune mission sélectionnée"
 autowrap_mode = 3
 
-[node name="AcceptMissionButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer"]
+[node name="AcceptMissionButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/MissionsContainer"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 text = "Accepter"
 
-[node name="ClaimMissionRewardButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer"]
+[node name="ClaimMissionRewardButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/MissionsContainer"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 text = "Récupérer la récompense"
 
-[node name="PirateStatusButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+[node name="PirateStatusButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 text = "Statut pirate"
 
-[node name="PirateStatusContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+[node name="PirateStatusContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="PirateStatusIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/PirateStatusContainer"]
+[node name="PirateStatusIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/PirateStatusContainer"]
 layout_mode = 2
 text = "Renom du capitaine"
 horizontal_alignment = 1
 
-[node name="PirateStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/PirateStatusContainer"]
+[node name="PirateStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/PirateStatusContainer"]
 layout_mode = 2
 text = "Titre : Loup de mer\nRéputation : Inconnu\nPoints : 0\nProchain rang : Recherché\nProgression : 0 / 100"
 autowrap_mode = 3
 
-[node name="RecruitAllyButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+[node name="RecruitAllyButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
 text = "Recruter un allié"

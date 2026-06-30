@@ -10,47 +10,48 @@ const REPAIR_HEALTH_PER_WOOD := 5
 @onready var subtitle_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/SubtitleLabel
 @onready var port_info_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/PortInfoLabel
 @onready var status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/StatusLabel
-@onready var ports_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/PortsButton
-@onready var ports_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/PortsContainer
-@onready var port_list: ItemList = $Root/CenterContainer/PanelContainer/VBoxContainer/PortsContainer/PortList
-@onready var port_services_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/PortsContainer/PortServicesLabel
-@onready var repair_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/RepairButton
-@onready var repair_ally_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/RepairAllyButton
-@onready var upgrades_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesButton
-@onready var upgrades_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer
-@onready var upgrades_ship_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/UpgradesShipLabel
-@onready var hull_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/HullStatusLabel
-@onready var sails_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/SailsStatusLabel
-@onready var cannons_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/CannonsStatusLabel
-@onready var hull_upgrade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/HullUpgradeButton
-@onready var sails_upgrade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/SailsUpgradeButton
-@onready var cannons_upgrade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/UpgradesContainer/CannonsUpgradeButton
-@onready var shipyard_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardButton
-@onready var shipyard_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer
-@onready var current_ship_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer/CurrentShipLabel
-@onready var ship_list: ItemList = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer/ShipList
-@onready var ship_details_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer/ShipDetailsLabel
-@onready var ship_hierarchy_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer/ShipHierarchyLabel
-@onready var buy_ship_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer/BuyShipButton
-@onready var equip_ship_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ShipyardContainer/EquipShipButton
-@onready var trade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/TradeButton
-@onready var trade_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer
-@onready var cargo_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer/CargoStatusLabel
-@onready var trade_list: ItemList = $Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer/TradeList
-@onready var trade_details_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer/TradeDetailsLabel
-@onready var buy_trade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer/BuyTradeButton
-@onready var sell_trade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/TradeContainer/SellTradeButton
-@onready var missions_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsButton
-@onready var missions_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer
-@onready var missions_intro_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/MissionsIntroLabel
-@onready var mission_list: ItemList = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/MissionList
-@onready var mission_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/MissionStatusLabel
-@onready var accept_mission_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/AcceptMissionButton
-@onready var claim_mission_reward_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/MissionsContainer/ClaimMissionRewardButton
-@onready var pirate_status_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/PirateStatusButton
-@onready var pirate_status_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/PirateStatusContainer
-@onready var pirate_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/PirateStatusContainer/PirateStatusLabel
-@onready var recruit_ally_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/RecruitAllyButton
+@onready var scroll_container: ScrollContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer
+@onready var ports_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/PortsButton
+@onready var ports_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/PortsContainer
+@onready var port_list: ItemList = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/PortsContainer/PortList
+@onready var port_services_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/PortsContainer/PortServicesLabel
+@onready var repair_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/RepairButton
+@onready var repair_ally_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/RepairAllyButton
+@onready var upgrades_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/UpgradesButton
+@onready var upgrades_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/UpgradesContainer
+@onready var upgrades_ship_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/UpgradesContainer/UpgradesShipLabel
+@onready var hull_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/UpgradesContainer/HullStatusLabel
+@onready var sails_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/UpgradesContainer/SailsStatusLabel
+@onready var cannons_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/UpgradesContainer/CannonsStatusLabel
+@onready var hull_upgrade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/UpgradesContainer/HullUpgradeButton
+@onready var sails_upgrade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/UpgradesContainer/SailsUpgradeButton
+@onready var cannons_upgrade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/UpgradesContainer/CannonsUpgradeButton
+@onready var shipyard_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/ShipyardButton
+@onready var shipyard_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/ShipyardContainer
+@onready var current_ship_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/ShipyardContainer/CurrentShipLabel
+@onready var ship_list: ItemList = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/ShipyardContainer/ShipList
+@onready var ship_details_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/ShipyardContainer/ShipDetailsLabel
+@onready var ship_hierarchy_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/ShipyardContainer/ShipHierarchyLabel
+@onready var buy_ship_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/ShipyardContainer/BuyShipButton
+@onready var equip_ship_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/ShipyardContainer/EquipShipButton
+@onready var trade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/TradeButton
+@onready var trade_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/TradeContainer
+@onready var cargo_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/TradeContainer/CargoStatusLabel
+@onready var trade_list: ItemList = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/TradeContainer/TradeList
+@onready var trade_details_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/TradeContainer/TradeDetailsLabel
+@onready var buy_trade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/TradeContainer/BuyTradeButton
+@onready var sell_trade_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/TradeContainer/SellTradeButton
+@onready var missions_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/MissionsButton
+@onready var missions_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/MissionsContainer
+@onready var missions_intro_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/MissionsContainer/MissionsIntroLabel
+@onready var mission_list: ItemList = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/MissionsContainer/MissionList
+@onready var mission_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/MissionsContainer/MissionStatusLabel
+@onready var accept_mission_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/MissionsContainer/AcceptMissionButton
+@onready var claim_mission_reward_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/MissionsContainer/ClaimMissionRewardButton
+@onready var pirate_status_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/PirateStatusButton
+@onready var pirate_status_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/PirateStatusContainer
+@onready var pirate_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/PirateStatusContainer/PirateStatusLabel
+@onready var recruit_ally_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/RecruitAllyButton
 @onready var quit_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/QuitButton
 
 var _player: Node
@@ -121,6 +122,7 @@ func open(player: Node, port: Node = null) -> void:
 	trade_container.visible = false
 	missions_container.visible = false
 	pirate_status_container.visible = false
+	_reset_scroll()
 	_refresh_port_header()
 	_refresh_port_rows()
 	_refresh_repair_button()
@@ -149,6 +151,11 @@ func close() -> void:
 
 func is_open() -> bool:
 	return root_control.visible
+
+
+func _reset_scroll() -> void:
+	if scroll_container != null:
+		scroll_container.scroll_vertical = 0
 
 
 func _set_active_port_from_node(port: Node) -> void:
@@ -191,6 +198,7 @@ func _on_ports_pressed() -> void:
 		missions_container.visible = false
 		pirate_status_container.visible = false
 		status_label.text = "Choisis un port"
+		_reset_scroll()
 		_refresh_port_rows()
 	else:
 		status_label.text = ""
@@ -383,6 +391,7 @@ func _on_upgrades_pressed() -> void:
 		missions_container.visible = false
 		pirate_status_container.visible = false
 		status_label.text = "Choisis une amélioration"
+		_reset_scroll()
 		_refresh_upgrade_rows()
 	else:
 		status_label.text = ""
@@ -695,6 +704,7 @@ func _on_shipyard_pressed() -> void:
 		missions_container.visible = false
 		pirate_status_container.visible = false
 		status_label.text = "Chantier naval"
+		_reset_scroll()
 		_refresh_shipyard_rows()
 	else:
 		status_label.text = ""
@@ -933,6 +943,7 @@ func _on_trade_pressed() -> void:
 		missions_container.visible = false
 		pirate_status_container.visible = false
 		status_label.text = "Commerce"
+		_reset_scroll()
 		_refresh_trade_rows()
 	else:
 		status_label.text = ""
@@ -1135,6 +1146,7 @@ func _on_missions_pressed() -> void:
 		trade_container.visible = false
 		pirate_status_container.visible = false
 		status_label.text = "Choisis une mission"
+		_reset_scroll()
 		_refresh_mission_rows()
 	else:
 		status_label.text = ""
@@ -1149,6 +1161,7 @@ func _on_pirate_status_pressed() -> void:
 		trade_container.visible = false
 		missions_container.visible = false
 		status_label.text = "Statut pirate"
+		_reset_scroll()
 		_refresh_pirate_status_panel()
 	else:
 		status_label.text = ""
