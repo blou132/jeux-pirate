@@ -23,7 +23,6 @@ var _current_zoom_factor: float = 1.0
 var _target_zoom_factor: float = 1.0
 var _current_look_offset: Vector3 = Vector3.ZERO
 var _target_look_offset: Vector3 = Vector3.ZERO
-var _is_looking_around: bool = false
 var is_free_look_unlocked: bool = false
 
 
@@ -59,7 +58,6 @@ func _process(delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _are_camera_controls_blocked():
-		_is_looking_around = false
 		return
 
 	if event is InputEventKey:
@@ -73,9 +71,6 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	elif event is InputEventMouseButton:
 		var mouse_event: InputEventMouseButton = event as InputEventMouseButton
-		if mouse_event.button_index == MOUSE_BUTTON_RIGHT:
-			_is_looking_around = mouse_event.pressed
-			return
 		if not mouse_event.pressed:
 			return
 
@@ -86,7 +81,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			_adjust_zoom(zoom_step)
 			get_viewport().set_input_as_handled()
 
-	elif event is InputEventMouseMotion and _is_looking_around:
+	elif event is InputEventMouseMotion and is_free_look_unlocked:
 		var motion_event: InputEventMouseMotion = event as InputEventMouseMotion
 		_add_look_offset(motion_event.relative)
 		get_viewport().set_input_as_handled()
