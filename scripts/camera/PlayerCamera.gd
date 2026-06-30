@@ -24,6 +24,7 @@ var _target_zoom_factor: float = 1.0
 var _current_look_offset: Vector3 = Vector3.ZERO
 var _target_look_offset: Vector3 = Vector3.ZERO
 var _is_looking_around: bool = false
+var is_free_look_unlocked: bool = false
 
 
 func _ready() -> void:
@@ -63,7 +64,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	if event is InputEventKey:
 		var key_event: InputEventKey = event as InputEventKey
-		if key_event.pressed and not key_event.echo and key_event.keycode == KEY_C:
+		if key_event.pressed and not key_event.echo and key_event.keycode == KEY_V:
+			is_free_look_unlocked = not is_free_look_unlocked
+			get_viewport().set_input_as_handled()
+		elif key_event.pressed and not key_event.echo and key_event.keycode == KEY_C:
 			recenter()
 			get_viewport().set_input_as_handled()
 
