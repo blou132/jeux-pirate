@@ -42,6 +42,8 @@ La v0.8 ajoute une progression sociale : réputation pirate, rangs de réputatio
 
 La refonte UI pirate ajoute une premiere direction visuelle dark fantasy : barre de ressources en haut, panneau navire/flotte a gauche, panneau reputation/titre a droite, onglets bas de navigation et menu du port plus lisible.
 
+La v0.12 ajoute une camera joueur mobile pour rendre la navigation, l'exploration et la recherche de ports plus confortables.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -321,6 +323,16 @@ La refonte UI pirate ajoute une premiere direction visuelle dark fantasy : barre
 - Quatre ports physiques sont places dans `World.tscn` : `starter_quay`, `merchant_port`, `great_port` et `naval_arsenal`.
 - Repartition physique : Quai en Eaux sures pres du spawn, Port marchand en Zone surveillee, Grand port en Zone contestee, Arsenal naval en Zone hostile.
 - Chaque port physique transmet son `port_id` au menu et affiche sa categorie plus sa zone dans le prompt d'interaction.
+
+## Etat v0.12
+
+- Camera joueur dediee dans `scripts/camera/PlayerCamera.gd`.
+- Suivi fluide du bateau joueur, sans camera rigide directement collee au parent.
+- Zoom molette borne entre une vue proche et une vue large.
+- Clic droit maintenu + mouvement souris pour observer autour du bateau avec offset limite.
+- `C` recentre la camera sur le joueur sans changer le zoom.
+- La camera respecte les limites de carte exposees par `WorldBounds`.
+- Les controles camera sont ignores quand le port ou le menu d'exploration est ouvert, pour laisser le scroll et les clics UI fonctionner.
 
 ## Lancement
 

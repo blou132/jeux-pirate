@@ -120,25 +120,34 @@
 - Limiter commerce, chantier naval, missions, flotte, reparations et ameliorations selon le port actif.
 - Preparer des routes commerciales entre ports.
 
-## v0.12 - Tresors et exploration
+## v0.12 - Camera mobile
+
+- Ajouter une camera joueur dediee.
+- Ajouter le zoom a la molette.
+- Ajouter un decalage manuel limite autour du joueur.
+- Ajouter `C` pour recentrer la camera.
+- Clamper la camera aux limites de carte.
+- Desactiver les controles camera quand les menus sont ouverts.
+
+## v0.13 - Tresors et exploration
 
 - Differencier les types de tresors.
 - Relier les reliques et fragments a des recompenses plus rares.
 - Preparer des collections ou decouvertes majeures.
 
-## v0.13 - Zones de danger
+## v0.14 - Zones de danger avancees
 
 - Rendre les zones de danger plus evolutives.
 - Relier danger, reputation et types d'ennemis.
 - Preparer des routes maritimes plus risquees.
 
-## v0.14 - Creatures marines
+## v0.15 - Creatures marines
 
 - Ajouter les premieres menaces non humaines.
 - Tester des comportements simples distincts des navires.
 - Garder les combats lisibles avec les regles de navigation existantes.
 
-## v0.15 - Controle de territoire
+## v0.16 - Controle de territoire
 
 - Preparer des zones controlables ou contestables.
 - Relier territoire, ports et reputation.
