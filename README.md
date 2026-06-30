@@ -313,7 +313,10 @@ La refonte UI pirate ajoute une premiere direction visuelle dark fantasy : barre
 - Ports : Quai, Petit port, Port marchand, Grand port, Arsenal naval, Capitale maritime, Port legendaire, Sanctuaire pirate.
 - Le port de depart reste en Eaux sures.
 - Le menu du port affiche une liste de ports simules v0.11 pour tester les services sans creer une grande carte.
+- Le menu du port est responsive en 1280x720 : en-tete et bouton de sortie restent fixes, le contenu principal defile dans un `ScrollContainer`, et les longues listes sont limitees en hauteur.
+- Le chantier naval garde les actions Acheter/Equiper accessibles avant le texte long de hierarchie.
 - Chaque port definit sa categorie, sa zone de danger, ses services, ses niveaux de commerce/reparation/chantier naval, ses navires, ses marchandises et ses missions.
+- Le catalogue prepare plusieurs ports par zone et expose des helpers pour filtrer par zone de danger, niveau ou ports deja places sur la carte.
 - Les services du menu sont limites par le port actif : commerce, chantier naval, missions, flotte, reparations et ameliorations.
 - Quatre ports physiques sont places dans `World.tscn` : `starter_quay`, `merchant_port`, `great_port` et `naval_arsenal`.
 - Repartition physique : Quai en Eaux sures pres du spawn, Port marchand en Zone surveillee, Grand port en Zone contestee, Arsenal naval en Zone hostile.

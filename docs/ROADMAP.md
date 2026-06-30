@@ -113,6 +113,8 @@
 - Differencier progressivement les services et prix selon les ports.
 - Relier chaque categorie de port a une zone de danger.
 - Ajouter une premiere liste de ports simules dans le menu du port.
+- Rendre le menu du port responsive en 1280x720 avec contenu principal scrollable et listes compactes.
+- Preparer plusieurs ports par zone via le catalogue, avec filtrage par zone, niveau et ports physiques.
 - Ajouter quatre ports physiques : Quai, Port marchand, Grand port et Arsenal naval.
 - Connecter chaque port physique a un `port_id` du `PortCatalog`.
 - Limiter commerce, chantier naval, missions, flotte, reparations et ameliorations selon le port actif.

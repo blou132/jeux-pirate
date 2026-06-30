@@ -10,24 +10,38 @@ const SERVICE_MISSIONS := "missions"
 const SERVICE_STATUS := "status"
 
 const PORT_QUAI := "starter_quay"
+const PORT_QUAI_DE_PECHE := "fisher_quay"
 const PORT_PETIT_PORT := "petit_port"
+const PORT_POSTE_DE_GARDE := "watch_post"
 const PORT_PORT_MARCHAND := "merchant_port"
+const PORT_CRIQUE_CONTREBANDIERS := "smuggler_cove"
 const PORT_GRAND_PORT := "great_port"
+const PORT_FORTIN_FRONTIERE := "frontier_fort"
 const PORT_ARSENAL_NAVAL := "naval_arsenal"
+const PORT_PORT_TEMPETE := "storm_harbor"
 const PORT_CAPITALE_MARITIME := "capitale_maritime"
+const PORT_VIEUX_ROI := "old_king_port"
 const PORT_LEGENDAIRE := "port_legendaire"
+const PORT_QUAI_ABYSSES := "abyss_black_dock"
 const PORT_SANCTUAIRE_PIRATE := "sanctuaire_pirate"
 
 const STARTING_PORT_ID := PORT_QUAI
 
 const PORT_IDS: Array[String] = [
 	PORT_QUAI,
+	PORT_QUAI_DE_PECHE,
 	PORT_PETIT_PORT,
+	PORT_POSTE_DE_GARDE,
 	PORT_PORT_MARCHAND,
+	PORT_CRIQUE_CONTREBANDIERS,
 	PORT_GRAND_PORT,
+	PORT_FORTIN_FRONTIERE,
 	PORT_ARSENAL_NAVAL,
+	PORT_PORT_TEMPETE,
 	PORT_CAPITALE_MARITIME,
+	PORT_VIEUX_ROI,
 	PORT_LEGENDAIRE,
+	PORT_QUAI_ABYSSES,
 	PORT_SANCTUAIRE_PIRATE,
 ]
 
@@ -48,6 +62,7 @@ const PORTS := {
 		"level": 1,
 		"category": "Quai",
 		"danger_zone": "Eaux sures",
+		"world_port": true,
 		"services": ["repair", "trade", "missions", "status"],
 		"trade_level": 1,
 		"repair_level": 1,
@@ -55,6 +70,20 @@ const PORTS := {
 		"ships": ["barque"],
 		"goods": ["rum", "cloth"],
 		"missions": ["pirate_hunt", "return_to_port"],
+	},
+	"fisher_quay": {
+		"id": "fisher_quay",
+		"name": "Quai des Filets",
+		"level": 1,
+		"category": "Quai",
+		"danger_zone": "Eaux sures",
+		"services": ["repair", "trade", "missions", "status"],
+		"trade_level": 1,
+		"repair_level": 1,
+		"shipyard_level": 0,
+		"ships": ["barque"],
+		"goods": ["rum", "cloth"],
+		"missions": ["return_to_port"],
 	},
 	"petit_port": {
 		"id": "petit_port",
@@ -70,12 +99,27 @@ const PORTS := {
 		"goods": ["rum", "cloth", "spices"],
 		"missions": ["pirate_hunt", "first_map_fragment", "ancient_relic", "return_to_port"],
 	},
+	"watch_post": {
+		"id": "watch_post",
+		"name": "Poste de garde de Clairevigie",
+		"level": 2,
+		"category": "Petit port",
+		"danger_zone": "Zone surveillee",
+		"services": ["repair", "fleet", "trade", "missions", "status"],
+		"trade_level": 2,
+		"repair_level": 2,
+		"shipyard_level": 0,
+		"ships": ["barque", "chaloupe"],
+		"goods": ["rum", "cloth", "spices"],
+		"missions": ["pirate_hunt", "return_to_port"],
+	},
 	"merchant_port": {
 		"id": "merchant_port",
 		"name": "Port marchand des Alizes",
 		"level": 3,
 		"category": "Port marchand",
 		"danger_zone": "Zone surveillee",
+		"world_port": true,
 		"services": ["repair", "fleet", "upgrades", "shipyard", "trade", "missions", "status"],
 		"trade_level": 3,
 		"repair_level": 2,
@@ -84,12 +128,27 @@ const PORTS := {
 		"goods": ["rum", "spices", "cloth", "ore"],
 		"missions": ["pirate_hunt", "first_map_fragment", "ancient_relic", "return_to_port"],
 	},
+	"smuggler_cove": {
+		"id": "smuggler_cove",
+		"name": "Crique des Contrebandiers",
+		"level": 3,
+		"category": "Port marchand",
+		"danger_zone": "Zone contestee",
+		"services": ["repair", "fleet", "trade", "missions", "status"],
+		"trade_level": 3,
+		"repair_level": 2,
+		"shipyard_level": 0,
+		"ships": ["barque", "chaloupe", "sloop"],
+		"goods": ["rum", "spices", "ore"],
+		"missions": ["pirate_hunt", "first_map_fragment", "return_to_port"],
+	},
 	"great_port": {
 		"id": "great_port",
 		"name": "Grand port de Briselame",
 		"level": 4,
 		"category": "Grand port",
 		"danger_zone": "Zone contestee",
+		"world_port": true,
 		"services": ["repair", "fleet", "upgrades", "shipyard", "trade", "missions", "status"],
 		"trade_level": 4,
 		"repair_level": 3,
@@ -98,12 +157,27 @@ const PORTS := {
 		"goods": ["rum", "spices", "cloth", "ore", "pearls"],
 		"missions": ["pirate_hunt", "first_map_fragment", "ancient_relic", "return_to_port"],
 	},
+	"frontier_fort": {
+		"id": "frontier_fort",
+		"name": "Fortin de Frontiere",
+		"level": 4,
+		"category": "Grand port",
+		"danger_zone": "Zone hostile",
+		"services": ["repair", "fleet", "upgrades", "shipyard", "trade", "missions", "status"],
+		"trade_level": 3,
+		"repair_level": 4,
+		"shipyard_level": 3,
+		"ships": ["barque", "chaloupe", "sloop"],
+		"goods": ["rum", "cloth", "ore", "pearls"],
+		"missions": ["pirate_hunt", "first_map_fragment", "ancient_relic"],
+	},
 	"naval_arsenal": {
 		"id": "naval_arsenal",
 		"name": "Arsenal naval de Ferhoule",
 		"level": 5,
 		"category": "Arsenal naval",
 		"danger_zone": "Zone hostile",
+		"world_port": true,
 		"services": ["repair", "fleet", "upgrades", "shipyard", "trade", "missions", "status"],
 		"trade_level": 4,
 		"repair_level": 4,
@@ -111,6 +185,20 @@ const PORTS := {
 		"ships": ["barque", "chaloupe", "sloop", "goelette"],
 		"goods": ["rum", "spices", "cloth", "ore", "pearls"],
 		"missions": ["pirate_hunt", "first_map_fragment", "ancient_relic", "return_to_port"],
+	},
+	"storm_harbor": {
+		"id": "storm_harbor",
+		"name": "Havre des Tempetes",
+		"level": 5,
+		"category": "Arsenal naval",
+		"danger_zone": "Zone mortelle",
+		"services": ["repair", "fleet", "upgrades", "shipyard", "trade", "missions", "status"],
+		"trade_level": 4,
+		"repair_level": 5,
+		"shipyard_level": 4,
+		"ships": ["barque", "chaloupe", "sloop", "goelette"],
+		"goods": ["rum", "spices", "ore", "pearls"],
+		"missions": ["pirate_hunt", "first_map_fragment", "ancient_relic"],
 	},
 	"capitale_maritime": {
 		"id": "capitale_maritime",
@@ -126,6 +214,20 @@ const PORTS := {
 		"goods": ["rum", "spices", "cloth", "ore", "pearls"],
 		"missions": ["pirate_hunt", "first_map_fragment", "ancient_relic", "return_to_port"],
 	},
+	"old_king_port": {
+		"id": "old_king_port",
+		"name": "Port du Vieux Roi",
+		"level": 6,
+		"category": "Capitale maritime",
+		"danger_zone": "Territoire legendaire",
+		"services": ["repair", "fleet", "upgrades", "shipyard", "trade", "missions", "status"],
+		"trade_level": 5,
+		"repair_level": 6,
+		"shipyard_level": 5,
+		"ships": ["barque", "chaloupe", "sloop", "goelette"],
+		"goods": ["spices", "cloth", "ore", "pearls"],
+		"missions": ["pirate_hunt", "first_map_fragment", "ancient_relic"],
+	},
 	"port_legendaire": {
 		"id": "port_legendaire",
 		"name": "Port legendaire de Brume-Or",
@@ -139,6 +241,20 @@ const PORTS := {
 		"ships": ["barque", "chaloupe", "sloop", "goelette"],
 		"goods": ["rum", "spices", "cloth", "ore", "pearls"],
 		"missions": ["pirate_hunt", "first_map_fragment", "ancient_relic", "return_to_port"],
+	},
+	"abyss_black_dock": {
+		"id": "abyss_black_dock",
+		"name": "Quai noir des Abysses",
+		"level": 7,
+		"category": "Port legendaire",
+		"danger_zone": "Enfers des mers",
+		"services": ["repair", "fleet", "upgrades", "shipyard", "trade", "missions", "status"],
+		"trade_level": 6,
+		"repair_level": 7,
+		"shipyard_level": 6,
+		"ships": ["barque", "chaloupe", "sloop", "goelette"],
+		"goods": ["spices", "ore", "pearls"],
+		"missions": ["pirate_hunt", "first_map_fragment", "ancient_relic"],
 	},
 	"sanctuaire_pirate": {
 		"id": "sanctuaire_pirate",
@@ -159,6 +275,40 @@ const PORTS := {
 
 static func get_port_ids() -> Array[String]:
 	return PORT_IDS.duplicate()
+
+
+static func get_danger_zones() -> Array[String]:
+	return DANGER_ZONES.duplicate()
+
+
+static func get_ports_for_danger_zone(danger_zone: String) -> Array[String]:
+	var ids: Array[String] = []
+	for port_id in PORT_IDS:
+		if get_port_danger_zone(port_id) == danger_zone:
+			ids.append(port_id)
+
+	return ids
+
+
+static func get_ports_by_level(min_level: int, max_level: int) -> Array[String]:
+	var ids: Array[String] = []
+	var from_level: int = maxi(1, min_level)
+	var to_level: int = maxi(from_level, max_level)
+	for port_id in PORT_IDS:
+		var port_level: int = get_port_level(port_id)
+		if port_level >= from_level and port_level <= to_level:
+			ids.append(port_id)
+
+	return ids
+
+
+static func get_world_port_ids() -> Array[String]:
+	var ids: Array[String] = []
+	for port_id in PORT_IDS:
+		if is_world_port(port_id):
+			ids.append(port_id)
+
+	return ids
 
 
 static func has_port(port_id: String) -> bool:
@@ -191,6 +341,11 @@ static func get_port_danger_zone(port_id: String) -> String:
 static func get_port_level(port_id: String) -> int:
 	var port: Dictionary = get_port(port_id)
 	return maxi(1, int(port.get("level", 1)))
+
+
+static func is_world_port(port_id: String) -> bool:
+	var port: Dictionary = get_port(port_id)
+	return bool(port.get("world_port", false))
 
 
 static func get_trade_level(port_id: String) -> int:

@@ -365,6 +365,10 @@ Ports physiques v0.11 :
 
 Les ports physiques utilisent `Port.gd` avec un `port_id` exporte. `World.gd` transmet le port actif au menu, et `PortMenu.gd` lit `PortCatalog` pour afficher la zone, les services, les marchandises, les missions et les navires accessibles.
 
+Le menu de port doit rester utilisable en 1280x720. L'en-tete et le bouton de fermeture restent fixes, tandis que les services, listes et details defilent dans un `ScrollContainer`. Les listes de ports, navires, marchandises et missions ont une hauteur limitee pour eviter que les boutons critiques, notamment Acheter/Equiper au chantier naval, sortent de l'ecran.
+
+Le catalogue contient maintenant plusieurs ports simules par zone de danger en plus des ports physiques. Les fonctions `get_ports_for_danger_zone`, `get_ports_by_level` et `get_world_port_ids` preparent les futures routes commerciales et le placement de ports sans changer la carte actuelle.
+
 ## Réputation et titres v0.8
 
 La réputation donne une progression sociale simple sans ajouter encore de contrôle de territoire ou de hiérarchie de ports :
