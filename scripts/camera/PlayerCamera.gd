@@ -19,6 +19,7 @@ var _target: Node3D
 var _world_bounds: Node
 var _base_local_offset: Vector3
 var _base_pitch_degrees: float
+var _base_yaw_degrees: float
 var _current_zoom_factor: float = 1.0
 var _target_zoom_factor: float = 1.0
 var _current_look_offset: Vector3 = Vector3.ZERO
@@ -29,6 +30,7 @@ var is_free_look_unlocked: bool = false
 func _ready() -> void:
 	_base_local_offset = position
 	_base_pitch_degrees = rotation_degrees.x
+	_base_yaw_degrees = rotation_degrees.y
 	_target = _find_follow_target()
 	_world_bounds = _find_world_bounds()
 	top_level = true
@@ -191,7 +193,7 @@ func _are_camera_controls_blocked() -> bool:
 func _get_desired_rotation() -> Vector3:
 	return Vector3(
 		deg_to_rad(_base_pitch_degrees),
-		_target.global_rotation.y,
+		deg_to_rad(_base_yaw_degrees),
 		0.0
 	)
 
