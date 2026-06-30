@@ -237,6 +237,88 @@ func get_cargo_items() -> Dictionary:
 	return cargo_items.duplicate(true)
 
 
+func get_trade_good_view(item_id: String) -> Dictionary:
+	if not CargoCatalog.has_good(item_id):
+		return {}
+
+	var quantity: int = get_cargo_quantity(item_id)
+	var weight: int = CargoCatalog.get_good_weight(item_id)
+	return {
+		"id": item_id,
+		"name": CargoCatalog.get_good_name(item_id),
+		"weight": weight,
+		"buy_price": CargoCatalog.get_buy_price(item_id),
+		"sell_price": CargoCatalog.get_sell_price(item_id),
+		"quantity": quantity,
+		"used_space": quantity * weight,
+		"can_buy": can_buy_trade_good(item_id, 1),
+		"can_sell": can_sell_trade_good(item_id, 1),
+	}
+
+
+func get_trade_good_views() -> Array[Dictionary]:
+	var views: Array[Dictionary] = []
+	var good_ids: Array[String] = CargoCatalog.get_trade_good_ids()
+	for item_id in good_ids:
+		views.append(get_trade_good_view(item_id))
+
+	return views
+
+
+func can_buy_trade_good(item_id: String, amount: int = 1) -> bool:
+	if amount <= 0:
+		return false
+	if not CargoCatalog.has_good(item_id):
+		return false
+
+	var total_price: int = CargoCatalog.get_buy_price(item_id) * amount
+	return gold >= total_price and can_add_cargo(item_id, amount)
+
+
+func buy_trade_good(item_id: String, amount: int = 1) -> String:
+	if amount <= 0 or not CargoCatalog.has_good(item_id):
+		return "Marchandise indisponible"
+
+	var total_price: int = CargoCatalog.get_buy_price(item_id) * amount
+	if gold < total_price:
+		return "Or insuffisant"
+	if not can_add_cargo(item_id, amount):
+		if get_cargo_free() <= 0:
+			return "Cargaison pleine"
+		return "Espace insuffisant"
+
+	if not spend_resources(total_price, 0):
+		return "Or insuffisant"
+	if not add_cargo(item_id, amount):
+		add_resources(total_price, 0)
+		return "Espace insuffisant"
+
+	return "Marchandise achetee : %s x%d" % [CargoCatalog.get_good_name(item_id), amount]
+
+
+func can_sell_trade_good(item_id: String, amount: int = 1) -> bool:
+	if amount <= 0:
+		return false
+	if not CargoCatalog.has_good(item_id):
+		return false
+
+	return get_cargo_quantity(item_id) >= amount
+
+
+func sell_trade_good(item_id: String, amount: int = 1) -> String:
+	if amount <= 0 or not CargoCatalog.has_good(item_id):
+		return "Marchandise indisponible"
+	if not can_sell_trade_good(item_id, amount):
+		return "Aucune marchandise a vendre"
+
+	if not remove_cargo(item_id, amount):
+		return "Aucune marchandise a vendre"
+
+	var total_price: int = CargoCatalog.get_sell_price(item_id) * amount
+	add_resources(total_price, 0)
+	return "Marchandise vendue : %s x%d" % [CargoCatalog.get_good_name(item_id), amount]
+
+
 func get_owned_player_ship_ids() -> Array[String]:
 	_ensure_valid_player_ship_state()
 	return owned_player_ship_ids.duplicate()
