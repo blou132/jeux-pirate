@@ -177,6 +177,7 @@ func _refresh_port_header() -> void:
 		PortCatalog.get_repair_level(_active_port_id),
 		PortCatalog.get_shipyard_level(_active_port_id),
 	]
+	port_info_label.text += "\nServices : %s" % ", ".join(PortCatalog.get_service_names(_active_port_id))
 	ports_button.text = "Ports disponibles : %s" % PortCatalog.get_port_category(_active_port_id)
 
 
@@ -455,7 +456,7 @@ func _get_fleet_manager() -> Node:
 
 func _refresh_repair_button() -> void:
 	if not _is_service_available(PortCatalog.SERVICE_REPAIR):
-		repair_button.text = "Reparation indisponible ici"
+		repair_button.text = "Reparation indisponible : pas d'atelier ici"
 		repair_button.disabled = true
 		return
 
@@ -480,7 +481,7 @@ func _refresh_repair_button() -> void:
 
 func _refresh_ally_repair_button() -> void:
 	if not _is_service_available(PortCatalog.SERVICE_FLEET):
-		repair_ally_button.text = "Flotte indisponible ici"
+		repair_ally_button.text = "Flotte indisponible : pas de capitainerie"
 		repair_ally_button.disabled = true
 		return
 
@@ -538,7 +539,7 @@ func _refresh_fleet_repair_button(fleet_manager: Node) -> bool:
 
 func _refresh_recruit_ally_button() -> void:
 	if not _is_service_available(PortCatalog.SERVICE_FLEET):
-		recruit_ally_button.text = "Recrutement indisponible ici"
+		recruit_ally_button.text = "Recrutement indisponible : pas de capitainerie"
 		recruit_ally_button.disabled = true
 		return
 
@@ -604,7 +605,7 @@ func _purchase_upgrade(upgrade_id: String) -> void:
 
 func _refresh_upgrade_rows() -> void:
 	if not _is_service_available(PortCatalog.SERVICE_UPGRADES):
-		upgrades_button.text = "Ameliorations indisponibles ici"
+		upgrades_button.text = "Ameliorations indisponibles : port sans atelier"
 		upgrades_button.disabled = true
 		upgrades_ship_label.text = "Atelier indisponible dans ce port"
 		hull_status_label.text = "Coque renforcee: indisponible"
@@ -703,7 +704,7 @@ func _refresh_shipyard_rows() -> void:
 	_ship_ids.clear()
 
 	if not _is_service_available(PortCatalog.SERVICE_SHIPYARD):
-		shipyard_button.text = "Chantier naval indisponible ici"
+		shipyard_button.text = "Chantier naval reserve aux ports equipes"
 		shipyard_button.disabled = true
 		current_ship_label.text = "Chantier naval indisponible"
 		ship_details_label.text = "Ce port ne propose pas de chantier naval."
@@ -941,7 +942,7 @@ func _refresh_trade_rows() -> void:
 	_trade_good_ids.clear()
 
 	if not _is_service_available(PortCatalog.SERVICE_TRADE):
-		trade_button.text = "Commerce indisponible ici"
+		trade_button.text = "Commerce indisponible : aucun marche local"
 		trade_button.disabled = true
 		cargo_status_label.text = "Commerce indisponible dans ce port"
 		trade_details_label.text = "Aucune marchandise disponible ici"
@@ -1250,7 +1251,7 @@ func _refresh_mission_rows() -> void:
 	_mission_ids.clear()
 
 	if not _is_service_available(PortCatalog.SERVICE_MISSIONS):
-		missions_button.text = "Missions indisponibles ici"
+		missions_button.text = "Missions indisponibles : pas de contrats"
 		missions_button.disabled = true
 		missions_intro_label.text = "Aucune mission disponible dans ce port"
 		mission_status_label.text = "Change de port pour trouver des contrats."
