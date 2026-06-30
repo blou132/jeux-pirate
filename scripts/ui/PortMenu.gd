@@ -549,10 +549,16 @@ func _build_ship_row_text(game_state: Node, ship_id: String) -> String:
 	if game_state.has_method("can_afford_player_ship"):
 		can_afford = bool(game_state.call("can_afford_player_ship", ship_id))
 
-	if owned:
-		status = "possédé"
+	var equip_block_reason: String = ""
+	if owned and not active and game_state.has_method("get_ship_equip_block_reason"):
+		equip_block_reason = String(game_state.call("get_ship_equip_block_reason", ship_id))
+
 	if active:
 		status = "navire actuel"
+	elif owned and not equip_block_reason.is_empty():
+		status = "cargaison trop lourde"
+	elif owned:
+		status = "possede"
 	elif not can_afford:
 		status = "ressources insuffisantes"
 
@@ -589,22 +595,33 @@ func _refresh_selected_ship() -> void:
 	if game_state.has_method("can_afford_player_ship"):
 		can_afford = bool(game_state.call("can_afford_player_ship", _selected_ship_id))
 
+	var equip_block_reason: String = ""
+	if owned and not active and game_state.has_method("get_ship_equip_block_reason"):
+		equip_block_reason = String(game_state.call("get_ship_equip_block_reason", _selected_ship_id))
+
+	var can_equip: bool = owned and not active and equip_block_reason.is_empty()
+
 	if active:
-		lines.append("État : navire actuel")
+		lines.append("Etat : navire actuel")
 	elif owned:
-		lines.append("État : possédé")
+		lines.append("Etat : possede")
+		if not equip_block_reason.is_empty():
+			lines.append("Avertissement : %s" % equip_block_reason)
+			lines.append("Vendez ou videz la cargaison avant d'equiper ce navire.")
 	elif can_afford:
-		lines.append("État : disponible à l'achat")
+		lines.append("Etat : disponible a l'achat")
 	else:
-		lines.append("État : ressources insuffisantes")
+		lines.append("Etat : ressources insuffisantes")
 
 	ship_details_label.text = "\n".join(lines)
 	buy_ship_button.text = "Acheter : %s" % ShipCatalog.format_cost(_selected_ship_id)
 	buy_ship_button.disabled = owned or not can_afford
-	equip_ship_button.text = "Équiper"
-	equip_ship_button.disabled = not owned or active
+	equip_ship_button.text = "Equiper"
+	equip_ship_button.disabled = not can_equip
 	if active:
 		equip_ship_button.text = "Navire actuel"
+	elif not equip_block_reason.is_empty():
+		equip_ship_button.text = "Cargaison trop lourde"
 
 
 func _on_buy_ship_pressed() -> void:

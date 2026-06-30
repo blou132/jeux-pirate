@@ -171,6 +171,14 @@ func get_player_storage_capacity() -> int:
 	return int(ship.get("storage", 0))
 
 
+func get_player_ship_cargo_capacity(ship_id: String) -> int:
+	if not ShipCatalog.has_ship(ship_id):
+		return 0
+
+	var ship: Dictionary = ShipCatalog.get_ship(ship_id)
+	return maxi(0, int(ship.get("storage", 0)))
+
+
 func get_cargo_capacity() -> int:
 	return get_player_storage_capacity()
 
@@ -337,6 +345,27 @@ func can_afford_player_ship(ship_id: String) -> bool:
 	return can_afford_cost(ShipCatalog.get_ship_cost(ship_id))
 
 
+func can_equip_player_ship(ship_id: String) -> bool:
+	return get_ship_equip_block_reason(ship_id).is_empty()
+
+
+func get_ship_equip_block_reason(ship_id: String) -> String:
+	if not ShipCatalog.has_ship(ship_id):
+		return "Navire indisponible"
+	if not is_player_ship_owned(ship_id):
+		return "Navire non possede"
+
+	var cargo_used: int = get_cargo_used()
+	var ship_capacity: int = get_player_ship_cargo_capacity(ship_id)
+	if cargo_used > ship_capacity:
+		return "Cargaison trop lourde pour ce navire - Cargaison : %d/%d" % [
+			cargo_used,
+			ship_capacity,
+		]
+
+	return ""
+
+
 func purchase_player_ship(ship_id: String) -> String:
 	if not ShipCatalog.has_ship(ship_id):
 		return "Navire indisponible"
@@ -359,6 +388,10 @@ func equip_player_ship(ship_id: String) -> String:
 		return "Navire non possédé"
 	if active_player_ship_id == ship_id:
 		return "Navire actuel : %s" % ShipCatalog.get_ship_name(ship_id)
+
+	var block_reason: String = get_ship_equip_block_reason(ship_id)
+	if not block_reason.is_empty():
+		return block_reason
 
 	active_player_ship_id = ship_id
 	player_ship_changed.emit(active_player_ship_id, get_active_player_ship_name())
