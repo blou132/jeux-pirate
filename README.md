@@ -339,6 +339,9 @@ Godot n'est pas inclus dans ce depot.
 - `D` : tourner a droite
 - Clic gauche : canon gauche
 - Clic droit : canon droit
+- Molette souris : zoom camera
+- Clic droit maintenu + deplacement souris : observer autour du bateau
+- `C` : recentrer la camera sur le bateau
 - `E` : interagir avec le port ou explorer une île selon la zone
 - `Échap` : fermer le menu
 - `R` : réapparaître au port après destruction
