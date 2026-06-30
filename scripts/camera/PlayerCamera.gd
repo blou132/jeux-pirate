@@ -50,7 +50,13 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton:
+	if event is InputEventKey:
+		var key_event: InputEventKey = event as InputEventKey
+		if key_event.pressed and not key_event.echo and key_event.keycode == KEY_C:
+			recenter()
+			get_viewport().set_input_as_handled()
+
+	elif event is InputEventMouseButton:
 		var mouse_event: InputEventMouseButton = event as InputEventMouseButton
 		if mouse_event.button_index == MOUSE_BUTTON_RIGHT:
 			_is_looking_around = mouse_event.pressed
@@ -92,6 +98,10 @@ func _adjust_zoom(delta_factor: float) -> void:
 	var min_zoom: float = minf(zoom_min_factor, zoom_max_factor)
 	var max_zoom: float = maxf(zoom_min_factor, zoom_max_factor)
 	_target_zoom_factor = clampf(_target_zoom_factor + delta_factor, min_zoom, max_zoom)
+
+
+func recenter() -> void:
+	_target_look_offset = Vector3.ZERO
 
 
 func _add_look_offset(mouse_delta: Vector2) -> void:
