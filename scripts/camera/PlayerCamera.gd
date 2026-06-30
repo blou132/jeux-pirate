@@ -11,8 +11,12 @@ extends Camera3D
 @export var look_offset_sensitivity: float = 0.035
 @export var look_offset_max_distance: float = 22.0
 @export var look_offset_smoothing: float = 8.0
+@export var clamp_to_world_bounds: bool = true
+@export var fallback_world_limit: Vector2 = Vector2(112.0, 112.0)
+@export var world_bounds_padding: float = 4.0
 
 var _target: Node3D
+var _world_bounds: Node
 var _base_local_offset: Vector3
 var _base_pitch_degrees: float
 var _current_zoom_factor: float = 1.0
@@ -26,6 +30,7 @@ func _ready() -> void:
 	_base_local_offset = position
 	_base_pitch_degrees = rotation_degrees.x
 	_target = _find_follow_target()
+	_world_bounds = _find_world_bounds()
 	top_level = true
 
 	if _target != null:
@@ -38,6 +43,8 @@ func _process(delta: float) -> void:
 		_target = _find_follow_target()
 	if _target == null:
 		return
+	if not is_instance_valid(_world_bounds):
+		_world_bounds = _find_world_bounds()
 
 	var position_weight: float = _get_smoothing_weight(follow_smoothing, delta)
 	var rotation_weight: float = _get_smoothing_weight(rotation_smoothing, delta)
@@ -90,8 +97,13 @@ func _find_follow_target() -> Node3D:
 	return get_tree().get_first_node_in_group("player") as Node3D
 
 
+func _find_world_bounds() -> Node:
+	return get_tree().get_first_node_in_group("world_bounds")
+
+
 func _get_desired_position() -> Vector3:
-	return _target.global_transform * ((_base_local_offset * _current_zoom_factor) + _current_look_offset)
+	var desired_position: Vector3 = _target.global_transform * ((_base_local_offset * _current_zoom_factor) + _current_look_offset)
+	return _clamp_to_world_bounds(desired_position)
 
 
 func _adjust_zoom(delta_factor: float) -> void:
@@ -118,6 +130,29 @@ func _clamp_look_offset(offset: Vector3) -> Vector3:
 		planar_offset = planar_offset.normalized() * max_distance
 
 	return Vector3(planar_offset.x, 0.0, planar_offset.y)
+
+
+func _clamp_to_world_bounds(world_position: Vector3) -> Vector3:
+	if not clamp_to_world_bounds:
+		return world_position
+
+	var limit: Vector2 = _get_camera_limit()
+	var x_limit: float = maxf(0.0, limit.x - world_bounds_padding)
+	var z_limit: float = maxf(0.0, limit.y - world_bounds_padding)
+	return Vector3(
+		clampf(world_position.x, -x_limit, x_limit),
+		world_position.y,
+		clampf(world_position.z, -z_limit, z_limit)
+	)
+
+
+func _get_camera_limit() -> Vector2:
+	if _world_bounds != null and _world_bounds.has_method("get_camera_limit"):
+		var raw_limit: Variant = _world_bounds.call("get_camera_limit")
+		if raw_limit is Vector2:
+			return raw_limit
+
+	return fallback_world_limit
 
 
 func _get_desired_rotation() -> Vector3:

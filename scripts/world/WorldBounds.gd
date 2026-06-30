@@ -49,6 +49,10 @@ func _is_outside_limit(world_position: Vector3, limit: Vector2) -> bool:
 	return absf(world_position.x) > limit.x or absf(world_position.z) > limit.y
 
 
+func get_camera_limit() -> Vector2:
+	return hard_limit
+
+
 func _push_player_inside(delta: float) -> void:
 	var target_position: Vector3 = _clamp_to_limit(_player.global_position, soft_limit)
 	target_position.y = 0.0
