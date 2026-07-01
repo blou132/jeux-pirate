@@ -29,6 +29,7 @@ extends CanvasLayer
 @onready var ally_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/AllyLabel
 @onready var quest_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/QuestLabel
 @onready var exploration_progress_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/ExplorationProgressLabel
+@onready var creature_resources_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/CreatureResourcesLabel
 @onready var reputation_panel: Control = $HUDRoot/RightReputationPanel
 @onready var reputation_label: Label = $HUDRoot/RightReputationPanel/ReputationVBox/ReputationLabel
 @onready var reputation_progress_label: Label = $HUDRoot/RightReputationPanel/ReputationVBox/ReputationProgressLabel
@@ -380,9 +381,14 @@ func _connect_game_state() -> void:
 	if _game_state.has_signal("exploration_progress_changed") and not _game_state.is_connected("exploration_progress_changed", exploration_callback):
 		_game_state.connect("exploration_progress_changed", exploration_callback)
 
+	var creature_resources_callback: Callable = Callable(self, "_on_creature_resources_changed")
+	if _game_state.has_signal("creature_resources_changed") and not _game_state.is_connected("creature_resources_changed", creature_resources_callback):
+		_game_state.connect("creature_resources_changed", creature_resources_callback)
+
 	_refresh_player_ship_label()
 	_refresh_cargo_from_game_state()
 	_refresh_exploration_progress_from_game_state()
+	_refresh_creature_resources_from_game_state()
 
 
 func _on_resources_changed(gold: int, wood: int) -> void:
@@ -480,6 +486,42 @@ func _on_exploration_progress_changed(discovered_treasures: int, explored_sites:
 	exploration_progress_label.text = "Exploration: %d tresor(s), %d site(s)" % [
 		discovered_treasures,
 		explored_sites,
+	]
+
+
+func _refresh_creature_resources_from_game_state() -> void:
+	if _game_state == null:
+		_on_creature_resources_changed({}, 0)
+		return
+	if not _game_state.has_method("get_creature_resources") or not _game_state.has_method("get_marine_creatures_defeated"):
+		_on_creature_resources_changed({}, 0)
+		return
+
+	_on_creature_resources_changed(
+		_game_state.call("get_creature_resources"),
+		int(_game_state.call("get_marine_creatures_defeated"))
+	)
+
+
+func _on_creature_resources_changed(resources: Dictionary, creatures_defeated: int) -> void:
+	var parts: Array[String] = []
+	for resource_id in resources.keys():
+		var resource_key: String = String(resource_id)
+		var amount: int = maxi(0, int(resources.get(resource_key, 0)))
+		if amount <= 0:
+			continue
+
+		parts.append("%s x%d" % [MarineCreatureCatalog.get_resource_name(resource_key), amount])
+		if parts.size() >= 4:
+			break
+
+	var resource_text: String = "aucune"
+	if not parts.is_empty():
+		resource_text = ", ".join(parts)
+
+	creature_resources_label.text = "Creatures: %d vaincue(s)\nRessources: %s" % [
+		creatures_defeated,
+		resource_text,
 	]
 
 

@@ -30,6 +30,7 @@ var _wander_direction: Vector3 = Vector3.FORWARD
 var _wander_timer: float = 0.0
 var _attack_cooldown_remaining: float = 0.0
 var _safe_zone_cooldown_remaining: float = 0.0
+var _spotted_feedback_shown: bool = false
 
 
 func _ready() -> void:
@@ -196,6 +197,22 @@ func _defeat() -> void:
 	queue_free()
 
 
+func _show_spotted_feedback() -> void:
+	if _spotted_feedback_shown:
+		return
+	if aggression < 0.5:
+		return
+
+	_spotted_feedback_shown = true
+	var message: String = "%s repere" % display_name
+	if creature_id == MarineCreatureCatalog.CREATURE_JUVENILE_KRAKEN:
+		message = "Kraken juvenile dans les eaux hostiles"
+
+	var hud: Node = get_tree().get_first_node_in_group("hud")
+	if hud != null and hud.has_method("show_temporary_context_message"):
+		hud.call("show_temporary_context_message", message, 1.4)
+
+
 func _process_passive_behavior(delta: float) -> void:
 	var threat: Node3D = _get_closest_target(detection_range)
 	if threat != null:
@@ -215,6 +232,8 @@ func _process_aggressive_behavior(delta: float) -> void:
 
 	if not _is_valid_target(_target, chase_leash_distance):
 		_target = _get_closest_target(detection_range)
+		if _target != null:
+			_show_spotted_feedback()
 
 	if _target == null:
 		_patrol(delta)

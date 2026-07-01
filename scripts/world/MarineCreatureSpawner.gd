@@ -230,14 +230,20 @@ func _grant_creature_rewards(_world_position: Vector3, creature_id: String, rewa
 	if game_state != null and game_state.has_method("record_marine_creature_defeated"):
 		game_state.call("record_marine_creature_defeated", creature_id)
 
+	var reward_messages: Array[String] = ["%s vaincu" % MarineCreatureCatalog.get_creature_name(creature_id)]
 	var gold_reward: int = maxi(0, int(rewards.get("gold", 0)))
 	var wood_reward: int = maxi(0, int(rewards.get("wood", 0)))
 	if game_state != null and game_state.has_method("add_resources") and (gold_reward > 0 or wood_reward > 0):
 		game_state.call("add_resources", gold_reward, wood_reward)
+		if gold_reward > 0:
+			reward_messages.append("+%d or" % gold_reward)
+		if wood_reward > 0:
+			reward_messages.append("+%d bois" % wood_reward)
 
 	var map_fragments: int = maxi(0, int(rewards.get("map_fragments", 0)))
 	if game_state != null and game_state.has_method("add_treasure_resources") and map_fragments > 0:
 		game_state.call("add_treasure_resources", map_fragments, 0, true)
+		reward_messages.append("+%d fragment" % map_fragments)
 
 	var rare_resource_id: String = String(rewards.get("rare_resource_id", ""))
 	var rare_resource_amount: int = maxi(0, int(rewards.get("rare_resource_amount", 0)))
@@ -245,8 +251,21 @@ func _grant_creature_rewards(_world_position: Vector3, creature_id: String, rewa
 	if not rare_resource_id.is_empty() and rare_resource_amount > 0 and randf() <= rare_resource_chance:
 		if game_state != null and game_state.has_method("add_creature_resource"):
 			game_state.call("add_creature_resource", rare_resource_id, rare_resource_amount)
+			reward_messages.append("Ressource gagnee : %s x%d" % [
+				MarineCreatureCatalog.get_resource_name(rare_resource_id),
+				rare_resource_amount,
+			])
 
 	var renown_reward: int = maxi(0, int(rewards.get("renown", 0)))
 	var reputation_system: Node = get_node_or_null("/root/ReputationSystem")
 	if reputation_system != null and reputation_system.has_method("add_reputation") and renown_reward > 0:
 		reputation_system.call("add_reputation", renown_reward, "marine_creature_defeated")
+		reward_messages.append("+%d renom" % renown_reward)
+
+	_show_reward_feedback(reward_messages)
+
+
+func _show_reward_feedback(reward_messages: Array[String]) -> void:
+	var hud: Node = get_tree().get_first_node_in_group("hud")
+	if hud != null and hud.has_method("show_temporary_context_message"):
+		hud.call("show_temporary_context_message", "\n".join(reward_messages), 2.2)
