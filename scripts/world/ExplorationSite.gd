@@ -22,6 +22,7 @@ var _explored: bool = false
 
 func _ready() -> void:
 	add_to_group("exploration_sites")
+	_ensure_treasure_matches_danger_zone()
 	_refresh_label()
 	_explored = _is_explored()
 	_refresh_visual()
@@ -85,7 +86,18 @@ func _refresh_label() -> void:
 	if name_label == null:
 		return
 
-	name_label.text = "%s\n%s" % [site_name, danger_zone]
+	name_label.text = "%s\n%s - %s" % [
+		site_name,
+		danger_zone,
+		TreasureCatalog.get_treasure_name(treasure_id),
+	]
+
+
+func _ensure_treasure_matches_danger_zone() -> void:
+	if TreasureCatalog.is_treasure_available_in_danger_zone(treasure_id, danger_zone):
+		return
+
+	treasure_id = TreasureCatalog.get_default_treasure_for_danger_zone(danger_zone)
 
 
 func _refresh_visual() -> void:

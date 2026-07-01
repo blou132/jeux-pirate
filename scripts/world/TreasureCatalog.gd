@@ -200,6 +200,28 @@ static func get_treasures_for_danger_zone(danger_zone: String) -> Array[String]:
 	return treasure_ids
 
 
+static func is_treasure_available_in_danger_zone(treasure_id: String, danger_zone: String) -> bool:
+	return get_treasures_for_danger_zone(danger_zone).has(treasure_id)
+
+
+static func get_default_treasure_for_danger_zone(danger_zone: String) -> String:
+	var treasure_ids: Array[String] = get_treasures_for_danger_zone(danger_zone)
+	if treasure_ids.is_empty():
+		return TREASURE_POUCH
+
+	return treasure_ids[0]
+
+
+static func get_danger_zone_treasure_text(danger_zone: String) -> String:
+	var treasure_names: Array[String] = []
+	for treasure_id in get_treasures_for_danger_zone(danger_zone):
+		treasure_names.append(get_treasure_name(treasure_id))
+	if treasure_names.is_empty():
+		return "Aucun tresor defini"
+
+	return ", ".join(treasure_names)
+
+
 static func get_requirement_text(treasure_id: String) -> String:
 	var requirements: Array[String] = []
 	var fragments: int = get_required_map_fragments(treasure_id)
