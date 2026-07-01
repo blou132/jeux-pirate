@@ -44,6 +44,8 @@ La refonte UI pirate ajoute une premiere direction visuelle dark fantasy : barre
 
 La v0.12 ajoute une camera joueur mobile pour rendre la navigation, l'exploration et la recherche de ports plus confortables.
 
+La v0.12.3 transforme le mode verrouille en vraie camera de poursuite derriere le bateau, avec hauteur reglable et inclinaison adaptee a la vue horizon/vue plongeante.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -328,11 +330,13 @@ La v0.12 ajoute une camera joueur mobile pour rendre la navigation, l'exploratio
 
 - Camera joueur dediee dans `scripts/camera/PlayerCamera.gd`.
 - Suivi fluide du bateau joueur, sans camera rigide directement collee au parent.
-- La camera garde une orientation monde stable et ne tourne pas avec le bateau pendant un 360 degres.
+- En mode verrouille, la camera reste derriere le bateau et suit sa direction sans roll parasite pendant les 360 degres.
 - Zoom molette borne entre une vue proche et une vue large.
 - `V` verrouille ou deverrouille la camera libre.
-- Souris pour observer autour du bateau avec offset limite et stable quand la camera libre est deverrouillee.
-- `C` recentre la camera sur le joueur sans changer le zoom.
+- Souris pour observer autour du bateau avec offset limite quand la camera libre est deverrouillee.
+- `C` recentre la camera derriere le bateau sans changer le zoom ni l'etat lock/unlock.
+- `PageUp` / `PageDown` ajustent la hauteur camera entre vue plus haute et vue plus proche de l'horizon.
+- L'inclinaison s'adapte a la hauteur : camera basse plus orientee horizon, camera haute plus plongeante.
 - La camera respecte les limites de carte exposees par `WorldBounds`.
 - Les controles camera sont ignores quand le port ou le menu d'exploration est ouvert, pour laisser le scroll et les clics UI fonctionner.
 
@@ -357,6 +361,7 @@ Godot n'est pas inclus dans ce depot.
 - `V` : verrouiller / deverrouiller camera libre
 - Souris : observer autour du bateau quand la camera libre est deverrouillee
 - `C` : recentrer la camera sur le bateau
+- `PageUp` / `PageDown` : lever / baisser la camera
 - `E` : interagir avec le port ou explorer une île selon la zone
 - `Échap` : fermer le menu
 - `R` : réapparaître au port après destruction

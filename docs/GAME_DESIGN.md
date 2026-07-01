@@ -108,15 +108,16 @@ Le joueur incarne le capitaine d'un petit navire independant qui construit progr
 
 ## Boucle de jeu v0.12
 
-1. Le joueur navigue avec une camera qui suit le bateau avec inertie.
+1. Le joueur navigue avec une camera de poursuite qui reste derriere le bateau en mode verrouille.
 2. Il ajuste le zoom a la molette selon le besoin : combat rapproche ou exploration plus large.
 3. Il appuie sur `V` pour deverrouiller la camera libre.
 4. Il deplace la souris pour observer autour du bateau sans maintenir de bouton.
 5. Il appuie de nouveau sur `V` pour verrouiller la camera sur un suivi normal.
 6. Il appuie sur `C` pour recentrer la camera sur le navire.
-7. Le bateau peut effectuer un 360 degres sans faire tourner l'ecran ni deriver le cadrage.
-8. Les limites de carte empechent la camera de partir trop loin hors de la zone jouable.
-9. Les menus de port et d'exploration gardent la priorite sur les entrees souris et clavier.
+7. Il utilise `PageUp` ou `PageDown` pour lever ou baisser la camera sans changer le zoom.
+8. Le bateau peut effectuer un 360 degres fluide sans snap a 0/360 ni roll parasite.
+9. Les limites de carte empechent la camera de partir trop loin hors de la zone jouable.
+10. Les menus de port et d'exploration gardent la priorite sur les entrees souris et clavier.
 
 ## Port et progression
 
@@ -386,11 +387,14 @@ Le catalogue contient maintenant plusieurs ports simules par zone de danger en p
 La camera doit ameliorer le confort d'exploration sans devenir un outil de triche ni masquer l'UI :
 
 - Le script `PlayerCamera.gd` suit le bateau avec un lissage de position et de rotation.
-- La rotation camera reste fixe en monde et ne reprend pas le yaw du bateau.
+- En mode verrouille, la position cible est calculee derriere le bateau avec sa direction horizontale, une distance et une hauteur reglables.
+- La camera regarde un point au-dessus du navire avec un lissage de rotation pour eviter snap et roll parasite.
 - La molette ajuste un zoom borne pour passer d'une lecture proche du bateau a une vue plus large des environs.
+- `PageUp` et `PageDown` ajustent la hauteur camera entre 5 et 18 unites, independamment du zoom.
+- Quand la camera est basse, elle regarde davantage vers l'horizon ; quand elle est haute, elle donne une vue plus plongeante.
 - `V` verrouille ou deverrouille la camera libre.
-- Quand la camera libre est deverrouillee, la position de souris par rapport au centre de l'ecran donne un decalage manuel limite autour du joueur.
-- L'offset de camera est applique en coordonnees monde stables, pas dans le repere tournant du bateau.
+- Quand la camera libre est deverrouillee, la souris cree un decalage manuel limite autour du joueur depuis son point d'ancrage au moment du deverrouillage.
+- Quand la camera est reverrouillee, le decalage revient progressivement a zero et la camera reprend sa position derriere le bateau.
 - Le clic droit reste reserve au combat et au canon tribord.
 - `C` annule le decalage manuel et recentre progressivement la camera sur le navire sans changer l'etat verrouille/deverrouille.
 - La position camera est clampée avec les limites de `WorldBounds`.

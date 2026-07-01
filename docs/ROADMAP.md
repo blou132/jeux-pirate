@@ -123,11 +123,13 @@
 ## v0.12 - Camera mobile
 
 - Ajouter une camera joueur dediee.
-- Stabiliser la camera pendant les rotations completes du bateau.
+- Camera verrouillee de poursuite derriere le bateau, compatible avec les rotations completes.
 - Ajouter le zoom a la molette.
 - Ajouter `V` pour verrouiller / deverrouiller la camera libre.
 - Deplacer la vue avec la souris seulement quand la camera libre est deverrouillee.
 - Ajouter `C` pour recentrer la camera.
+- Ajouter `PageUp` / `PageDown` pour regler la hauteur camera.
+- Adapter l'inclinaison entre vue horizon et vue plongeante selon la hauteur.
 - Clamper la camera aux limites de carte.
 - Desactiver les controles camera quand les menus sont ouverts.
 
