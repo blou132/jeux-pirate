@@ -303,6 +303,7 @@ func _attack_target(target: Node3D) -> void:
 
 	if _apply_damage_to_target(target):
 		_attack_cooldown_remaining = attack_cooldown
+		_show_damage_feedback(target, contact_damage)
 
 
 func _move_along_direction(direction: Vector3, delta: float, speed_scale: float) -> void:
@@ -395,6 +396,47 @@ func _apply_damage_to_target(target: Node) -> bool:
 		return true
 
 	return false
+
+
+func _show_damage_feedback(target: Node, damage_amount: int) -> void:
+	if damage_amount <= 0:
+		return
+
+	var hud: Node = get_tree().get_first_node_in_group("hud")
+	if hud == null or not hud.has_method("show_temporary_context_message"):
+		return
+
+	var message: String = _get_damage_feedback_message(target, damage_amount)
+	if message.is_empty():
+		return
+
+	hud.call("show_temporary_context_message", message, 1.0)
+
+
+func _get_damage_feedback_message(target: Node, damage_amount: int) -> String:
+	if target != null and target.is_in_group("player"):
+		match creature_id:
+			MarineCreatureCatalog.CREATURE_SHARK:
+				return "%s vous mord : -%d PV" % [display_name, damage_amount]
+			MarineCreatureCatalog.CREATURE_SEA_CROCODILE:
+				return "%s mord la coque : -%d PV" % [display_name, damage_amount]
+			MarineCreatureCatalog.CREATURE_SEA_SERPENT:
+				return "%s frappe la coque : -%d PV" % [display_name, damage_amount]
+			MarineCreatureCatalog.CREATURE_JUVENILE_KRAKEN:
+				return "%s ecrase la coque : -%d PV" % [display_name, damage_amount]
+
+		return "%s attaque : -%d PV" % [display_name, damage_amount]
+
+	if target != null and target.is_in_group("ally_ships"):
+		var target_name: String = "un allie"
+		if target.has_method("get_hud_name"):
+			target_name = String(target.call("get_hud_name"))
+		elif target.has_method("get_display_name"):
+			target_name = String(target.call("get_display_name"))
+
+		return "%s attaque %s : -%d PV" % [display_name, target_name, damage_amount]
+
+	return ""
 
 
 func _is_valid_target(target: Node, search_range: float) -> bool:
