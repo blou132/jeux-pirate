@@ -31,7 +31,13 @@ func _set_current_danger_zone(normalized_zone_id: String) -> bool:
 
 
 func _get_notification_message(normalized_zone_id: String) -> String:
+	var base_message: String = DangerZoneCatalog.get_entry_message(normalized_zone_id)
 	if not zone_message.is_empty():
-		return zone_message
+		base_message = zone_message
 
-	return DangerZoneCatalog.get_entry_message(normalized_zone_id)
+	var zone_level: int = DangerZoneCatalog.get_zone_level(normalized_zone_id)
+	var reward_multiplier: float = DangerZoneCatalog.get_reward_multiplier(normalized_zone_id)
+	if reward_multiplier > 1.0:
+		return "%s - niv. %d - bonus x%.2f" % [base_message, zone_level, reward_multiplier]
+
+	return "%s - niv. %d" % [base_message, zone_level]
