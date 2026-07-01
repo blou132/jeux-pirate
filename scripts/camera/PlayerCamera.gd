@@ -18,6 +18,8 @@ extends Camera3D
 @export var camera_height_step: float = 1.0
 @export var height_smoothing: float = 8.0
 @export var look_at_height: float = 2.0
+@export var low_camera_look_at_height: float = 3.0
+@export var high_camera_look_at_height: float = 1.5
 @export var clamp_to_world_bounds: bool = true
 @export var fallback_world_limit: Vector2 = Vector2(112.0, 112.0)
 @export var world_bounds_padding: float = 4.0
@@ -150,9 +152,15 @@ func _adjust_camera_height(delta_height: float) -> void:
 
 
 func _get_clamped_camera_height(raw_height: float) -> float:
-	var min_height: float = minf(min_camera_height, max_camera_height)
-	var max_height: float = maxf(min_camera_height, max_camera_height)
-	return clampf(raw_height, min_height, max_height)
+	return clampf(raw_height, _get_min_camera_height(), _get_max_camera_height())
+
+
+func _get_min_camera_height() -> float:
+	return minf(min_camera_height, max_camera_height)
+
+
+func _get_max_camera_height() -> float:
+	return maxf(min_camera_height, max_camera_height)
 
 
 func recenter() -> void:
@@ -192,6 +200,7 @@ func _get_free_look_anchor_position() -> Vector2:
 		_has_free_look_anchor = true
 
 	return _free_look_anchor_position
+
 
 func _clamp_to_world_bounds(world_position: Vector3) -> Vector3:
 	if not clamp_to_world_bounds:
@@ -246,9 +255,18 @@ func _are_camera_controls_blocked() -> bool:
 
 
 func _apply_look_at_rotation(weight: float) -> void:
-	var look_position: Vector3 = _target.global_position + (Vector3.UP * look_at_height)
+	var look_position: Vector3 = _target.global_position + (Vector3.UP * _get_current_look_at_height())
 	var desired_transform: Transform3D = global_transform.looking_at(look_position, Vector3.UP)
 	global_transform.basis = global_transform.basis.slerp(desired_transform.basis, clampf(weight, 0.0, 1.0)).orthonormalized()
+
+
+func _get_current_look_at_height() -> float:
+	var height_span: float = _get_max_camera_height() - _get_min_camera_height()
+	if height_span <= 0.001:
+		return look_at_height
+
+	var height_ratio: float = clampf((_current_camera_height - _get_min_camera_height()) / height_span, 0.0, 1.0)
+	return lerpf(low_camera_look_at_height, high_camera_look_at_height, height_ratio)
 
 
 func _get_smoothing_weight(smoothing: float, delta: float) -> float:
