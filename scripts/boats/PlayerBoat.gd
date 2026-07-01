@@ -355,27 +355,29 @@ func _secure_respawn_area(respawn_position: Vector3) -> void:
 		safe_center = port.global_position
 
 	safe_center.y = 0.0
-	for enemy in get_tree().get_nodes_in_group("enemy_ships"):
-		if not enemy is Node3D:
-			continue
-		if enemy.has_method("is_destroyed") and enemy.is_destroyed():
-			continue
+	var threat_groups: Array[String] = ["enemy_ships", "marine_creatures"]
+	for group_name in threat_groups:
+		for threat in get_tree().get_nodes_in_group(group_name):
+			if not threat is Node3D:
+				continue
+			if threat.has_method("is_destroyed") and threat.is_destroyed():
+				continue
 
-		var enemy_node := enemy as Node3D
-		var offset := enemy_node.global_position - safe_center
-		offset.y = 0.0
-		if offset.length() > respawn_safe_radius:
-			continue
+			var threat_node: Node3D = threat as Node3D
+			var offset: Vector3 = threat_node.global_position - safe_center
+			offset.y = 0.0
+			if offset.length() > respawn_safe_radius:
+				continue
 
-		var push_direction := offset.normalized()
-		if push_direction.length_squared() < 0.01:
-			push_direction = Vector3.FORWARD
+			var push_direction: Vector3 = offset.normalized()
+			if push_direction.length_squared() < 0.01:
+				push_direction = Vector3.FORWARD
 
-		enemy_node.global_position = safe_center + (push_direction * respawn_enemy_push_distance)
-		enemy_node.global_position.y = 0.0
-		if enemy_node is CharacterBody3D:
-			var enemy_body := enemy_node as CharacterBody3D
-			enemy_body.velocity = Vector3.ZERO
+			threat_node.global_position = safe_center + (push_direction * respawn_enemy_push_distance)
+			threat_node.global_position.y = 0.0
+			if threat_node is CharacterBody3D:
+				var threat_body: CharacterBody3D = threat_node as CharacterBody3D
+				threat_body.velocity = Vector3.ZERO
 
 
 func _refresh_debug_markers() -> void:
