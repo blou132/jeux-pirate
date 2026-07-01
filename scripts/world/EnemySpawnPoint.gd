@@ -1,6 +1,6 @@
 extends Marker3D
 
-@export var danger_zone: String = "open"
+@export var danger_zone: String = DangerZoneCatalog.ZONE_SAFE
 
 
 func _ready() -> void:
@@ -8,4 +8,4 @@ func _ready() -> void:
 
 
 func get_danger_zone() -> String:
-	return danger_zone
+	return DangerZoneCatalog.normalize_zone_id(danger_zone)

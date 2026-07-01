@@ -232,31 +232,37 @@ script = ExtResource("4_spawn_manager")
 position = Vector3(28, 0, -18)
 rotation_degrees = Vector3(0, -35, 0)
 script = ExtResource("9_enemy_spawn_point")
-danger_zone = "port"
+danger_zone = "safe_waters"
 
 [node name="SpawnNorthChannel" type="Marker3D" parent="SpawnManager"]
 position = Vector3(-8, 0, -46)
 rotation_degrees = Vector3(0, 155, 0)
 script = ExtResource("9_enemy_spawn_point")
-danger_zone = "archipelago"
+danger_zone = "watched_zone"
 
 [node name="SpawnEastReef" type="Marker3D" parent="SpawnManager"]
 position = Vector3(54, 0, 18)
 rotation_degrees = Vector3(0, -105, 0)
 script = ExtResource("9_enemy_spawn_point")
-danger_zone = "archipelago"
+danger_zone = "contested_zone"
 
 [node name="SpawnHostileSouth" type="Marker3D" parent="SpawnManager"]
 position = Vector3(-42, 0, 52)
 rotation_degrees = Vector3(0, 35, 0)
 script = ExtResource("9_enemy_spawn_point")
-danger_zone = "hostile"
+danger_zone = "hostile_zone"
 
 [node name="SpawnHostileWest" type="Marker3D" parent="SpawnManager"]
 position = Vector3(-58, 0, -18)
 rotation_degrees = Vector3(0, 80, 0)
 script = ExtResource("9_enemy_spawn_point")
-danger_zone = "hostile"
+danger_zone = "hostile_zone"
+
+[node name="SpawnDeadlyTreasureRoute" type="Marker3D" parent="SpawnManager"]
+position = Vector3(-88, 0, 64)
+rotation_degrees = Vector3(0, 45, 0)
+script = ExtResource("9_enemy_spawn_point")
+danger_zone = "deadly_zone"
 
 [node name="StarterQuay" parent="." instance=ExtResource("6_port")]
 position = Vector3(-9, 0, 8)

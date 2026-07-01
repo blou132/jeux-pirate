@@ -48,7 +48,8 @@ func _spawn_enemy_if_possible() -> bool:
 		enemy.queue_free()
 		return false
 
-	var variant_config := _pick_enemy_variant(_get_spawn_point_zone(spawn_point))
+	var spawn_zone_id: String = _get_spawn_point_zone(spawn_point)
+	var variant_config: Dictionary = _pick_enemy_variant(spawn_zone_id)
 	if enemy.has_method("configure_variant"):
 		enemy.configure_variant(variant_config)
 
@@ -251,69 +252,55 @@ func _get_danger_level() -> int:
 
 func _get_spawn_point_zone(spawn_point: Marker3D) -> String:
 	if spawn_point.has_method("get_danger_zone"):
-		return spawn_point.get_danger_zone()
+		return DangerZoneCatalog.normalize_zone_id(String(spawn_point.get_danger_zone()))
 
-	return "open"
+	return DangerZoneCatalog.ZONE_SAFE
 
 
 func _get_variant_weight(variant_id: String, danger_level: int, danger_zone: String) -> int:
-	match danger_zone:
-		"port":
-			match variant_id:
-				"small_pirate":
-					return 8
-				"brigantine":
-					return 1 + mini(danger_level, 2)
-				"heavy_patrol":
-					return 0
-		"archipelago":
-			match variant_id:
-				"small_pirate":
-					return max(2, 6 - danger_level)
-				"brigantine":
-					return 4 + danger_level
-				"heavy_patrol":
-					return max(0, danger_level - 2)
-		"hostile":
-			match variant_id:
-				"small_pirate":
-					return max(1, 4 - danger_level)
-				"brigantine":
-					return 4
-				"heavy_patrol":
-					return 2 + danger_level
+	var zone_id: String = DangerZoneCatalog.normalize_zone_id(danger_zone)
+	var allowed_enemy_types: Array[String] = DangerZoneCatalog.get_enemy_types(zone_id)
+	if not allowed_enemy_types.has(variant_id):
+		return 0
 
-	if danger_level <= 1:
-		match variant_id:
-			"small_pirate":
-				return 7
-			"brigantine":
-				return 2
-			"heavy_patrol":
-				return 0
-	elif danger_level == 2:
-		match variant_id:
-			"small_pirate":
-				return 5
-			"brigantine":
-				return 4
-			"heavy_patrol":
-				return 1
-	elif danger_level == 3:
-		match variant_id:
-			"small_pirate":
-				return 3
-			"brigantine":
-				return 5
-			"heavy_patrol":
-				return 2
-
-	match variant_id:
-		"small_pirate":
-			return 2
-		"brigantine":
-			return 5
-		"heavy_patrol":
-			return 4
+	match zone_id:
+		DangerZoneCatalog.ZONE_SAFE:
+			match variant_id:
+				"small_pirate":
+					return 10
+		DangerZoneCatalog.ZONE_WATCHED:
+			match variant_id:
+				"small_pirate":
+					return maxi(3, 7 - danger_level)
+				"brigantine":
+					return 2 + mini(danger_level, 3)
+		DangerZoneCatalog.ZONE_CONTESTED:
+			match variant_id:
+				"small_pirate":
+					return maxi(1, 4 - danger_level)
+				"brigantine":
+					return 6
+				"heavy_patrol":
+					return maxi(1, danger_level)
+		DangerZoneCatalog.ZONE_HOSTILE:
+			match variant_id:
+				"brigantine":
+					return 5
+				"heavy_patrol":
+					return 3 + danger_level
+		DangerZoneCatalog.ZONE_DEADLY:
+			match variant_id:
+				"brigantine":
+					return 2
+				"heavy_patrol":
+					return 7 + danger_level
+		DangerZoneCatalog.ZONE_LEGENDARY:
+			match variant_id:
+				"heavy_patrol":
+					return 10 + danger_level
+		DangerZoneCatalog.ZONE_ABYSS:
+			match variant_id:
+				"heavy_patrol":
+					return 12 + danger_level
 
 	return 1
