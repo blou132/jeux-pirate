@@ -156,6 +156,8 @@ func _cleanup_inactive_creatures() -> void:
 
 func _get_current_danger_zone_id() -> String:
 	var game_state: Node = get_node_or_null("/root/GameState")
+	if game_state != null and game_state.has_method("get_current_danger_zone_id_safe"):
+		return DangerZoneCatalog.normalize_zone_id(String(game_state.call("get_current_danger_zone_id_safe")))
 	if game_state != null and game_state.has_method("get_current_danger_zone_id"):
 		return DangerZoneCatalog.normalize_zone_id(String(game_state.call("get_current_danger_zone_id")))
 

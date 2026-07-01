@@ -248,6 +248,14 @@ func get_current_danger_zone_id() -> String:
 	return current_danger_zone_id
 
 
+func get_current_danger_zone_id_safe() -> String:
+	var normalized_zone_id: String = DangerZoneCatalog.normalize_zone_id(current_danger_zone_id)
+	if normalized_zone_id.is_empty():
+		return DangerZoneCatalog.ZONE_SAFE
+
+	return normalized_zone_id
+
+
 func get_current_danger_zone_name() -> String:
 	return DangerZoneCatalog.get_zone_name(current_danger_zone_id)
 
