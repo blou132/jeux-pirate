@@ -15,19 +15,51 @@ signal defeated(world_position: Vector3, creature_id: String, rewards: Dictionar
 @export var attack_range: float = 2.2
 @export var attack_cooldown: float = 1.7
 @export var aggression: float = 0.5
+@export var patrol_radius: float = 12.0
+@export var flee_distance: float = 18.0
+@export var port_safe_radius: float = 45.0
+@export var port_expulsion_radius: float = 58.0
 
 var health: int = 0
 var spawn_zone_id: String = DangerZoneCatalog.ZONE_SAFE
 var _destroyed: bool = false
 var _last_damage_source: Node
+var _home_position: Vector3 = Vector3.ZERO
+var _target: Node3D
+var _wander_direction: Vector3 = Vector3.FORWARD
+var _wander_timer: float = 0.0
+var _attack_cooldown_remaining: float = 0.0
+var _safe_zone_cooldown_remaining: float = 0.0
 
 
 func _ready() -> void:
 	add_to_group("marine_creatures")
+	_home_position = global_position
 	health = max_health
 	_apply_catalog_data(creature_id)
+	_pick_new_wander_direction()
 	_refresh_nameplate()
 	health_changed.emit(health, max_health)
+
+
+func _physics_process(delta: float) -> void:
+	if _destroyed:
+		return
+
+	_wander_timer = maxf(0.0, _wander_timer - delta)
+	_attack_cooldown_remaining = maxf(0.0, _attack_cooldown_remaining - delta)
+	_safe_zone_cooldown_remaining = maxf(0.0, _safe_zone_cooldown_remaining - delta)
+
+	if _is_position_inside_port_safe_zone(global_position):
+		_target = null
+		_safe_zone_cooldown_remaining = 2.0
+		_move_away_from_closest_port(delta)
+		return
+
+	if behavior == MarineCreatureCatalog.BEHAVIOR_PASSIVE:
+		_process_passive_behavior(delta)
+	else:
+		_process_aggressive_behavior(delta)
 
 
 func configure_creature(config: Dictionary, zone_id: String) -> void:
@@ -35,6 +67,8 @@ func configure_creature(config: Dictionary, zone_id: String) -> void:
 	creature_id = String(config.get("id", creature_id))
 	_apply_catalog_data(creature_id)
 	health = max_health
+	_home_position = global_position
+	_pick_new_wander_direction()
 	health_changed.emit(health, max_health)
 
 
@@ -155,3 +189,210 @@ func _defeat() -> void:
 	velocity = Vector3.ZERO
 	defeated.emit(global_position, creature_id, get_rewards())
 	queue_free()
+
+
+func _process_passive_behavior(delta: float) -> void:
+	var threat: Node3D = _get_closest_target(detection_range)
+	if threat != null:
+		var flee_direction: Vector3 = global_position - threat.global_position
+		flee_direction.y = 0.0
+		if flee_direction.length_squared() > 0.01:
+			_move_along_direction(flee_direction.normalized(), delta, 1.25)
+			return
+
+	_patrol(delta)
+
+
+func _process_aggressive_behavior(delta: float) -> void:
+	if _safe_zone_cooldown_remaining > 0.0:
+		_patrol(delta)
+		return
+
+	if not _is_valid_target(_target, chase_leash_distance):
+		_target = _get_closest_target(detection_range)
+
+	if _target == null:
+		_patrol(delta)
+		return
+
+	var offset: Vector3 = _target.global_position - global_position
+	offset.y = 0.0
+	var distance: float = offset.length()
+	if distance > chase_leash_distance:
+		_target = null
+		_patrol(delta)
+		return
+
+	if distance <= attack_range:
+		_attack_target(_target)
+		_slow_down(delta)
+		return
+
+	if offset.length_squared() > 0.01:
+		_move_along_direction(offset.normalized(), delta, 1.0 + (aggression * 0.18))
+	else:
+		_slow_down(delta)
+
+
+func _patrol(delta: float) -> void:
+	if _wander_timer <= 0.0:
+		_pick_new_wander_direction()
+
+	var offset_from_home: Vector3 = global_position - _home_position
+	offset_from_home.y = 0.0
+	var desired_direction: Vector3 = _wander_direction
+	if offset_from_home.length() > patrol_radius:
+		desired_direction = (_home_position - global_position).normalized()
+		desired_direction.y = 0.0
+
+	if desired_direction.length_squared() < 0.01:
+		_slow_down(delta)
+		return
+
+	_move_along_direction(desired_direction.normalized(), delta, 0.55)
+
+
+func _attack_target(target: Node3D) -> void:
+	if _attack_cooldown_remaining > 0.0:
+		return
+	if contact_damage <= 0:
+		return
+	if target == null or not is_instance_valid(target):
+		return
+	if _is_position_inside_port_safe_zone(target.global_position):
+		_target = null
+		_safe_zone_cooldown_remaining = 2.0
+		return
+
+	if target.has_method("take_damage"):
+		target.call("take_damage", contact_damage)
+		_attack_cooldown_remaining = attack_cooldown
+
+
+func _move_along_direction(direction: Vector3, delta: float, speed_scale: float) -> void:
+	if direction.length_squared() < 0.01:
+		_slow_down(delta)
+		return
+
+	direction.y = 0.0
+	direction = direction.normalized()
+	velocity = direction * move_speed * maxf(0.0, speed_scale)
+	move_and_slide()
+	global_position.y = 0.0
+	_face_direction(direction, delta)
+
+
+func _slow_down(delta: float) -> void:
+	velocity = velocity.move_toward(Vector3.ZERO, move_speed * delta)
+	move_and_slide()
+	global_position.y = 0.0
+
+
+func _face_direction(direction: Vector3, delta: float) -> void:
+	if direction.length_squared() < 0.01:
+		return
+
+	var current_forward: Vector3 = -global_transform.basis.z
+	current_forward.y = 0.0
+	if current_forward.length_squared() < 0.01:
+		look_at(global_position + direction, Vector3.UP)
+		return
+
+	current_forward = current_forward.normalized()
+	var signed_angle: float = current_forward.signed_angle_to(direction.normalized(), Vector3.UP)
+	var turn_amount: float = clampf(signed_angle, -2.4 * delta, 2.4 * delta)
+	rotate_y(turn_amount)
+
+
+func _pick_new_wander_direction() -> void:
+	var angle: float = randf_range(0.0, TAU)
+	_wander_direction = Vector3(cos(angle), 0.0, sin(angle)).normalized()
+	_wander_timer = randf_range(2.2, 4.8)
+
+
+func _get_closest_target(search_range: float) -> Node3D:
+	var closest_target: Node3D
+	var closest_distance_squared: float = search_range * search_range
+
+	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
+	if _is_valid_target(player, search_range):
+		closest_target = player
+		closest_distance_squared = global_position.distance_squared_to(player.global_position)
+
+	for ally in get_tree().get_nodes_in_group("ally_ships"):
+		if not ally is Node3D:
+			continue
+
+		var ally_node: Node3D = ally as Node3D
+		if not _is_valid_target(ally_node, search_range):
+			continue
+
+		var distance_squared: float = global_position.distance_squared_to(ally_node.global_position)
+		if distance_squared <= closest_distance_squared:
+			closest_distance_squared = distance_squared
+			closest_target = ally_node
+
+	return closest_target
+
+
+func _is_valid_target(target: Node, search_range: float) -> bool:
+	if target == null or not is_instance_valid(target):
+		return false
+	if not target is Node3D:
+		return false
+	if target.has_method("can_be_targeted") and not bool(target.call("can_be_targeted")):
+		return false
+	if target.has_method("is_alive") and not bool(target.call("is_alive")):
+		return false
+	if target.has_method("is_destroyed") and bool(target.call("is_destroyed")):
+		return false
+
+	var target_node: Node3D = target as Node3D
+	if _is_position_inside_port_safe_zone(target_node.global_position):
+		return false
+
+	return global_position.distance_squared_to(target_node.global_position) <= search_range * search_range
+
+
+func _is_position_inside_port_safe_zone(position: Vector3) -> bool:
+	for port in get_tree().get_nodes_in_group("ports"):
+		if not port is Node3D:
+			continue
+
+		var port_node: Node3D = port as Node3D
+		var offset: Vector3 = position - port_node.global_position
+		offset.y = 0.0
+		if offset.length_squared() <= port_safe_radius * port_safe_radius:
+			return true
+
+	return false
+
+
+func _move_away_from_closest_port(delta: float) -> void:
+	var closest_port: Node3D
+	var closest_distance_squared: float = INF
+	for port in get_tree().get_nodes_in_group("ports"):
+		if not port is Node3D:
+			continue
+
+		var port_node: Node3D = port as Node3D
+		var distance_squared: float = global_position.distance_squared_to(port_node.global_position)
+		if distance_squared < closest_distance_squared:
+			closest_distance_squared = distance_squared
+			closest_port = port_node
+
+	if closest_port == null:
+		_patrol(delta)
+		return
+
+	var escape_direction: Vector3 = global_position - closest_port.global_position
+	escape_direction.y = 0.0
+	if escape_direction.length_squared() < 0.01:
+		escape_direction = Vector3.FORWARD
+
+	_move_along_direction(escape_direction.normalized(), delta, 1.1)
+	var offset_from_port: Vector3 = global_position - closest_port.global_position
+	offset_from_port.y = 0.0
+	if offset_from_port.length() < port_expulsion_radius:
+		global_position = closest_port.global_position + (offset_from_port.normalized() * port_expulsion_radius)
+		global_position.y = 0.0
