@@ -248,7 +248,8 @@ func _process_aggressive_behavior(delta: float) -> void:
 		_patrol(delta)
 		return
 
-	var offset: Vector3 = _target.global_position - global_position
+	var target_position: Vector3 = _get_target_position(_target)
+	var offset: Vector3 = target_position - global_position
 	offset.y = 0.0
 	var distance: float = offset.length()
 	if distance > chase_leash_distance:
@@ -300,8 +301,7 @@ func _attack_target(target: Node3D) -> void:
 		_safe_zone_cooldown_remaining = 2.0
 		return
 
-	if target.has_method("take_damage"):
-		target.call("take_damage", contact_damage)
+	if _apply_damage_to_target(target):
 		_attack_cooldown_remaining = attack_cooldown
 
 
@@ -369,6 +369,32 @@ func _get_closest_target(search_range: float) -> Node3D:
 			closest_target = ally_node
 
 	return closest_target
+
+
+func _get_target_position(target: Node3D) -> Vector3:
+	if target != null and target.has_method("get_aim_position"):
+		var aim_position_value: Variant = target.call("get_aim_position")
+		if aim_position_value is Vector3:
+			return aim_position_value as Vector3
+
+	return target.global_position
+
+
+func _apply_damage_to_target(target: Node) -> bool:
+	if target == null or not is_instance_valid(target):
+		return false
+
+	if target.has_method("take_damage"):
+		target.call("take_damage", contact_damage)
+		return true
+	if target.has_method("apply_damage"):
+		target.call("apply_damage", contact_damage)
+		return true
+	if target.has_method("damage"):
+		target.call("damage", contact_damage)
+		return true
+
+	return false
 
 
 func _is_valid_target(target: Node, search_range: float) -> bool:
