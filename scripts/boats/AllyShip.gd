@@ -165,6 +165,14 @@ func is_destroyed() -> bool:
 	return _destroyed
 
 
+func is_alive() -> bool:
+	return not _destroyed and health > 0
+
+
+func can_be_targeted() -> bool:
+	return is_alive()
+
+
 func get_starboard_axis() -> Vector3:
 	var left_point := get_node_or_null("LeftCannonPoint") as Node3D
 	var right_point := get_node_or_null("RightCannonPoint") as Node3D
