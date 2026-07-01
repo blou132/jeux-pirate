@@ -139,6 +139,16 @@ Le joueur incarne le capitaine d'un petit navire independant qui construit progr
 5. Les transitions de zone affichent le niveau et le bonus de recompense.
 6. Les combats et sites d'exploration en zone dangereuse rapportent plus d'or, de bois et de renom.
 
+## Boucle de jeu v0.15
+
+1. Le joueur croise des creatures marines selon la zone de danger.
+2. Les poissons rendent les eaux sures plus vivantes et fuient le navire.
+3. Les requins, crocodiles marins, serpents de mer et krakens juveniles peuvent attaquer a courte portee.
+4. Le joueur et sa flotte peuvent les combattre avec les boulets existants.
+5. Les creatures vaincues donnent or, bois, renom, fragments possibles et ressources rares.
+6. Les ressources rares restent des compteurs separes de la cargaison commerciale.
+7. Les ports restent des zones sures : les creatures decrochent ou sont repoussees au respawn.
+
 ## Port et progression
 
 Le port sert de premier point sûr et de première interface de progression. Il établit le rythme attendu : partir en mer, obtenir des ressources, revenir au port, réparer, améliorer le bateau, accepter des missions et recruter un premier soutien allié.
@@ -452,6 +462,28 @@ Zones officielles :
 La v0.14 ne cree pas une carte immense. Elle ajoute une premiere Zone mortelle autour de l'ile au tresor et convertit les regions existantes vers les identifiants officiels. Les zones legendaires restent surtout des donnees de preparation pour les ports, tresors et routes futures.
 
 Le danger global issu du nombre d'ennemis detruits reste conserve pour la progression historique. La zone courante est separee dans le HUD pour eviter de confondre niveau de region et escalade globale.
+
+## Creatures marines v0.15
+
+La v0.15 ajoute une premiere couche de vie et de menace non pirate sans lancer encore de boss complexe :
+
+- Poisson : passif, fuit le joueur, surtout Eaux sures.
+- Requin : rapide, agressif a courte portee, rare en Eaux sures puis plus frequent.
+- Crocodile marin : lent et robuste, apparait a partir de la Zone surveillee.
+- Serpent de mer : rapide et agressif, reserve aux zones contestee, hostile et mortelle.
+- Kraken juvenile : rare, lent, dangereux, surtout Zone hostile et Zone mortelle.
+
+Les creatures futures restent dans le catalogue mais ne spawnent pas en v0.15 : Leviathan, Kraken ancestral et Dieu des oceans.
+
+Repartition de spawn :
+
+- Eaux sures : poissons, requins rares.
+- Zone surveillee : poissons, requins, crocodiles marins rares.
+- Zone contestee : requins, crocodiles marins, serpents de mer rares.
+- Zone hostile : crocodiles marins, serpents de mer, krakens juveniles rares.
+- Zone mortelle : serpents de mer, krakens juveniles.
+
+Les ressources rares v0.15 sont Perle noire, Dents de requin, Corail sacre, Ecaille de serpent et Oeil de kraken. Elles sont stockees dans `GameState` comme compteurs separes pour eviter de casser la cargaison et le commerce.
 
 ## Réputation et titres v0.8
 

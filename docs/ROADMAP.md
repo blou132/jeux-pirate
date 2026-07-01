@@ -156,9 +156,17 @@
 
 ## v0.15 - Creatures marines
 
-- Ajouter les premieres menaces non humaines.
-- Tester des comportements simples distincts des navires.
-- Garder les combats lisibles avec les regles de navigation existantes.
+- Ajouter `MarineCreatureCatalog` avec la hierarchie marine complete.
+- Implementer en v0.15 Poisson, Requin, Crocodile marin, Serpent de mer et Kraken juvenile.
+- Garder Leviathan, Kraken ancestral et Dieu des oceans en donnees `a venir`.
+- Ajouter une scene generique `MarineCreature` en primitives Godot.
+- Ajouter un spawner marin dedie avec points de spawn par zone de danger.
+- Ajouter comportements simples : passif/fuite, detection, poursuite, attaque au contact et leash.
+- Permettre aux boulets joueur et allies de blesser les creatures.
+- Ajouter recompenses : or, bois, renom, fragments possibles et ressources rares.
+- Stocker les ressources de creatures separement de la cargaison commerciale.
+- Afficher feedback HUD et compteur detaille des creatures/ressources.
+- Garder les ports comme zones sures sans camping de creatures.
 
 ## v0.16 - Controle de territoire
 

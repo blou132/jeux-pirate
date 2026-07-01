@@ -50,6 +50,8 @@ La v0.13 ajoute une premiere couche de tresors et d'exploration : catalogue de t
 
 La v0.14 avance les zones de danger : catalogue central, regions de monde identifiees, HUD de zone, spawns ennemis et recompenses modules par le risque.
 
+La v0.15 ajoute une premiere base de creatures marines : poissons, requins, crocodiles marins, serpents de mer et krakens juveniles, avec spawns par zone, combat simple et ressources rares.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -366,6 +368,19 @@ La v0.14 avance les zones de danger : catalogue central, regions de monde identi
 - La densite ennemie et le delai de respawn augmentent avec le danger de la zone courante.
 - Les recompenses de combat et d'exploration gagnent un multiplicateur de zone sur or, bois et renom.
 
+## Etat v0.15
+
+- `MarineCreatureCatalog` centralise la hierarchie marine : Poissons, Requins, Crocodiles marins, Kraken juvenile, Serpent de mer, Leviathan, Kraken ancestral et Dieu des oceans.
+- Creatures jouables en v0.15 : Poisson passif, Requin, Crocodile marin, Serpent de mer et Kraken juvenile.
+- Creatures reservees plus tard : Leviathan, Kraken ancestral et Dieu des oceans.
+- `MarineCreatureSpawner` utilise des points de spawn dedies et les zones de danger pour choisir les creatures.
+- Repartition : Eaux sures = poissons/requins rares, Zone surveillee = poissons/requins/crocodiles rares, Zone contestee = requins/crocodiles/serpents rares, Zone hostile = crocodiles/serpents/krakens rares, Zone mortelle = serpents/krakens.
+- Les creatures agressives detectent joueur ou allies, poursuivent a courte portee, attaquent au contact et decrochent pres des ports.
+- Les boulets joueur et allies peuvent toucher les creatures ; les boulets pirates restent reserves au joueur et a la flotte.
+- Ressources rares suivies separement de la cargaison : Perle noire, Dents de requin, Corail sacre, Ecaille de serpent et Oeil de kraken.
+- Le HUD detaille affiche creatures vaincues et ressources marines possedees.
+- Une aide debug desactivee par defaut peut afficher l'etat IA des creatures et les spawns marins.
+
 ## Lancement
 
 1. Installer Godot 4.x.
@@ -425,6 +440,8 @@ Les lignes de bordée ennemies peuvent être affichées avec `debug_show_broadsi
 - `QuestSystem` est configure en autoload pour suivre les missions actives et les récompenses.
 - `ReputationSystem` est configure en autoload pour suivre réputation, rangs, titres pirates et feedback de progression.
 - `DangerZoneCatalog` centralise les zones de danger, leurs niveaux, types d'ennemis, densites, ports, tresors et multiplicateurs de recompense.
+- `MarineCreatureCatalog` centralise les creatures marines, leurs zones, comportements, stats et recompenses.
+- `MarineCreatureSpawner` gere les creatures actives, les points de spawn marins et la densite par zone.
 - `TreasureCatalog` centralise les types de tresors, prerequis, zones recommandees et recompenses.
 - `ExplorationSite` et `ExplorationSiteSpawner` ajoutent des sites explorables uniques sur la carte.
 - `QuestObjectiveSpawner` crée les objectifs temporaires de mission dans la scène jouable.
