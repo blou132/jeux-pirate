@@ -131,6 +131,9 @@ func _adjust_zoom(delta_factor: float) -> void:
 
 func recenter() -> void:
 	_target_look_offset = Vector3.ZERO
+	if is_free_look_unlocked:
+		_free_look_anchor_position = get_viewport().get_mouse_position()
+		_has_free_look_anchor = true
 
 
 func _refresh_free_look_target() -> void:
