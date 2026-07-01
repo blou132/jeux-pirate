@@ -139,11 +139,11 @@ func is_exploration_site_explored(site_id: String) -> bool:
 	return bool(explored_exploration_sites.get(site_id, false))
 
 
-func mark_exploration_site_explored(site_id: String, treasure_id: String = "") -> void:
+func mark_exploration_site_explored(site_id: String, treasure_id: String = "") -> bool:
 	if site_id.is_empty():
-		return
+		return false
 	if bool(explored_exploration_sites.get(site_id, false)):
-		return
+		return false
 
 	explored_exploration_sites[site_id] = true
 	if not treasure_id.is_empty():
@@ -151,6 +151,7 @@ func mark_exploration_site_explored(site_id: String, treasure_id: String = "") -
 		discovered_treasures[treasure_id] = current_count + 1
 
 	exploration_progress_changed.emit(get_discovered_treasure_count(), get_explored_site_count())
+	return true
 
 
 func reset_exploration_sites() -> void:

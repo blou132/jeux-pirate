@@ -86,13 +86,6 @@ func explore() -> Dictionary:
 			"Aucun fragment consomme",
 		])
 
-	if not _spend_unlock_requirements(game_state):
-		return _make_exploration_result([
-			"Fragments de carte insuffisants",
-			_build_requirement_status(game_state),
-			"Aucun fragment consomme",
-		])
-
 	var rewards: Dictionary = TreasureCatalog.get_rewards(treasure_id)
 	var cargo_reward: Dictionary = rewards.get("cargo", {})
 	var cargo_block_reason: String = _get_cargo_block_reason(game_state, cargo_reward)
@@ -102,7 +95,19 @@ func explore() -> Dictionary:
 			"Vendez des marchandises avant d'explorer ce site",
 		])
 
-	_mark_explored()
+	if not _spend_unlock_requirements(game_state):
+		return _make_exploration_result([
+			"Fragments de carte insuffisants",
+			_build_requirement_status(game_state),
+			"Aucun fragment consomme",
+		])
+
+	if not _mark_explored():
+		return _make_exploration_result([
+			"Site deja explore",
+			"%s deja recupere" % TreasureCatalog.get_treasure_name(treasure_id),
+		])
+
 	_refresh_visual()
 	_grant_rewards(game_state, rewards)
 	var renown_gained: int = _grant_renown()
@@ -287,11 +292,13 @@ func _is_explored() -> bool:
 	return false
 
 
-func _mark_explored() -> void:
+func _mark_explored() -> bool:
 	_explored = true
 	var game_state: Node = _get_game_state()
 	if game_state != null and game_state.has_method("mark_exploration_site_explored"):
-		game_state.call("mark_exploration_site_explored", _get_site_key(), treasure_id)
+		return bool(game_state.call("mark_exploration_site_explored", _get_site_key(), treasure_id))
+
+	return true
 
 
 func _get_site_key() -> String:
