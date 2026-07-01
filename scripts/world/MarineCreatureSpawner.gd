@@ -4,6 +4,7 @@ extends Node3D
 @export var max_creatures: int = 4
 @export var initial_spawn_count: int = 2
 @export var respawn_delay: float = 7.0
+@export var spawn_check_interval: float = 3.0
 @export var min_player_spawn_distance: float = 18.0
 @export var port_avoidance_distance: float = 48.0
 @export var debug_creature_spawns: bool = false
@@ -11,10 +12,12 @@ extends Node3D
 var _active_creatures: Array[Node] = []
 var _spawn_points: Array[Marker3D] = []
 var _spawn_retry_scheduled: bool = false
+var _spawn_check_timer: Timer
 
 
 func _ready() -> void:
 	add_to_group("marine_creature_spawner")
+	_start_spawn_check_timer()
 	call_deferred("_initialize_spawns")
 
 
@@ -24,6 +27,18 @@ func _initialize_spawns() -> void:
 	var target_initial_spawn_count: int = mini(initial_spawn_count, _get_target_creature_count())
 	for i in range(target_initial_spawn_count):
 		_spawn_creature_if_possible()
+
+	_fill_spawn_slots()
+
+
+func _start_spawn_check_timer() -> void:
+	_spawn_check_timer = Timer.new()
+	_spawn_check_timer.name = "CreatureSpawnCheckTimer"
+	_spawn_check_timer.wait_time = maxf(0.5, spawn_check_interval)
+	_spawn_check_timer.one_shot = false
+	_spawn_check_timer.autostart = true
+	_spawn_check_timer.timeout.connect(_fill_spawn_slots)
+	add_child(_spawn_check_timer)
 
 
 func _refresh_spawn_points() -> void:
@@ -37,7 +52,10 @@ func _refresh_spawn_points() -> void:
 func _spawn_creature_if_possible() -> bool:
 	_cleanup_inactive_creatures()
 
-	if creature_scene == null or _active_creatures.size() >= _get_target_creature_count():
+	var target_creature_count: int = _get_target_creature_count()
+	if creature_scene == null:
+		return false
+	if _active_creatures.size() >= target_creature_count:
 		return false
 
 	var spawn_point: Marker3D = _pick_spawn_point()
@@ -106,11 +124,17 @@ func _is_spawn_point_valid(spawn_point: Marker3D) -> bool:
 
 
 func _pick_creature_config(zone_id: String) -> Dictionary:
-	var creature_ids: Array[String] = MarineCreatureCatalog.get_spawnable_creature_ids_for_zone(zone_id)
+	var normalized_zone_id: String = DangerZoneCatalog.normalize_zone_id(zone_id)
+	var creature_ids: Array[String] = MarineCreatureCatalog.get_spawnable_creature_ids_for_zone(normalized_zone_id)
+	if creature_ids.is_empty() and normalized_zone_id != DangerZoneCatalog.ZONE_SAFE:
+		creature_ids = MarineCreatureCatalog.get_spawnable_creature_ids_for_zone(DangerZoneCatalog.ZONE_SAFE)
+
 	var weighted_creature_ids: Array[String] = []
 
 	for creature_id in creature_ids:
-		var weight: int = MarineCreatureCatalog.get_spawn_weight(creature_id, zone_id)
+		var weight: int = MarineCreatureCatalog.get_spawn_weight(creature_id, normalized_zone_id)
+		if weight <= 0 and normalized_zone_id != DangerZoneCatalog.ZONE_SAFE:
+			weight = MarineCreatureCatalog.get_spawn_weight(creature_id, DangerZoneCatalog.ZONE_SAFE)
 		for i in range(weight):
 			weighted_creature_ids.append(creature_id)
 
