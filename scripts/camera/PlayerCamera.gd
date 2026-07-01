@@ -13,6 +13,10 @@ extends Camera3D
 @export var look_offset_smoothing: float = 8.0
 @export var camera_distance: float = 16.0
 @export var camera_height: float = 10.0
+@export var min_camera_height: float = 5.0
+@export var max_camera_height: float = 18.0
+@export var camera_height_step: float = 1.0
+@export var height_smoothing: float = 8.0
 @export var look_at_height: float = 2.0
 @export var clamp_to_world_bounds: bool = true
 @export var fallback_world_limit: Vector2 = Vector2(112.0, 112.0)
@@ -27,12 +31,16 @@ var _target_look_offset: Vector3 = Vector3.ZERO
 var is_free_look_unlocked: bool = false
 var _free_look_anchor_position: Vector2 = Vector2.ZERO
 var _has_free_look_anchor: bool = false
+var _current_camera_height: float = 10.0
+var _target_camera_height: float = 10.0
 
 
 func _ready() -> void:
 	_target = _find_follow_target()
 	_world_bounds = _find_world_bounds()
 	top_level = true
+	_target_camera_height = _get_clamped_camera_height(camera_height)
+	_current_camera_height = _target_camera_height
 
 	if _target != null:
 		global_position = _get_desired_position()
@@ -51,9 +59,11 @@ func _process(delta: float) -> void:
 	var rotation_weight: float = _get_smoothing_weight(rotation_smoothing, delta)
 	var zoom_weight: float = _get_smoothing_weight(zoom_smoothing, delta)
 	var look_offset_weight: float = _get_smoothing_weight(look_offset_smoothing, delta)
+	var height_weight: float = _get_smoothing_weight(height_smoothing, delta)
 	_refresh_free_look_target()
 	_current_zoom_factor = lerpf(_current_zoom_factor, _target_zoom_factor, zoom_weight)
 	_current_look_offset = _current_look_offset.lerp(_target_look_offset, look_offset_weight)
+	_current_camera_height = lerpf(_current_camera_height, _target_camera_height, height_weight)
 	global_position = global_position.lerp(_get_desired_position(), position_weight)
 	_apply_look_at_rotation(rotation_weight)
 
@@ -70,6 +80,12 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 		elif key_event.pressed and not key_event.echo and key_event.keycode == KEY_C:
 			recenter()
+			get_viewport().set_input_as_handled()
+		elif key_event.pressed and not key_event.echo and key_event.keycode == KEY_PAGEUP:
+			_adjust_camera_height(camera_height_step)
+			get_viewport().set_input_as_handled()
+		elif key_event.pressed and not key_event.echo and key_event.keycode == KEY_PAGEDOWN:
+			_adjust_camera_height(-camera_height_step)
 			get_viewport().set_input_as_handled()
 
 	elif event is InputEventMouseButton:
@@ -109,7 +125,7 @@ func _get_desired_position() -> Vector3:
 	var boat_back: Vector3 = _get_boat_back_direction()
 	var desired_position: Vector3 = _target.global_position
 	desired_position += boat_back * (camera_distance * _current_zoom_factor)
-	desired_position += Vector3.UP * camera_height
+	desired_position += Vector3.UP * _current_camera_height
 	desired_position += _current_look_offset
 	return _clamp_to_world_bounds(desired_position)
 
@@ -127,6 +143,16 @@ func _adjust_zoom(delta_factor: float) -> void:
 	var min_zoom: float = minf(zoom_min_factor, zoom_max_factor)
 	var max_zoom: float = maxf(zoom_min_factor, zoom_max_factor)
 	_target_zoom_factor = clampf(_target_zoom_factor + delta_factor, min_zoom, max_zoom)
+
+
+func _adjust_camera_height(delta_height: float) -> void:
+	_target_camera_height = _get_clamped_camera_height(_target_camera_height + delta_height)
+
+
+func _get_clamped_camera_height(raw_height: float) -> float:
+	var min_height: float = minf(min_camera_height, max_camera_height)
+	var max_height: float = maxf(min_camera_height, max_camera_height)
+	return clampf(raw_height, min_height, max_height)
 
 
 func recenter() -> void:
