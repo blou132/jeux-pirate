@@ -8,6 +8,7 @@ extends Node3D
 @export var min_player_spawn_distance: float = 22.0
 @export var port_avoidance_distance: float = 45.0
 @export var fallback_port_avoidance_distance: float = 28.0
+@export var debug_spawns: bool = false
 
 var _active_enemies: Array[Node] = []
 var _spawn_points: Array[Marker3D] = []
@@ -54,23 +55,28 @@ func _spawn_enemy_if_possible() -> bool:
 
 	var target_enemy_count: int = _get_target_enemy_count()
 	if enemy_scene == null:
+		_debug_spawn("fail: enemy scene missing")
 		return false
 	if _active_enemies.size() >= target_enemy_count:
+		_debug_spawn("skip: max enemies reached")
 		return false
 
 	var spawn_point := _pick_spawn_point()
 	if spawn_point == null:
+		_debug_spawn("fail: no valid enemy spawn point")
 		_schedule_spawn_retry()
 		return false
 
 	var enemy := enemy_scene.instantiate()
 	if not enemy is Node3D:
+		_debug_spawn("fail: enemy scene did not instantiate Node3D")
 		enemy.queue_free()
 		return false
 
 	var spawn_zone_id: String = _get_spawn_point_zone(spawn_point)
 	var variant_config: Dictionary = _pick_enemy_variant(spawn_zone_id)
 	if variant_config.is_empty():
+		_debug_spawn("fail: no enemy variant for zone %s" % spawn_zone_id)
 		_schedule_spawn_retry()
 		return false
 
@@ -87,16 +93,26 @@ func _spawn_enemy_if_possible() -> bool:
 	if enemy.has_signal("destroyed"):
 		enemy.connect("destroyed", Callable(self, "_on_enemy_destroyed").bind(enemy))
 
+	_debug_spawn("spawned %s in %s" % [
+		String(variant_config.get("display_name", "Ennemi")),
+		DangerZoneCatalog.get_zone_name(spawn_zone_id),
+	])
 	return true
 
 
 func _pick_spawn_point() -> Marker3D:
 	_refresh_spawn_points()
+	if _spawn_points.is_empty():
+		_debug_spawn("fail: no nodes in enemy_spawn_points group")
+		return null
+
 	var valid_points: Array[Marker3D] = _get_valid_spawn_points(port_avoidance_distance)
 	if valid_points.is_empty() and fallback_port_avoidance_distance < port_avoidance_distance:
+		_debug_spawn("retry: strict port avoidance rejected all enemy points")
 		valid_points = _get_valid_spawn_points(fallback_port_avoidance_distance)
 
 	if valid_points.is_empty():
+		_debug_spawn("fail: fallback port avoidance rejected all enemy points")
 		return null
 
 	return _pick_weighted_spawn_point(valid_points)
@@ -406,3 +422,19 @@ func _get_variant_weight(variant_id: String, danger_level: int, danger_zone: Str
 					return 12 + danger_level
 
 	return 1
+
+
+func _debug_spawn(message: String) -> void:
+	if not debug_spawns:
+		return
+
+	print(
+		"SpawnManager: %s | active=%d/%d points=%d current_zone=%s"
+		% [
+			message,
+			_active_enemies.size(),
+			_get_target_enemy_count(),
+			_spawn_points.size(),
+			DangerZoneCatalog.get_zone_name(_get_current_danger_zone_id()),
+		]
+	)

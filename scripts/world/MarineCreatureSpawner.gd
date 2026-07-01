@@ -55,23 +55,28 @@ func _spawn_creature_if_possible() -> bool:
 
 	var target_creature_count: int = _get_target_creature_count()
 	if creature_scene == null:
+		_debug_spawn("fail: marine creature scene missing")
 		return false
 	if _active_creatures.size() >= target_creature_count:
+		_debug_spawn("skip: max marine creatures reached")
 		return false
 
 	var spawn_point: Marker3D = _pick_spawn_point()
 	if spawn_point == null:
+		_debug_spawn("fail: no valid marine creature spawn point")
 		_schedule_spawn_retry()
 		return false
 
 	var spawn_zone_id: String = _get_spawn_point_zone(spawn_point)
 	var creature_config: Dictionary = _pick_creature_config(spawn_zone_id)
 	if creature_config.is_empty():
+		_debug_spawn("fail: no marine creature config for zone %s" % spawn_zone_id)
 		_schedule_spawn_retry()
 		return false
 
 	var creature: Node = creature_scene.instantiate()
 	if not creature is Node3D:
+		_debug_spawn("fail: marine creature scene did not instantiate Node3D")
 		creature.queue_free()
 		return false
 
@@ -87,17 +92,26 @@ func _spawn_creature_if_possible() -> bool:
 	if creature.has_signal("defeated"):
 		creature.connect("defeated", Callable(self, "_on_creature_defeated").bind(creature))
 
-	_debug_spawn(creature_config, spawn_zone_id)
+	_debug_spawn("spawned %s in %s" % [
+		String(creature_config.get("name", "Creature")),
+		DangerZoneCatalog.get_zone_name(spawn_zone_id),
+	])
 	return true
 
 
 func _pick_spawn_point() -> Marker3D:
 	_refresh_spawn_points()
+	if _spawn_points.is_empty():
+		_debug_spawn("fail: no nodes in marine_creature_spawn_points group")
+		return null
+
 	var valid_points: Array[Marker3D] = _get_valid_spawn_points(port_avoidance_distance)
 	if valid_points.is_empty() and fallback_port_avoidance_distance < port_avoidance_distance:
+		_debug_spawn("retry: strict port avoidance rejected all marine creature points")
 		valid_points = _get_valid_spawn_points(fallback_port_avoidance_distance)
 
 	if valid_points.is_empty():
+		_debug_spawn("fail: fallback port avoidance rejected all marine creature points")
 		return null
 
 	return _pick_weighted_spawn_point(valid_points)
@@ -244,17 +258,18 @@ func _get_spawn_point_weight(spawn_point: Marker3D) -> int:
 	return 1
 
 
-func _debug_spawn(creature_config: Dictionary, zone_id: String) -> void:
+func _debug_spawn(message: String) -> void:
 	if not debug_creature_spawns:
 		return
 
 	print(
-		"MarineCreatureSpawner spawn=%s zone=%s active=%d/%d"
+		"MarineCreatureSpawner: %s | active=%d/%d points=%d current_zone=%s"
 		% [
-			String(creature_config.get("name", "Creature")),
-			DangerZoneCatalog.get_zone_name(zone_id),
+			message,
 			_active_creatures.size(),
 			_get_target_creature_count(),
+			_spawn_points.size(),
+			DangerZoneCatalog.get_zone_name(_get_current_danger_zone_id()),
 		]
 	)
 
