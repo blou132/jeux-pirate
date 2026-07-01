@@ -1,0 +1,63 @@
+[gd_scene load_steps=9 format=3 uid="uid://marine_creature_v015"]
+
+[ext_resource type="Script" path="res://scripts/creatures/MarineCreature.gd" id="1_marine_creature"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_body"]
+albedo_color = Color(0.16, 0.21, 0.25, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fin"]
+albedo_color = Color(0.08, 0.12, 0.15, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_body"]
+radius = 0.6
+height = 1.2
+
+[sub_resource type="BoxMesh" id="BoxMesh_fin"]
+size = Vector3(0.18, 0.45, 0.75)
+
+[sub_resource type="BoxMesh" id="BoxMesh_tail"]
+size = Vector3(0.8, 0.18, 0.18)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_collision"]
+size = Vector3(1.4, 0.8, 2.3)
+
+[sub_resource type="SphereMesh" id="SphereMesh_aim"]
+radius = 0.09
+height = 0.18
+
+[node name="MarineCreature" type="CharacterBody3D"]
+script = ExtResource("1_marine_creature")
+
+[node name="Visuals" type="Node3D" parent="."]
+
+[node name="Body" type="MeshInstance3D" parent="Visuals"]
+mesh = SubResource("SphereMesh_body")
+material_override = SubResource("StandardMaterial3D_body")
+
+[node name="Fin" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 0.52, -0.2)
+mesh = SubResource("BoxMesh_fin")
+material_override = SubResource("StandardMaterial3D_fin")
+
+[node name="Tail" type="MeshInstance3D" parent="Visuals"]
+position = Vector3(0, 0.0, 0.98)
+mesh = SubResource("BoxMesh_tail")
+material_override = SubResource("StandardMaterial3D_fin")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+position = Vector3(0, 0.08, 0)
+shape = SubResource("BoxShape3D_collision")
+
+[node name="AimPoint" type="Marker3D" parent="."]
+position = Vector3(0, 0.28, 0)
+
+[node name="DebugMarker" type="MeshInstance3D" parent="AimPoint"]
+visible = false
+mesh = SubResource("SphereMesh_aim")
+material_override = SubResource("StandardMaterial3D_fin")
+
+[node name="Nameplate" type="Label3D" parent="."]
+position = Vector3(0, 1.6, 0)
+billboard = 1
+text = "Creature marine - 0 PV"
+font_size = 24
