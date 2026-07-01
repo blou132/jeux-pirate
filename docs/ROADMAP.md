@@ -135,9 +135,13 @@
 
 ## v0.13 - Tresors et exploration
 
-- Differencier les types de tresors.
-- Relier les reliques et fragments a des recompenses plus rares.
-- Preparer des collections ou decouvertes majeures.
+- Ajouter `TreasureCatalog` avec Bourse, Coffre, Chambre forte, Cave au tresor, Tresor royal, Tresor imperial et Tresor mythique.
+- Ajouter des sites d'exploration simples : epave, grotte cotiere, ruines anciennes, camp abandonne et ile au tresor.
+- Lier les tresors aux zones de danger pour pousser le joueur vers les zones plus risquees.
+- Utiliser les fragments de carte comme prerequis pour les tresors avances.
+- Ajouter des recompenses de tresors : or, bois, fragments, reliques, marchandises et renom.
+- Afficher feedback et progression d'exploration dans le HUD detaille.
+- Empecher les recompenses repetees sur un site deja explore.
 
 ## v0.14 - Zones de danger avancees
 

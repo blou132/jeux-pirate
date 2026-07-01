@@ -119,6 +119,17 @@ Le joueur incarne le capitaine d'un petit navire independant qui construit progr
 9. Les limites de carte empechent la camera de partir trop loin hors de la zone jouable.
 10. Les menus de port et d'exploration gardent la priorite sur les entrees souris et clavier.
 
+## Boucle de jeu v0.13
+
+1. Le joueur repere un site d'exploration en mer.
+2. Il s'approche et utilise `E` pour ouvrir le menu d'exploration.
+3. Le menu affiche le type de site, la zone, le tresor, les fragments requis et les recompenses.
+4. Si les prerequis sont suffisants, le joueur explore le site et recupere le tresor.
+5. Les fragments ou reliques requis sont consommes seulement quand le tresor est bien obtenu.
+6. Les recompenses ajoutent or, bois, fragments, reliques, marchandises et renom selon le tresor.
+7. Le site est marque explore et ne peut pas etre farme pendant la session.
+8. Le HUD detaille affiche les tresors decouverts et les sites explores.
+
 ## Port et progression
 
 Le port sert de premier point sûr et de première interface de progression. Il établit le rythme attendu : partir en mer, obtenir des ressources, revenir au port, réparer, améliorer le bateau, accepter des missions et recruter un premier soutien allié.
@@ -399,6 +410,21 @@ La camera doit ameliorer le confort d'exploration sans devenir un outil de trich
 - `C` annule le decalage manuel et recentre progressivement la camera sur le navire sans changer l'etat verrouille/deverrouille.
 - La position camera est clampée avec les limites de `WorldBounds`.
 - Si le port ou le menu d'exploration est ouvert, la camera ignore ses controles pour laisser les boutons et le scroll fonctionner.
+
+## Tresors et exploration v0.13
+
+La v0.13 donne une premiere utilite claire aux fragments de carte sans creer encore une grande carte ni des donjons :
+
+- `TreasureCatalog` definit sept categories : Bourse, Coffre, Chambre forte, Cave au tresor, Tresor royal, Tresor imperial et Tresor mythique.
+- Les tresors ont un niveau, une rarete, une zone de danger recommandee, des prerequis et des recompenses.
+- Repartition par danger : Eaux sures = Bourse/Coffre, Zone surveillee = Coffre/Chambre forte, Zone contestee = Chambre forte/Cave au tresor, Zone hostile = Cave au tresor/Tresor royal, Zone mortelle = Tresor royal/Tresor imperial, Territoire legendaire = Tresor imperial/Tresor mythique, Enfers des mers = Tresor mythique.
+- Les fragments requis montent avec la rarete : 0, 0, 1, 2, 3, 4, puis 5 fragments et 1 relique pour le Tresor mythique.
+- Les sites v0.13 sont des primitives simples : epave, grotte cotiere, ruines anciennes, camp abandonne et ile au tresor.
+- Chaque site est unique pendant la session et stocke son etat dans `GameState`.
+- Les recompenses restent simples : or, bois, fragments, reliques, marchandises et renom.
+- Le renom des tresors passe par `ReputationSystem.record_treasure_discovered` pour mettre a jour rangs, titres et score de titre.
+- Si la cargaison est insuffisante pour une recompense en marchandises, le site refuse l'exploration avant de consommer des fragments.
+- Les coffres d'iles v0.4 et les coffres de quete v0.5 continuent d'utiliser leur flux existant.
 
 ## Réputation et titres v0.8
 

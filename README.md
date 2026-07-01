@@ -46,6 +46,8 @@ La v0.12 ajoute une camera joueur mobile pour rendre la navigation, l'exploratio
 
 La v0.12.3 transforme le mode verrouille en vraie camera de poursuite derriere le bateau, avec hauteur reglable et inclinaison adaptee a la vue horizon/vue plongeante.
 
+La v0.13 ajoute une premiere couche de tresors et d'exploration : catalogue de tresors, sites explorables, fragments de carte utiles, recompenses de tresors et progression affichee dans le HUD detaille.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -340,6 +342,18 @@ La v0.12.3 transforme le mode verrouille en vraie camera de poursuite derriere l
 - La camera respecte les limites de carte exposees par `WorldBounds`.
 - Les controles camera sont ignores quand le port ou le menu d'exploration est ouvert, pour laisser le scroll et les clics UI fonctionner.
 
+## Etat v0.13
+
+- `TreasureCatalog` centralise la hierarchie des tresors : Bourse, Coffre, Chambre forte, Cave au tresor, Tresor royal, Tresor imperial et Tresor mythique.
+- Cinq sites d'exploration sont ajoutes a la carte : epave, grotte cotiere, ruines anciennes, camp abandonne et ile au tresor.
+- Les sites utilisent `E` puis le menu d'exploration existant avec une action `Explorer le site`.
+- Les tresors sont lies aux zones de danger : tresors faibles en Eaux sures, tresors plus rares dans les zones plus dangereuses.
+- Les fragments de carte servent a debloquer les tresors avances : 1 fragment pour Chambre forte, 2 pour Cave au tresor, 3 pour Tresor royal, 4 pour Tresor imperial, 5 plus 1 relique pour Tresor mythique.
+- Si les fragments ou reliques manquent, le menu affiche un message clair et ne consomme rien.
+- Les recompenses peuvent donner or, bois, fragments, reliques, marchandises et renom.
+- Un site explore ne redonne jamais sa recompense pendant la session.
+- Le HUD detaille affiche maintenant le nombre de tresors decouverts et de sites explores.
+
 ## Lancement
 
 1. Installer Godot 4.x.
@@ -398,6 +412,8 @@ Les lignes de bordée ennemies peuvent être affichées avec `debug_show_broadsi
 - `UpgradeSystem` est configure en autoload pour suivre les niveaux d'amélioration.
 - `QuestSystem` est configure en autoload pour suivre les missions actives et les récompenses.
 - `ReputationSystem` est configure en autoload pour suivre réputation, rangs, titres pirates et feedback de progression.
+- `TreasureCatalog` centralise les types de tresors, prerequis, zones recommandees et recompenses.
+- `ExplorationSite` et `ExplorationSiteSpawner` ajoutent des sites explorables uniques sur la carte.
 - `QuestObjectiveSpawner` crée les objectifs temporaires de mission dans la scène jouable.
 - `ShipCatalog` centralise les donnees des navires joueur et leur hierarchie.
 - `FleetManager` gère les alliés actifs, la limite de flotte, les ordres, la formation et la réparation de flotte.
