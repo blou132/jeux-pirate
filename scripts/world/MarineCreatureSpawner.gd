@@ -18,6 +18,7 @@ var _spawn_check_timer: Timer
 
 func _ready() -> void:
 	add_to_group("marine_creature_spawner")
+	_run_spawn_catalog_sanity_checks()
 	_start_spawn_check_timer()
 	call_deferred("_initialize_spawns")
 
@@ -272,6 +273,30 @@ func _debug_spawn(message: String) -> void:
 			DangerZoneCatalog.get_zone_name(_get_current_danger_zone_id()),
 		]
 	)
+
+
+func _run_spawn_catalog_sanity_checks() -> void:
+	if not debug_creature_spawns:
+		return
+
+	var checked_zones: Array[String] = [
+		DangerZoneCatalog.ZONE_SAFE,
+		DangerZoneCatalog.ZONE_WATCHED,
+		DangerZoneCatalog.ZONE_CONTESTED,
+		DangerZoneCatalog.ZONE_HOSTILE,
+		DangerZoneCatalog.ZONE_DEADLY,
+	]
+	for zone_id in checked_zones:
+		var creature_ids: Array[String] = MarineCreatureCatalog.get_spawnable_creature_ids_for_zone(zone_id)
+		if creature_ids.is_empty():
+			print("Spawn sanity: no marine creatures for %s" % zone_id)
+			continue
+
+		for creature_id in creature_ids:
+			if not MarineCreatureCatalog.has_creature(creature_id):
+				print("Spawn sanity: unknown marine creature '%s' in %s" % [creature_id, zone_id])
+			elif not MarineCreatureCatalog.is_creature_implemented(creature_id):
+				print("Spawn sanity: unimplemented marine creature '%s' in %s" % [creature_id, zone_id])
 
 
 func _grant_creature_rewards(_world_position: Vector3, creature_id: String, rewards: Dictionary) -> void:

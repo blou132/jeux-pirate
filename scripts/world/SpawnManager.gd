@@ -18,6 +18,7 @@ var _spawn_check_timer: Timer
 
 func _ready() -> void:
 	add_to_group("spawn_manager")
+	_run_spawn_catalog_sanity_checks()
 	_start_spawn_check_timer()
 	call_deferred("_initialize_spawns")
 
@@ -309,6 +310,14 @@ func _get_enemy_variants() -> Array[Dictionary]:
 	return variants
 
 
+func _get_enemy_variant_ids() -> Array[String]:
+	var ids: Array[String] = []
+	for variant in _get_enemy_variants():
+		ids.append(String(variant.get("id", "")))
+
+	return ids
+
+
 func _get_danger_level() -> int:
 	var game_state := get_node_or_null("/root/GameState")
 	if game_state != null and game_state.has_method("get_danger_level"):
@@ -438,3 +447,19 @@ func _debug_spawn(message: String) -> void:
 			DangerZoneCatalog.get_zone_name(_get_current_danger_zone_id()),
 		]
 	)
+
+
+func _run_spawn_catalog_sanity_checks() -> void:
+	if not debug_spawns:
+		return
+
+	var known_enemy_ids: Array[String] = _get_enemy_variant_ids()
+	for zone_id in DangerZoneCatalog.get_zone_ids():
+		var enemy_types: Array[String] = DangerZoneCatalog.get_enemy_types(zone_id)
+		if enemy_types.is_empty():
+			print("Spawn sanity: no pirate enemy types for %s" % zone_id)
+			continue
+
+		for enemy_type in enemy_types:
+			if not known_enemy_ids.has(enemy_type):
+				print("Spawn sanity: unknown pirate enemy type '%s' in %s" % [enemy_type, zone_id])
