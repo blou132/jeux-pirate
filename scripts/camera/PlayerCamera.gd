@@ -151,7 +151,10 @@ func _adjust_camera_height(delta_height: float) -> void:
 	if _are_camera_controls_blocked():
 		return
 
+	var previous_height: float = _target_camera_height
 	_target_camera_height = _get_clamped_camera_height(_target_camera_height + delta_height)
+	if absf(_target_camera_height - previous_height) > 0.001:
+		_show_height_feedback()
 
 
 func _get_clamped_camera_height(raw_height: float) -> float:
@@ -229,13 +232,33 @@ func _get_camera_limit() -> Vector2:
 
 
 func _show_lock_feedback() -> void:
-	var hud: Node = get_tree().get_first_node_in_group("hud")
-	if hud == null or not hud.has_method("show_temporary_context_message"):
-		return
-
 	var message: String = "Camera libre activee"
 	if not is_free_look_unlocked:
 		message = "Camera verrouillee"
+
+	_show_camera_feedback(message)
+
+
+func _show_height_feedback() -> void:
+	var min_height: float = _get_min_camera_height()
+	var height_span: float = _get_max_camera_height() - min_height
+	var height_ratio: float = 0.5
+	if height_span > 0.001:
+		height_ratio = clampf((_target_camera_height - min_height) / height_span, 0.0, 1.0)
+
+	var height_label: String = "moyenne"
+	if height_ratio <= 0.25:
+		height_label = "basse"
+	elif height_ratio >= 0.75:
+		height_label = "haute"
+
+	_show_camera_feedback("Hauteur camera : %s" % height_label)
+
+
+func _show_camera_feedback(message: String) -> void:
+	var hud: Node = get_tree().get_first_node_in_group("hud")
+	if hud == null or not hud.has_method("show_temporary_context_message"):
+		return
 
 	hud.call("show_temporary_context_message", message, 1.1)
 
