@@ -168,6 +168,14 @@
 - Afficher feedback HUD et compteur detaille des creatures/ressources.
 - Garder les ports comme zones sures sans camping de creatures.
 
+Correctif v0.15.1 :
+
+- Restaurer les spawns pirates avec relance periodique du remplissage.
+- Restaurer les spawns de creatures marines par zone de danger.
+- Ajouter un fallback de zone de danger pour eviter les echecs silencieux.
+- Eviter que les zones sures de ports rejettent tous les points de spawn.
+- Ajouter des diagnostics de spawn et des sanity checks de catalogues desactives par defaut.
+
 ## v0.16 - Controle de territoire
 
 - Preparer des zones controlables ou contestables.

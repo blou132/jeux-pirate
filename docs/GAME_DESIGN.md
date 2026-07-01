@@ -485,6 +485,14 @@ Repartition de spawn :
 
 Les ressources rares v0.15 sont Perle noire, Dents de requin, Corail sacre, Ecaille de serpent et Oeil de kraken. Elles sont stockees dans `GameState` comme compteurs separes pour eviter de casser la cargaison et le commerce.
 
+Correctif v0.15.1 :
+
+- Les ennemis pirates et les creatures marines ont des spawners, compteurs et limites separes.
+- Chaque spawner relance regulierement le remplissage de ses emplacements, meme si les premieres tentatives echouent temporairement.
+- La zone de danger courante utilise un fallback sur les Eaux sures si l'etat est vide ou invalide.
+- Les ports restent des zones sures, mais les points de spawn peuvent utiliser une distance de secours pour eviter que les zones sures bloquent toute la carte.
+- Des diagnostics desactives par defaut affichent les actifs, la zone, le type choisi et la raison d'un echec de spawn.
+
 ## Réputation et titres v0.8
 
 La réputation donne une progression sociale simple sans ajouter encore de contrôle de territoire ou de hiérarchie de ports :

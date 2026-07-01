@@ -52,6 +52,8 @@ La v0.14 avance les zones de danger : catalogue central, regions de monde identi
 
 La v0.15 ajoute une premiere base de creatures marines : poissons, requins, crocodiles marins, serpents de mer et krakens juveniles, avec spawns par zone, combat simple et ressources rares.
 
+La v0.15.1 restaure les spawns pirates et creatures apres la v0.15 : les spawners relancent regulierement leurs tentatives, utilisent une zone de danger de secours si l'etat courant est invalide et gardent des limites separees pour pirates et creatures.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -375,11 +377,12 @@ La v0.15 ajoute une premiere base de creatures marines : poissons, requins, croc
 - Creatures reservees plus tard : Leviathan, Kraken ancestral et Dieu des oceans.
 - `MarineCreatureSpawner` utilise des points de spawn dedies et les zones de danger pour choisir les creatures.
 - Repartition : Eaux sures = poissons/requins rares, Zone surveillee = poissons/requins/crocodiles rares, Zone contestee = requins/crocodiles/serpents rares, Zone hostile = crocodiles/serpents/krakens rares, Zone mortelle = serpents/krakens.
+- Correctif v0.15.1 : `SpawnManager` et `MarineCreatureSpawner` gardent chacun leur propre compteur, un timer de remplissage, une distance de securite stricte pres des ports puis une distance de secours si tous les points sont rejetes.
 - Les creatures agressives detectent joueur ou allies, poursuivent a courte portee, attaquent au contact et decrochent pres des ports.
 - Les boulets joueur et allies peuvent toucher les creatures ; les boulets pirates restent reserves au joueur et a la flotte.
 - Ressources rares suivies separement de la cargaison : Perle noire, Dents de requin, Corail sacre, Ecaille de serpent et Oeil de kraken.
 - Le HUD detaille affiche creatures vaincues et ressources marines possedees.
-- Une aide debug desactivee par defaut peut afficher l'etat IA des creatures et les spawns marins.
+- Une aide debug desactivee par defaut peut afficher l'etat IA des creatures, les spawns marins, les spawns pirates et les raisons d'echec de spawn.
 
 ## Lancement
 
