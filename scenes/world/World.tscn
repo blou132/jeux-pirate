@@ -236,15 +236,33 @@ rotation_degrees = Vector3(0, -35, 0)
 script = ExtResource("9_enemy_spawn_point")
 danger_zone = "safe_waters"
 
+[node name="SpawnSafeShoals" type="Marker3D" parent="SpawnManager"]
+position = Vector3(20, 0, -34)
+rotation_degrees = Vector3(0, -75, 0)
+script = ExtResource("9_enemy_spawn_point")
+danger_zone = "safe_waters"
+
 [node name="SpawnNorthChannel" type="Marker3D" parent="SpawnManager"]
 position = Vector3(-8, 0, -46)
 rotation_degrees = Vector3(0, 155, 0)
 script = ExtResource("9_enemy_spawn_point")
 danger_zone = "watched_zone"
 
+[node name="SpawnWatchedReef" type="Marker3D" parent="SpawnManager"]
+position = Vector3(42, 0, -66)
+rotation_degrees = Vector3(0, 130, 0)
+script = ExtResource("9_enemy_spawn_point")
+danger_zone = "watched_zone"
+
 [node name="SpawnEastReef" type="Marker3D" parent="SpawnManager"]
-position = Vector3(54, 0, 18)
+position = Vector3(68, 0, 80)
 rotation_degrees = Vector3(0, -105, 0)
+script = ExtResource("9_enemy_spawn_point")
+danger_zone = "contested_zone"
+
+[node name="SpawnContestedSouth" type="Marker3D" parent="SpawnManager"]
+position = Vector3(10, 0, 82)
+rotation_degrees = Vector3(0, -140, 0)
 script = ExtResource("9_enemy_spawn_point")
 danger_zone = "contested_zone"
 
@@ -260,9 +278,21 @@ rotation_degrees = Vector3(0, 80, 0)
 script = ExtResource("9_enemy_spawn_point")
 danger_zone = "hostile_zone"
 
+[node name="SpawnHostileOuter" type="Marker3D" parent="SpawnManager"]
+position = Vector3(-94, 0, -18)
+rotation_degrees = Vector3(0, 95, 0)
+script = ExtResource("9_enemy_spawn_point")
+danger_zone = "hostile_zone"
+
 [node name="SpawnDeadlyTreasureRoute" type="Marker3D" parent="SpawnManager"]
 position = Vector3(-88, 0, 64)
 rotation_degrees = Vector3(0, 45, 0)
+script = ExtResource("9_enemy_spawn_point")
+danger_zone = "deadly_zone"
+
+[node name="SpawnDeadlyNorth" type="Marker3D" parent="SpawnManager"]
+position = Vector3(-108, 0, 98)
+rotation_degrees = Vector3(0, 20, 0)
 script = ExtResource("9_enemy_spawn_point")
 danger_zone = "deadly_zone"
 
@@ -275,15 +305,33 @@ rotation_degrees = Vector3(0, -25, 0)
 script = ExtResource("18_marine_creature_spawn_point")
 danger_zone = "safe_waters"
 
+[node name="CreatureSpawnSafeKelp" type="Marker3D" parent="MarineCreatureSpawner"]
+position = Vector3(-24, 0, -66)
+rotation_degrees = Vector3(0, 15, 0)
+script = ExtResource("18_marine_creature_spawn_point")
+danger_zone = "safe_waters"
+
 [node name="CreatureSpawnWatchedChannel" type="Marker3D" parent="MarineCreatureSpawner"]
 position = Vector3(8, 0, -70)
 rotation_degrees = Vector3(0, 160, 0)
 script = ExtResource("18_marine_creature_spawn_point")
 danger_zone = "watched_zone"
 
+[node name="CreatureSpawnWatchedShallows" type="Marker3D" parent="MarineCreatureSpawner"]
+position = Vector3(46, 0, -76)
+rotation_degrees = Vector3(0, 120, 0)
+script = ExtResource("18_marine_creature_spawn_point")
+danger_zone = "watched_zone"
+
 [node name="CreatureSpawnContestedBank" type="Marker3D" parent="MarineCreatureSpawner"]
-position = Vector3(78, 0, 44)
+position = Vector3(68, 0, 82)
 rotation_degrees = Vector3(0, -120, 0)
+script = ExtResource("18_marine_creature_spawn_point")
+danger_zone = "contested_zone"
+
+[node name="CreatureSpawnContestedDrift" type="Marker3D" parent="MarineCreatureSpawner"]
+position = Vector3(12, 0, 80)
+rotation_degrees = Vector3(0, -145, 0)
 script = ExtResource("18_marine_creature_spawn_point")
 danger_zone = "contested_zone"
 
@@ -293,9 +341,21 @@ rotation_degrees = Vector3(0, 70, 0)
 script = ExtResource("18_marine_creature_spawn_point")
 danger_zone = "hostile_zone"
 
+[node name="CreatureSpawnHostileTrench" type="Marker3D" parent="MarineCreatureSpawner"]
+position = Vector3(-100, 0, -32)
+rotation_degrees = Vector3(0, 55, 0)
+script = ExtResource("18_marine_creature_spawn_point")
+danger_zone = "hostile_zone"
+
 [node name="CreatureSpawnDeadlyDepths" type="Marker3D" parent="MarineCreatureSpawner"]
 position = Vector3(-104, 0, 100)
 rotation_degrees = Vector3(0, 40, 0)
+script = ExtResource("18_marine_creature_spawn_point")
+danger_zone = "deadly_zone"
+
+[node name="CreatureSpawnDeadlyAbyss" type="Marker3D" parent="MarineCreatureSpawner"]
+position = Vector3(-70, 0, 106)
+rotation_degrees = Vector3(0, -10, 0)
 script = ExtResource("18_marine_creature_spawn_point")
 danger_zone = "deadly_zone"
 
