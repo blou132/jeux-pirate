@@ -31,7 +31,7 @@ func launch(direction: Vector3, source: Node, projectile_speed: float, hit_damag
 func _on_body_entered(body: Node) -> void:
 	if body == _source:
 		return
-	if not body.is_in_group("enemy_ships"):
+	if not body.is_in_group("enemy_ships") and not body.is_in_group("marine_creatures"):
 		return
 	if body.has_method("is_destroyed") and body.is_destroyed():
 		return
