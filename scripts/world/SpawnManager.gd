@@ -20,7 +20,8 @@ func _ready() -> void:
 func _initialize_spawns() -> void:
 	_refresh_spawn_points()
 
-	for i in range(initial_spawn_count):
+	var target_initial_spawn_count: int = mini(initial_spawn_count, _get_target_enemy_count())
+	for i in range(target_initial_spawn_count):
 		_spawn_enemy_if_possible()
 
 
@@ -35,7 +36,7 @@ func _refresh_spawn_points() -> void:
 func _spawn_enemy_if_possible() -> bool:
 	_cleanup_inactive_enemies()
 
-	if enemy_scene == null or _active_enemies.size() >= max_enemies:
+	if enemy_scene == null or _active_enemies.size() >= _get_target_enemy_count():
 		return false
 
 	var spawn_point := _pick_spawn_point()
@@ -76,7 +77,7 @@ func _pick_spawn_point() -> Marker3D:
 	if valid_points.is_empty():
 		return null
 
-	return valid_points.pick_random()
+	return _pick_weighted_spawn_point(valid_points)
 
 
 func _is_spawn_point_valid(spawn_point: Marker3D) -> bool:
@@ -109,7 +110,7 @@ func _schedule_spawn_retry() -> void:
 		return
 
 	_spawn_retry_scheduled = true
-	var timer := get_tree().create_timer(respawn_delay)
+	var timer := get_tree().create_timer(_get_respawn_delay())
 	timer.timeout.connect(func() -> void:
 		_spawn_retry_scheduled = false
 		_fill_spawn_slots()
@@ -119,7 +120,8 @@ func _schedule_spawn_retry() -> void:
 func _fill_spawn_slots() -> void:
 	_cleanup_inactive_enemies()
 
-	while _active_enemies.size() < max_enemies:
+	var target_enemy_count: int = _get_target_enemy_count()
+	while _active_enemies.size() < target_enemy_count:
 		if not _spawn_enemy_if_possible():
 			break
 
@@ -250,11 +252,60 @@ func _get_danger_level() -> int:
 	return 1
 
 
+func _get_current_danger_zone_id() -> String:
+	var game_state: Node = get_node_or_null("/root/GameState")
+	if game_state != null and game_state.has_method("get_current_danger_zone_id"):
+		return DangerZoneCatalog.normalize_zone_id(String(game_state.call("get_current_danger_zone_id")))
+
+	return DangerZoneCatalog.ZONE_SAFE
+
+
+func _get_target_enemy_count() -> int:
+	var zone_id: String = _get_current_danger_zone_id()
+	var density: float = DangerZoneCatalog.get_enemy_density(zone_id)
+	var target_count: int = roundi(float(max_enemies) * density)
+	return clampi(target_count, 1, 12)
+
+
+func _get_respawn_delay() -> float:
+	var zone_id: String = _get_current_danger_zone_id()
+	var density: float = DangerZoneCatalog.get_enemy_density(zone_id)
+	return clampf(respawn_delay / maxf(0.5, density), 2.5, respawn_delay * 1.5)
+
+
 func _get_spawn_point_zone(spawn_point: Marker3D) -> String:
 	if spawn_point.has_method("get_danger_zone"):
 		return DangerZoneCatalog.normalize_zone_id(String(spawn_point.get_danger_zone()))
 
 	return DangerZoneCatalog.ZONE_SAFE
+
+
+func _pick_weighted_spawn_point(valid_points: Array[Marker3D]) -> Marker3D:
+	var weighted_points: Array[Marker3D] = []
+	for spawn_point in valid_points:
+		var weight: int = _get_spawn_point_weight(spawn_point)
+		for i in range(weight):
+			weighted_points.append(spawn_point)
+
+	if weighted_points.is_empty():
+		return valid_points.pick_random()
+
+	return weighted_points.pick_random()
+
+
+func _get_spawn_point_weight(spawn_point: Marker3D) -> int:
+	var current_zone_id: String = _get_current_danger_zone_id()
+	var spawn_zone_id: String = _get_spawn_point_zone(spawn_point)
+	var current_level: int = DangerZoneCatalog.get_zone_level(current_zone_id)
+	var spawn_level: int = DangerZoneCatalog.get_zone_level(spawn_zone_id)
+	var level_distance: int = absi(current_level - spawn_level)
+
+	if spawn_zone_id == current_zone_id:
+		return 5
+	if level_distance == 1:
+		return 2
+
+	return 1
 
 
 func _get_variant_weight(variant_id: String, danger_level: int, danger_zone: String) -> int:
