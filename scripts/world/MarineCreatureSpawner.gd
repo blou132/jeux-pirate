@@ -122,18 +122,25 @@ func _pick_spawn_point() -> Marker3D:
 func _get_valid_spawn_points(required_port_avoidance_distance: float) -> Array[Marker3D]:
 	var valid_points: Array[Marker3D] = []
 	for spawn_point in _spawn_points:
-		if _is_spawn_point_valid(spawn_point, required_port_avoidance_distance):
+		var rejection_reason: String = _get_spawn_point_rejection_reason(spawn_point, required_port_avoidance_distance)
+		if rejection_reason.is_empty():
 			valid_points.append(spawn_point)
+		else:
+			_debug_spawn("reject %s: %s" % [spawn_point.name, rejection_reason])
 
 	return valid_points
 
 
 func _is_spawn_point_valid(spawn_point: Marker3D, required_port_avoidance_distance: float) -> bool:
+	return _get_spawn_point_rejection_reason(spawn_point, required_port_avoidance_distance).is_empty()
+
+
+func _get_spawn_point_rejection_reason(spawn_point: Marker3D, required_port_avoidance_distance: float) -> String:
 	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
 	if player != null:
 		var player_distance: float = spawn_point.global_position.distance_to(player.global_position)
 		if player_distance < min_player_spawn_distance:
-			return false
+			return "too close to player %.1f < %.1f" % [player_distance, min_player_spawn_distance]
 
 	for port in get_tree().get_nodes_in_group("ports"):
 		if not port is Node3D:
@@ -142,9 +149,9 @@ func _is_spawn_point_valid(spawn_point: Marker3D, required_port_avoidance_distan
 		var port_node: Node3D = port as Node3D
 		var port_distance: float = spawn_point.global_position.distance_to(port_node.global_position)
 		if port_distance < required_port_avoidance_distance:
-			return false
+			return "too close to port %s %.1f < %.1f" % [port_node.name, port_distance, required_port_avoidance_distance]
 
-	return true
+	return ""
 
 
 func _pick_creature_config(zone_id: String) -> Dictionary:
