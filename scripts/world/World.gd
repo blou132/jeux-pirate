@@ -16,6 +16,7 @@ func _enter_tree() -> void:
 
 
 func _ready() -> void:
+	_set_initial_danger_zone()
 	if hud.has_method("set_player"):
 		hud.set_player(player)
 	if fleet_manager != null:
@@ -92,3 +93,9 @@ func _on_island_interaction_requested(island: Node) -> void:
 
 	if island_exploration_menu.has_method("open"):
 		island_exploration_menu.open(island)
+
+
+func _set_initial_danger_zone() -> void:
+	var game_state: Node = get_node_or_null("/root/GameState")
+	if game_state != null and game_state.has_method("set_current_danger_zone"):
+		game_state.call("set_current_danger_zone", DangerZoneCatalog.ZONE_SAFE)

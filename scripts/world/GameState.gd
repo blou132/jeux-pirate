@@ -3,6 +3,7 @@ extends Node
 signal resources_changed(gold: int, wood: int)
 signal treasure_resources_changed(map_fragments: int, ancient_relics: int)
 signal danger_changed(danger_level: int, enemies_defeated: int)
+signal current_danger_zone_changed(zone_id: String, zone_name: String, zone_level: int)
 signal player_ship_changed(ship_id: String, ship_name: String)
 signal owned_player_ships_changed(owned_ship_ids: Array[String])
 signal cargo_changed(cargo_items: Dictionary, used: int, capacity: int)
@@ -12,6 +13,7 @@ const ENEMIES_PER_DANGER_LEVEL := 3
 const STARTING_PLAYER_SHIP_ID := "barque"
 
 var danger_level: int = 1
+var current_danger_zone_id: String = DangerZoneCatalog.ZONE_SAFE
 var enemies_defeated: int = 0
 var gold: int = 0
 var wood: int = 0
@@ -28,6 +30,7 @@ var cargo_items: Dictionary = {}
 func _ready() -> void:
 	_ensure_valid_player_ship_state()
 	_emit_cargo_changed()
+	_emit_current_danger_zone_changed()
 
 
 func add_resources(gold_amount: int, wood_amount: int) -> void:
@@ -182,6 +185,32 @@ func get_danger_level() -> int:
 
 func get_enemies_defeated() -> int:
 	return enemies_defeated
+
+
+func set_current_danger_zone(zone_id_or_name: String) -> bool:
+	var normalized_zone_id: String = DangerZoneCatalog.normalize_zone_id(zone_id_or_name)
+	if normalized_zone_id == current_danger_zone_id:
+		return false
+
+	current_danger_zone_id = normalized_zone_id
+	_emit_current_danger_zone_changed()
+	return true
+
+
+func get_current_danger_zone_id() -> String:
+	return current_danger_zone_id
+
+
+func get_current_danger_zone_name() -> String:
+	return DangerZoneCatalog.get_zone_name(current_danger_zone_id)
+
+
+func get_current_danger_zone_level() -> int:
+	return DangerZoneCatalog.get_zone_level(current_danger_zone_id)
+
+
+func get_current_danger_reward_multiplier() -> float:
+	return DangerZoneCatalog.get_reward_multiplier(current_danger_zone_id)
 
 
 func get_gold() -> int:
@@ -461,3 +490,11 @@ func _ensure_valid_player_ship_state() -> void:
 
 func _emit_cargo_changed() -> void:
 	cargo_changed.emit(get_cargo_items(), get_cargo_used(), get_cargo_capacity())
+
+
+func _emit_current_danger_zone_changed() -> void:
+	current_danger_zone_changed.emit(
+		current_danger_zone_id,
+		get_current_danger_zone_name(),
+		get_current_danger_zone_level()
+	)
