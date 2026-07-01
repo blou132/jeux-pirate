@@ -4,16 +4,19 @@ extends Node3D
 @export var max_enemies: int = 5
 @export var initial_spawn_count: int = 3
 @export var respawn_delay: float = 5.0
+@export var spawn_check_interval: float = 2.5
 @export var min_player_spawn_distance: float = 22.0
 @export var port_avoidance_distance: float = 45.0
 
 var _active_enemies: Array[Node] = []
 var _spawn_points: Array[Marker3D] = []
 var _spawn_retry_scheduled: bool = false
+var _spawn_check_timer: Timer
 
 
 func _ready() -> void:
 	add_to_group("spawn_manager")
+	_start_spawn_check_timer()
 	call_deferred("_initialize_spawns")
 
 
@@ -23,6 +26,18 @@ func _initialize_spawns() -> void:
 	var target_initial_spawn_count: int = mini(initial_spawn_count, _get_target_enemy_count())
 	for i in range(target_initial_spawn_count):
 		_spawn_enemy_if_possible()
+
+	_fill_spawn_slots()
+
+
+func _start_spawn_check_timer() -> void:
+	_spawn_check_timer = Timer.new()
+	_spawn_check_timer.name = "SpawnCheckTimer"
+	_spawn_check_timer.wait_time = maxf(0.5, spawn_check_interval)
+	_spawn_check_timer.one_shot = false
+	_spawn_check_timer.autostart = true
+	_spawn_check_timer.timeout.connect(_fill_spawn_slots)
+	add_child(_spawn_check_timer)
 
 
 func _refresh_spawn_points() -> void:
@@ -36,7 +51,10 @@ func _refresh_spawn_points() -> void:
 func _spawn_enemy_if_possible() -> bool:
 	_cleanup_inactive_enemies()
 
-	if enemy_scene == null or _active_enemies.size() >= _get_target_enemy_count():
+	var target_enemy_count: int = _get_target_enemy_count()
+	if enemy_scene == null:
+		return false
+	if _active_enemies.size() >= target_enemy_count:
 		return false
 
 	var spawn_point := _pick_spawn_point()
@@ -51,6 +69,10 @@ func _spawn_enemy_if_possible() -> bool:
 
 	var spawn_zone_id: String = _get_spawn_point_zone(spawn_point)
 	var variant_config: Dictionary = _pick_enemy_variant(spawn_zone_id)
+	if variant_config.is_empty():
+		_schedule_spawn_retry()
+		return false
+
 	variant_config = _apply_zone_reward_multiplier(variant_config, spawn_zone_id)
 	if enemy.has_method("configure_variant"):
 		enemy.configure_variant(variant_config)
@@ -149,6 +171,8 @@ func _pick_enemy_variant(danger_zone: String) -> Dictionary:
 	var variants := _get_enemy_variants()
 	var weighted_variants: Array[Dictionary] = []
 	var danger_level := _get_danger_level()
+	if variants.is_empty():
+		return {}
 
 	for config in variants:
 		var variant_id := String(config.get("id", ""))
