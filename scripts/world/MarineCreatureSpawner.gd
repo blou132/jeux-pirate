@@ -121,8 +121,9 @@ func _pick_creature_config(zone_id: String) -> Dictionary:
 	return MarineCreatureCatalog.get_creature(picked_id)
 
 
-func _on_creature_defeated(_world_position: Vector3, _creature_id: String, _rewards: Dictionary, creature: Node) -> void:
+func _on_creature_defeated(world_position: Vector3, creature_id: String, rewards: Dictionary, creature: Node) -> void:
 	_active_creatures.erase(creature)
+	_grant_creature_rewards(world_position, creature_id, rewards)
 	_schedule_spawn_retry()
 
 
@@ -222,3 +223,30 @@ func _debug_spawn(creature_config: Dictionary, zone_id: String) -> void:
 			_get_target_creature_count(),
 		]
 	)
+
+
+func _grant_creature_rewards(_world_position: Vector3, creature_id: String, rewards: Dictionary) -> void:
+	var game_state: Node = get_node_or_null("/root/GameState")
+	if game_state != null and game_state.has_method("record_marine_creature_defeated"):
+		game_state.call("record_marine_creature_defeated", creature_id)
+
+	var gold_reward: int = maxi(0, int(rewards.get("gold", 0)))
+	var wood_reward: int = maxi(0, int(rewards.get("wood", 0)))
+	if game_state != null and game_state.has_method("add_resources") and (gold_reward > 0 or wood_reward > 0):
+		game_state.call("add_resources", gold_reward, wood_reward)
+
+	var map_fragments: int = maxi(0, int(rewards.get("map_fragments", 0)))
+	if game_state != null and game_state.has_method("add_treasure_resources") and map_fragments > 0:
+		game_state.call("add_treasure_resources", map_fragments, 0, true)
+
+	var rare_resource_id: String = String(rewards.get("rare_resource_id", ""))
+	var rare_resource_amount: int = maxi(0, int(rewards.get("rare_resource_amount", 0)))
+	var rare_resource_chance: float = clampf(float(rewards.get("rare_resource_chance", 0.0)), 0.0, 1.0)
+	if not rare_resource_id.is_empty() and rare_resource_amount > 0 and randf() <= rare_resource_chance:
+		if game_state != null and game_state.has_method("add_creature_resource"):
+			game_state.call("add_creature_resource", rare_resource_id, rare_resource_amount)
+
+	var renown_reward: int = maxi(0, int(rewards.get("renown", 0)))
+	var reputation_system: Node = get_node_or_null("/root/ReputationSystem")
+	if reputation_system != null and reputation_system.has_method("add_reputation") and renown_reward > 0:
+		reputation_system.call("add_reputation", renown_reward, "marine_creature_defeated")

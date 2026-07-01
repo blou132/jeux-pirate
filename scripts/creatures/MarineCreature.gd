@@ -123,14 +123,19 @@ func get_aim_position() -> Vector3:
 
 func get_rewards() -> Dictionary:
 	var creature: Dictionary = MarineCreatureCatalog.get_creature(creature_id)
+	var reward_multiplier: float = DangerZoneCatalog.get_reward_multiplier(spawn_zone_id)
+	var gold_reward: int = roundi(float(maxi(0, int(creature.get("reward_gold", 0)))) * reward_multiplier)
+	var wood_reward: int = roundi(float(maxi(0, int(creature.get("reward_wood", 0)))) * reward_multiplier)
+	var renown_reward: int = roundi(float(maxi(0, int(creature.get("renown_reward", 0)))) * reward_multiplier)
 	return {
-		"gold": maxi(0, int(creature.get("reward_gold", 0))),
-		"wood": maxi(0, int(creature.get("reward_wood", 0))),
-		"renown": maxi(0, int(creature.get("renown_reward", 0))),
+		"gold": gold_reward,
+		"wood": wood_reward,
+		"renown": renown_reward,
 		"map_fragments": maxi(0, int(creature.get("map_fragments_reward", 0))),
 		"rare_resource_id": String(creature.get("rare_resource_id", "")),
 		"rare_resource_chance": clampf(float(creature.get("rare_resource_chance", 0.0)), 0.0, 1.0),
 		"rare_resource_amount": maxi(0, int(creature.get("rare_resource_amount", 0))),
+		"reward_multiplier": reward_multiplier,
 	}
 
 
