@@ -52,6 +52,9 @@ func get_explore_action_label() -> String:
 
 
 func get_exploration_hint_text() -> String:
+	if _is_explored():
+		return "Site deja explore\n%s deja recupere" % TreasureCatalog.get_treasure_name(treasure_id)
+
 	var lines: Array[String] = [
 		"Type : %s" % site_type,
 		"Zone : %s" % danger_zone,
@@ -66,7 +69,10 @@ func explore() -> Dictionary:
 	if _is_explored():
 		_explored = true
 		_refresh_visual()
-		return _make_exploration_result(["Site deja explore"])
+		return _make_exploration_result([
+			"Site deja explore",
+			"%s deja recupere" % TreasureCatalog.get_treasure_name(treasure_id),
+		])
 
 	var game_state: Node = _get_game_state()
 	if game_state == null:
@@ -74,16 +80,27 @@ func explore() -> Dictionary:
 
 	var block_reason: String = _get_unlock_block_reason(game_state)
 	if not block_reason.is_empty():
-		return _make_exploration_result([block_reason, _build_requirement_status(game_state)])
+		return _make_exploration_result([
+			block_reason,
+			_build_requirement_status(game_state),
+			"Aucun fragment consomme",
+		])
 
 	if not _spend_unlock_requirements(game_state):
-		return _make_exploration_result(["Fragments de carte insuffisants", _build_requirement_status(game_state)])
+		return _make_exploration_result([
+			"Fragments de carte insuffisants",
+			_build_requirement_status(game_state),
+			"Aucun fragment consomme",
+		])
 
 	var rewards: Dictionary = TreasureCatalog.get_rewards(treasure_id)
 	var cargo_reward: Dictionary = rewards.get("cargo", {})
 	var cargo_block_reason: String = _get_cargo_block_reason(game_state, cargo_reward)
 	if not cargo_block_reason.is_empty():
-		return _make_exploration_result([cargo_block_reason])
+		return _make_exploration_result([
+			cargo_block_reason,
+			"Vendez des marchandises avant d'explorer ce site",
+		])
 
 	_mark_explored()
 	_refresh_visual()
@@ -227,6 +244,7 @@ func _grant_renown() -> int:
 func _build_reward_messages(rewards: Dictionary, renown_gained: int) -> Array[String]:
 	var messages: Array[String] = [
 		"Tresor decouvert : %s" % TreasureCatalog.get_treasure_name(treasure_id),
+		"Site : %s" % site_name,
 	]
 	var reward_text: String = TreasureCatalog.get_reward_text(treasure_id)
 	if not reward_text.is_empty():
