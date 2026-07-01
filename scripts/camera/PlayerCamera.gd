@@ -11,15 +11,15 @@ extends Camera3D
 @export var look_offset_sensitivity: float = 0.025
 @export var look_offset_max_distance: float = 12.0
 @export var look_offset_smoothing: float = 8.0
+@export var camera_distance: float = 16.0
+@export var camera_height: float = 10.0
+@export var look_at_height: float = 2.0
 @export var clamp_to_world_bounds: bool = true
 @export var fallback_world_limit: Vector2 = Vector2(112.0, 112.0)
 @export var world_bounds_padding: float = 4.0
 
 var _target: Node3D
 var _world_bounds: Node
-var _base_local_offset: Vector3
-var _base_pitch_degrees: float
-var _base_yaw_degrees: float
 var _current_zoom_factor: float = 1.0
 var _target_zoom_factor: float = 1.0
 var _current_look_offset: Vector3 = Vector3.ZERO
@@ -28,16 +28,13 @@ var is_free_look_unlocked: bool = false
 
 
 func _ready() -> void:
-	_base_local_offset = position
-	_base_pitch_degrees = rotation_degrees.x
-	_base_yaw_degrees = rotation_degrees.y
 	_target = _find_follow_target()
 	_world_bounds = _find_world_bounds()
 	top_level = true
 
 	if _target != null:
 		global_position = _get_desired_position()
-		global_rotation = _get_desired_rotation()
+		_apply_look_at_rotation(1.0)
 
 
 func _process(delta: float) -> void:
@@ -56,7 +53,7 @@ func _process(delta: float) -> void:
 	_current_zoom_factor = lerpf(_current_zoom_factor, _target_zoom_factor, zoom_weight)
 	_current_look_offset = _current_look_offset.lerp(_target_look_offset, look_offset_weight)
 	global_position = global_position.lerp(_get_desired_position(), position_weight)
-	global_rotation = global_rotation.lerp(_get_desired_rotation(), rotation_weight)
+	_apply_look_at_rotation(rotation_weight)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -107,7 +104,11 @@ func _find_world_bounds() -> Node:
 
 
 func _get_desired_position() -> Vector3:
-	var desired_position: Vector3 = _target.global_position + (_base_local_offset * _current_zoom_factor) + _current_look_offset
+	var boat_back: Vector3 = _target.global_transform.basis.z.normalized()
+	var desired_position: Vector3 = _target.global_position
+	desired_position += boat_back * (camera_distance * _current_zoom_factor)
+	desired_position += Vector3.UP * camera_height
+	desired_position += _current_look_offset
 	return _clamp_to_world_bounds(desired_position)
 
 
@@ -187,12 +188,10 @@ func _are_camera_controls_blocked() -> bool:
 	return false
 
 
-func _get_desired_rotation() -> Vector3:
-	return Vector3(
-		deg_to_rad(_base_pitch_degrees),
-		deg_to_rad(_base_yaw_degrees),
-		0.0
-	)
+func _apply_look_at_rotation(weight: float) -> void:
+	var look_position: Vector3 = _target.global_position + (Vector3.UP * look_at_height)
+	var desired_transform: Transform3D = global_transform.looking_at(look_position, Vector3.UP)
+	global_transform.basis = global_transform.basis.slerp(desired_transform.basis, clampf(weight, 0.0, 1.0)).orthonormalized()
 
 
 func _get_smoothing_weight(smoothing: float, delta: float) -> float:
