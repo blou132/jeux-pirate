@@ -8,6 +8,7 @@ signal player_ship_changed(ship_id: String, ship_name: String)
 signal owned_player_ships_changed(owned_ship_ids: Array[String])
 signal cargo_changed(cargo_items: Dictionary, used: int, capacity: int)
 signal exploration_progress_changed(discovered_treasures: int, explored_sites: int)
+signal creature_resources_changed(resources: Dictionary, creatures_defeated: int)
 
 const ENEMIES_PER_DANGER_LEVEL := 3
 const STARTING_PLAYER_SHIP_ID := "barque"
@@ -22,6 +23,8 @@ var ancient_relics: int = 0
 var opened_island_chests: Dictionary = {}
 var explored_exploration_sites: Dictionary = {}
 var discovered_treasures: Dictionary = {}
+var creature_resources: Dictionary = {}
+var marine_creatures_defeated: int = 0
 var active_player_ship_id: String = STARTING_PLAYER_SHIP_ID
 var owned_player_ship_ids: Array[String] = [STARTING_PLAYER_SHIP_ID]
 var cargo_items: Dictionary = {}
@@ -31,6 +34,7 @@ func _ready() -> void:
 	_ensure_valid_player_ship_state()
 	_emit_cargo_changed()
 	_emit_current_danger_zone_changed()
+	_emit_creature_resources_changed()
 
 
 func add_resources(gold_amount: int, wood_amount: int) -> void:
@@ -161,6 +165,49 @@ func reset_exploration_sites() -> void:
 	explored_exploration_sites.clear()
 	discovered_treasures.clear()
 	exploration_progress_changed.emit(0, 0)
+
+
+func record_marine_creature_defeated(_creature_id: String) -> void:
+	marine_creatures_defeated += 1
+	_emit_creature_resources_changed()
+
+
+func add_creature_resource(resource_id: String, amount: int) -> void:
+	if resource_id.is_empty() or amount <= 0:
+		return
+
+	var current_amount: int = maxi(0, int(creature_resources.get(resource_id, 0)))
+	creature_resources[resource_id] = current_amount + amount
+	_emit_creature_resources_changed()
+
+
+func get_creature_resource_amount(resource_id: String) -> int:
+	return maxi(0, int(creature_resources.get(resource_id, 0)))
+
+
+func get_creature_resources() -> Dictionary:
+	return creature_resources.duplicate(true)
+
+
+func get_creature_resources_view() -> Array[Dictionary]:
+	var resources: Array[Dictionary] = []
+	for resource_id in creature_resources.keys():
+		var resource_key: String = String(resource_id)
+		var amount: int = get_creature_resource_amount(resource_key)
+		if amount <= 0:
+			continue
+
+		resources.append({
+			"id": resource_key,
+			"name": MarineCreatureCatalog.get_resource_name(resource_key),
+			"amount": amount,
+		})
+
+	return resources
+
+
+func get_marine_creatures_defeated() -> int:
+	return marine_creatures_defeated
 
 
 func get_explored_site_count() -> int:
@@ -498,3 +545,7 @@ func _emit_current_danger_zone_changed() -> void:
 		get_current_danger_zone_name(),
 		get_current_danger_zone_level()
 	)
+
+
+func _emit_creature_resources_changed() -> void:
+	creature_resources_changed.emit(get_creature_resources(), marine_creatures_defeated)
