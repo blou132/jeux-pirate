@@ -62,6 +62,9 @@ func get_exploration_hint_text() -> String:
 		"Requis : %s" % TreasureCatalog.get_requirement_text(treasure_id),
 		"Recompenses : %s" % TreasureCatalog.get_reward_text(treasure_id),
 	]
+	var reward_multiplier: float = _get_reward_multiplier()
+	if reward_multiplier > 1.0:
+		lines.append("Bonus zone : x%.2f" % reward_multiplier)
 	return _join_messages(lines)
 
 
@@ -214,8 +217,8 @@ func _get_cargo_block_reason(game_state: Node, cargo_reward: Dictionary) -> Stri
 
 
 func _grant_rewards(game_state: Node, rewards: Dictionary) -> void:
-	var gold_reward: int = maxi(0, int(rewards.get("gold", 0)))
-	var wood_reward: int = maxi(0, int(rewards.get("wood", 0)))
+	var gold_reward: int = _scale_zone_reward(maxi(0, int(rewards.get("gold", 0))))
+	var wood_reward: int = _scale_zone_reward(maxi(0, int(rewards.get("wood", 0))))
 	var map_fragment_reward: int = maxi(0, int(rewards.get("map_fragments", 0)))
 	var relic_reward: int = maxi(0, int(rewards.get("ancient_relics", 0)))
 	var cargo_reward: Dictionary = rewards.get("cargo", {})
@@ -233,7 +236,7 @@ func _grant_rewards(game_state: Node, rewards: Dictionary) -> void:
 
 
 func _grant_renown() -> int:
-	var renown_reward: int = TreasureCatalog.get_renown_reward(treasure_id)
+	var renown_reward: int = _scale_zone_reward(TreasureCatalog.get_renown_reward(treasure_id))
 	if renown_reward <= 0:
 		return 0
 
@@ -254,10 +257,24 @@ func _build_reward_messages(rewards: Dictionary, renown_gained: int) -> Array[St
 	var reward_text: String = TreasureCatalog.get_reward_text(treasure_id)
 	if not reward_text.is_empty():
 		messages.append("Recompenses : %s" % reward_text)
+	var reward_multiplier: float = _get_reward_multiplier()
+	if reward_multiplier > 1.0:
+		messages.append("Bonus de zone : x%.2f sur or, bois et renom" % reward_multiplier)
 	if renown_gained <= 0 and TreasureCatalog.get_renown_reward(treasure_id) > 0:
 		messages.append("Renom au maximum")
 
 	return messages
+
+
+func _get_reward_multiplier() -> float:
+	return DangerZoneCatalog.get_reward_multiplier(danger_zone)
+
+
+func _scale_zone_reward(base_reward: int) -> int:
+	if base_reward <= 0:
+		return 0
+
+	return roundi(float(base_reward) * _get_reward_multiplier())
 
 
 func _make_exploration_result(messages: Array[String]) -> Dictionary:

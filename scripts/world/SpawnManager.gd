@@ -51,6 +51,7 @@ func _spawn_enemy_if_possible() -> bool:
 
 	var spawn_zone_id: String = _get_spawn_point_zone(spawn_point)
 	var variant_config: Dictionary = _pick_enemy_variant(spawn_zone_id)
+	variant_config = _apply_zone_reward_multiplier(variant_config, spawn_zone_id)
 	if enemy.has_method("configure_variant"):
 		enemy.configure_variant(variant_config)
 
@@ -159,6 +160,19 @@ func _pick_enemy_variant(danger_zone: String) -> Dictionary:
 		return variants.pick_random()
 
 	return weighted_variants.pick_random()
+
+
+func _apply_zone_reward_multiplier(config: Dictionary, zone_id: String) -> Dictionary:
+	var adjusted_config: Dictionary = config.duplicate(true)
+	var reward_multiplier: float = DangerZoneCatalog.get_reward_multiplier(zone_id)
+	var gold_reward: int = maxi(0, int(adjusted_config.get("reward_gold", 0)))
+	var wood_reward: int = maxi(0, int(adjusted_config.get("reward_wood", 0)))
+
+	adjusted_config["reward_gold"] = roundi(float(gold_reward) * reward_multiplier)
+	adjusted_config["reward_wood"] = roundi(float(wood_reward) * reward_multiplier)
+	adjusted_config["danger_zone"] = zone_id
+	adjusted_config["reward_multiplier"] = reward_multiplier
+	return adjusted_config
 
 
 func _get_enemy_variants() -> Array[Dictionary]:
