@@ -34,6 +34,7 @@ func open(island: Node) -> void:
 	_island = island
 	status_label.text = ""
 	title_label.text = _get_island_name()
+	search_button.text = _get_explore_action_label()
 	root_control.visible = true
 	_previous_pause_state = get_tree().paused
 	get_tree().paused = true
@@ -73,6 +74,13 @@ func _get_island_name() -> String:
 		return _island.get_island_name()
 
 	return "Île inconnue"
+
+
+func _get_explore_action_label() -> String:
+	if _island != null and _island.has_method("get_explore_action_label"):
+		return String(_island.call("get_explore_action_label"))
+
+	return "Fouiller l'ile"
 
 
 func _show_exploration_result(result: Dictionary) -> void:

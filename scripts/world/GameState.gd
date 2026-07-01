@@ -6,6 +6,7 @@ signal danger_changed(danger_level: int, enemies_defeated: int)
 signal player_ship_changed(ship_id: String, ship_name: String)
 signal owned_player_ships_changed(owned_ship_ids: Array[String])
 signal cargo_changed(cargo_items: Dictionary, used: int, capacity: int)
+signal exploration_progress_changed(discovered_treasures: int, explored_sites: int)
 
 const ENEMIES_PER_DANGER_LEVEL := 3
 const STARTING_PLAYER_SHIP_ID := "barque"
@@ -17,6 +18,8 @@ var wood: int = 0
 var map_fragments: int = 0
 var ancient_relics: int = 0
 var opened_island_chests: Dictionary = {}
+var explored_exploration_sites: Dictionary = {}
+var discovered_treasures: Dictionary = {}
 var active_player_ship_id: String = STARTING_PLAYER_SHIP_ID
 var owned_player_ship_ids: Array[String] = [STARTING_PLAYER_SHIP_ID]
 var cargo_items: Dictionary = {}
@@ -127,6 +130,49 @@ func mark_island_chest_opened(chest_id: String) -> void:
 
 func reset_island_chests() -> void:
 	opened_island_chests.clear()
+
+
+func is_exploration_site_explored(site_id: String) -> bool:
+	if site_id.is_empty():
+		return false
+
+	return bool(explored_exploration_sites.get(site_id, false))
+
+
+func mark_exploration_site_explored(site_id: String, treasure_id: String = "") -> void:
+	if site_id.is_empty():
+		return
+	if bool(explored_exploration_sites.get(site_id, false)):
+		return
+
+	explored_exploration_sites[site_id] = true
+	if not treasure_id.is_empty():
+		var current_count: int = maxi(0, int(discovered_treasures.get(treasure_id, 0)))
+		discovered_treasures[treasure_id] = current_count + 1
+
+	exploration_progress_changed.emit(get_discovered_treasure_count(), get_explored_site_count())
+
+
+func reset_exploration_sites() -> void:
+	explored_exploration_sites.clear()
+	discovered_treasures.clear()
+	exploration_progress_changed.emit(0, 0)
+
+
+func get_explored_site_count() -> int:
+	return explored_exploration_sites.size()
+
+
+func get_discovered_treasure_count() -> int:
+	var count: int = 0
+	for treasure_id in discovered_treasures.keys():
+		count += maxi(0, int(discovered_treasures.get(treasure_id, 0)))
+
+	return count
+
+
+func get_discovered_treasure_types_count() -> int:
+	return discovered_treasures.size()
 
 
 func get_danger_level() -> int:

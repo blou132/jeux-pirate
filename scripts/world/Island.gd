@@ -49,6 +49,10 @@ func get_island_name() -> String:
 	return island_name
 
 
+func get_explore_action_label() -> String:
+	return "Fouiller l'ile"
+
+
 func explore() -> Dictionary:
 	if _is_chest_opened():
 		_chest_opened = true

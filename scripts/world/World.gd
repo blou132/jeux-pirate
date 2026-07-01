@@ -11,6 +11,8 @@ func _enter_tree() -> void:
 	var game_state := get_node_or_null("/root/GameState")
 	if game_state != null and game_state.has_method("reset_island_chests"):
 		game_state.reset_island_chests()
+	if game_state != null and game_state.has_method("reset_exploration_sites"):
+		game_state.reset_exploration_sites()
 
 
 func _ready() -> void:
