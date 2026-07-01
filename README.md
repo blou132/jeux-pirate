@@ -54,6 +54,8 @@ La v0.15 ajoute une premiere base de creatures marines : poissons, requins, croc
 
 La v0.15.1 restaure les spawns pirates et creatures apres la v0.15 : les spawners relancent regulierement leurs tentatives, utilisent une zone de danger de secours si l'etat courant est invalide et gardent des limites separees pour pirates et creatures.
 
+La v0.15.2 augmente la presence pirates/creatures, repartit mieux les points de spawn par region et corrige les degats de contact des creatures marines.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -378,6 +380,8 @@ La v0.15.1 restaure les spawns pirates et creatures apres la v0.15 : les spawner
 - `MarineCreatureSpawner` utilise des points de spawn dedies et les zones de danger pour choisir les creatures.
 - Repartition : Eaux sures = poissons/requins rares, Zone surveillee = poissons/requins/crocodiles rares, Zone contestee = requins/crocodiles/serpents rares, Zone hostile = crocodiles/serpents/krakens rares, Zone mortelle = serpents/krakens.
 - Correctif v0.15.1 : `SpawnManager` et `MarineCreatureSpawner` gardent chacun leur propre compteur, un timer de remplissage, une distance de securite stricte pres des ports puis une distance de secours si tous les points sont rejetes.
+- Correctif v0.15.2 : base pirates 8 avec respawn 4.5 s, base creatures 8 avec respawn 5 s, points de spawn plus nombreux par zone et densites plus fortes hors Eaux sures.
+- Degats creatures v0.15.2 : Requin 8, Crocodile marin 12, Serpent de mer 18, Kraken juvenile 28, avec feedback HUD au contact.
 - Les creatures agressives detectent joueur ou allies, poursuivent a courte portee, attaquent au contact et decrochent pres des ports.
 - Les boulets joueur et allies peuvent toucher les creatures ; les boulets pirates restent reserves au joueur et a la flotte.
 - Ressources rares suivies separement de la cargaison : Perle noire, Dents de requin, Corail sacre, Ecaille de serpent et Oeil de kraken.

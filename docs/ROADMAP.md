@@ -176,6 +176,14 @@ Correctif v0.15.1 :
 - Eviter que les zones sures de ports rejettent tous les points de spawn.
 - Ajouter des diagnostics de spawn et des sanity checks de catalogues desactives par defaut.
 
+Correctif v0.15.2 :
+
+- Augmenter la presence pirate sans rendre les Eaux sures injouables.
+- Ajouter une densite separee pour les creatures marines.
+- Ajouter plus de points de spawn par zone de danger.
+- Corriger les degats de contact des creatures sur joueur et allies.
+- Ajouter un feedback HUD quand une creature touche une cible.
+
 ## v0.16 - Controle de territoire
 
 - Preparer des zones controlables ou contestables.

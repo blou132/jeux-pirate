@@ -493,6 +493,15 @@ Correctif v0.15.1 :
 - Les ports restent des zones sures, mais les points de spawn peuvent utiliser une distance de secours pour eviter que les zones sures bloquent toute la carte.
 - Des diagnostics desactives par defaut affichent les actifs, la zone, le type choisi et la raison d'un echec de spawn.
 
+Correctif v0.15.2 :
+
+- La densite pirate passe a 0.4, 0.8, 1.2, 1.6 et 2.0 des Eaux sures a la Zone mortelle.
+- La densite des creatures devient separee : 0.7, 1.0, 1.3, 1.6 et 2.0 selon la zone.
+- Le monde contient plus de points de spawn par zone pour eviter les rencontres trop rares ou concentrees.
+- Les creatures agressives touchent a distance de contact reelle autour des coques au lieu d'attendre un chevauchement impossible.
+- Degats : Requin 8, Crocodile marin 12, Serpent de mer 18, Kraken juvenile 28.
+- Les ports gardent une exclusion stricte, puis une distance de secours si toute la carte serait rejetee.
+
 ## Réputation et titres v0.8
 
 La réputation donne une progression sociale simple sans ajouter encore de contrôle de territoire ou de hiérarchie de ports :
