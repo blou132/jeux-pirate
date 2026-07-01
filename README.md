@@ -48,6 +48,8 @@ La v0.12.3 transforme le mode verrouille en vraie camera de poursuite derriere l
 
 La v0.13 ajoute une premiere couche de tresors et d'exploration : catalogue de tresors, sites explorables, fragments de carte utiles, recompenses de tresors et progression affichee dans le HUD detaille.
 
+La v0.14 avance les zones de danger : catalogue central, regions de monde identifiees, HUD de zone, spawns ennemis et recompenses modules par le risque.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -354,6 +356,16 @@ La v0.13 ajoute une premiere couche de tresors et d'exploration : catalogue de t
 - Un site explore ne redonne jamais sa recompense pendant la session.
 - Le HUD detaille affiche maintenant le nombre de tresors decouverts et de sites explores.
 
+## Etat v0.14
+
+- `DangerZoneCatalog` centralise les sept zones : Eaux sures, Zone surveillee, Zone contestee, Zone hostile, Zone mortelle, Territoire legendaire et Enfers des mers.
+- Le monde jouable expose des regions de danger avec identifiant officiel, dont une premiere Zone mortelle pres de l'ile au tresor.
+- Le HUD affiche la zone courante separement du danger global historique.
+- Les notifications de transition indiquent le niveau de zone et le bonus de recompense quand il existe.
+- Les points de spawn utilisent les zones officielles pour choisir les variantes ennemies adaptees.
+- La densite ennemie et le delai de respawn augmentent avec le danger de la zone courante.
+- Les recompenses de combat et d'exploration gagnent un multiplicateur de zone sur or, bois et renom.
+
 ## Lancement
 
 1. Installer Godot 4.x.
@@ -412,6 +424,7 @@ Les lignes de bordée ennemies peuvent être affichées avec `debug_show_broadsi
 - `UpgradeSystem` est configure en autoload pour suivre les niveaux d'amélioration.
 - `QuestSystem` est configure en autoload pour suivre les missions actives et les récompenses.
 - `ReputationSystem` est configure en autoload pour suivre réputation, rangs, titres pirates et feedback de progression.
+- `DangerZoneCatalog` centralise les zones de danger, leurs niveaux, types d'ennemis, densites, ports, tresors et multiplicateurs de recompense.
 - `TreasureCatalog` centralise les types de tresors, prerequis, zones recommandees et recompenses.
 - `ExplorationSite` et `ExplorationSiteSpawner` ajoutent des sites explorables uniques sur la carte.
 - `QuestObjectiveSpawner` crée les objectifs temporaires de mission dans la scène jouable.

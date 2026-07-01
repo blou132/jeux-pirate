@@ -145,9 +145,14 @@
 
 ## v0.14 - Zones de danger avancees
 
-- Rendre les zones de danger plus evolutives.
-- Relier danger, reputation et types d'ennemis.
-- Preparer des routes maritimes plus risquees.
+- Ajouter `DangerZoneCatalog` comme source centrale des sept zones de danger.
+- Declarer les grandes regions du monde avec identifiants officiels.
+- Afficher la zone courante dans le HUD compact et detaille.
+- Utiliser la zone pour choisir les variantes ennemies disponibles.
+- Moduler densite ennemie et delai de respawn selon la zone courante.
+- Ajouter des multiplicateurs de recompense par zone pour combat et exploration.
+- Afficher un feedback de transition avec niveau de zone et bonus de recompense.
+- Garder les zones legendaires comme donnees de preparation pour routes et ports futurs.
 
 ## v0.15 - Creatures marines
 

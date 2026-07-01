@@ -130,6 +130,15 @@ Le joueur incarne le capitaine d'un petit navire independant qui construit progr
 7. Le site est marque explore et ne peut pas etre farme pendant la session.
 8. Le HUD detaille affiche les tresors decouverts et les sites explores.
 
+## Boucle de jeu v0.14
+
+1. Le joueur quitte les eaux sures et traverse des regions de danger mieux identifiees.
+2. Le HUD compact et detaille affiche la zone courante separement du danger global.
+3. Les spawns ennemis utilisent la zone pour choisir petits pirates, brigantins ou patrouilleurs lourds.
+4. La densite ennemie augmente dans les zones plus dangereuses.
+5. Les transitions de zone affichent le niveau et le bonus de recompense.
+6. Les combats et sites d'exploration en zone dangereuse rapportent plus d'or, de bois et de renom.
+
 ## Port et progression
 
 Le port sert de premier point sûr et de première interface de progression. Il établit le rythme attendu : partir en mer, obtenir des ressources, revenir au port, réparer, améliorer le bateau, accepter des missions et recruter un premier soutien allié.
@@ -425,6 +434,24 @@ La v0.13 donne une premiere utilite claire aux fragments de carte sans creer enc
 - Le renom des tresors passe par `ReputationSystem.record_treasure_discovered` pour mettre a jour rangs, titres et score de titre.
 - Si la cargaison est insuffisante pour une recompense en marchandises, le site refuse l'exploration avant de consommer des fragments.
 - Les coffres d'iles v0.4 et les coffres de quete v0.5 continuent d'utiliser leur flux existant.
+
+## Zones de danger avancees v0.14
+
+`DangerZoneCatalog` devient la source commune pour les regions de danger. Chaque zone declare son nom, niveau, description, types d'ennemis, densite, ports, tresors et multiplicateur de recompense.
+
+Zones officielles :
+
+1. Eaux sures : densite x0.35, recompenses x1.00, surtout Petits pirates.
+2. Zone surveillee : densite x0.65, recompenses x1.15, Petits pirates et Brigantins.
+3. Zone contestee : densite x1.00, recompenses x1.30, melange de menaces.
+4. Zone hostile : densite x1.30, recompenses x1.50, Brigantins et Patrouilleurs lourds.
+5. Zone mortelle : densite x1.65, recompenses x1.80, menaces lourdes plus frequentes.
+6. Territoire legendaire : densite x2.00, recompenses x2.20, prepare pour une future carte avancee.
+7. Enfers des mers : densite x2.40, recompenses x2.80, reserve aux versions futures.
+
+La v0.14 ne cree pas une carte immense. Elle ajoute une premiere Zone mortelle autour de l'ile au tresor et convertit les regions existantes vers les identifiants officiels. Les zones legendaires restent surtout des donnees de preparation pour les ports, tresors et routes futures.
+
+Le danger global issu du nombre d'ennemis detruits reste conserve pour la progression historique. La zone courante est separee dans le HUD pour eviter de confondre niveau de region et escalade globale.
 
 ## Réputation et titres v0.8
 
