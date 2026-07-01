@@ -31,6 +31,7 @@ const ZONES := {
 		"description": "Zone de depart protegee, avec peu de menaces.",
 		"enemy_types": ["small_pirate"],
 		"enemy_density": 0.4,
+		"marine_creature_density": 0.7,
 		"reward_multiplier": 1.0,
 		"treasures": [TreasureCatalog.TREASURE_POUCH, TreasureCatalog.TREASURE_CHEST],
 		"ports": [PortCatalog.PORT_QUAI, PortCatalog.PORT_QUAI_DE_PECHE, PortCatalog.PORT_PETIT_PORT],
@@ -43,6 +44,7 @@ const ZONES := {
 		"description": "Patrouilles legeres et premiers brigantins.",
 		"enemy_types": ["small_pirate", "brigantine"],
 		"enemy_density": 0.8,
+		"marine_creature_density": 1.0,
 		"reward_multiplier": 1.15,
 		"treasures": [TreasureCatalog.TREASURE_CHEST, TreasureCatalog.TREASURE_VAULT],
 		"ports": [PortCatalog.PORT_POSTE_DE_GARDE, PortCatalog.PORT_PORT_MARCHAND],
@@ -55,6 +57,7 @@ const ZONES := {
 		"description": "Route de combat plus dense, avec brigantins dominants.",
 		"enemy_types": ["small_pirate", "brigantine", "heavy_patrol"],
 		"enemy_density": 1.2,
+		"marine_creature_density": 1.3,
 		"reward_multiplier": 1.3,
 		"treasures": [TreasureCatalog.TREASURE_VAULT, TreasureCatalog.TREASURE_CAVE],
 		"ports": [PortCatalog.PORT_CRIQUE_CONTREBANDIERS, PortCatalog.PORT_GRAND_PORT],
@@ -67,6 +70,7 @@ const ZONES := {
 		"description": "Eaux dangereuses avec patrouilleurs lourds reguliers.",
 		"enemy_types": ["brigantine", "heavy_patrol"],
 		"enemy_density": 1.6,
+		"marine_creature_density": 1.6,
 		"reward_multiplier": 1.5,
 		"treasures": [TreasureCatalog.TREASURE_CAVE, TreasureCatalog.TREASURE_ROYAL],
 		"ports": [PortCatalog.PORT_FORTIN_FRONTIERE, PortCatalog.PORT_ARSENAL_NAVAL],
@@ -79,6 +83,7 @@ const ZONES := {
 		"description": "Secteur avance pour navire prepare et cargaison rentable.",
 		"enemy_types": ["brigantine", "heavy_patrol"],
 		"enemy_density": 2.0,
+		"marine_creature_density": 2.0,
 		"reward_multiplier": 1.8,
 		"treasures": [TreasureCatalog.TREASURE_ROYAL, TreasureCatalog.TREASURE_IMPERIAL],
 		"ports": [PortCatalog.PORT_PORT_TEMPETE, PortCatalog.PORT_CAPITALE_MARITIME],
@@ -91,6 +96,7 @@ const ZONES := {
 		"description": "Territoire futur pour expeditions rares.",
 		"enemy_types": ["heavy_patrol"],
 		"enemy_density": 2.0,
+		"marine_creature_density": 2.2,
 		"reward_multiplier": 2.2,
 		"treasures": [TreasureCatalog.TREASURE_IMPERIAL, TreasureCatalog.TREASURE_MYTHIC],
 		"ports": [PortCatalog.PORT_VIEUX_ROI, PortCatalog.PORT_LEGENDAIRE],
@@ -103,6 +109,7 @@ const ZONES := {
 		"description": "Zone finale future, reservee aux capitaines les plus avances.",
 		"enemy_types": ["heavy_patrol"],
 		"enemy_density": 2.4,
+		"marine_creature_density": 2.6,
 		"reward_multiplier": 2.8,
 		"treasures": [TreasureCatalog.TREASURE_MYTHIC],
 		"ports": [PortCatalog.PORT_QUAI_ABYSSES, PortCatalog.PORT_SANCTUAIRE_PIRATE],
@@ -167,6 +174,11 @@ static func get_zone_description(zone_id_or_name: String) -> String:
 static func get_enemy_density(zone_id_or_name: String) -> float:
 	var zone_data: Dictionary = get_zone(zone_id_or_name)
 	return maxf(0.1, float(zone_data.get("enemy_density", 1.0)))
+
+
+static func get_marine_creature_density(zone_id_or_name: String) -> float:
+	var zone_data: Dictionary = get_zone(zone_id_or_name)
+	return maxf(0.1, float(zone_data.get("marine_creature_density", get_enemy_density(zone_id_or_name))))
 
 
 static func get_reward_multiplier(zone_id_or_name: String) -> float:

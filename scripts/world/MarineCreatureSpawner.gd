@@ -1,13 +1,14 @@
 extends Node3D
 
 @export var creature_scene: PackedScene = preload("res://scenes/creatures/MarineCreature.tscn")
-@export var max_creatures: int = 4
-@export var initial_spawn_count: int = 2
-@export var respawn_delay: float = 7.0
-@export var spawn_check_interval: float = 3.0
+@export var max_creatures: int = 8
+@export var initial_spawn_count: int = 5
+@export var respawn_delay: float = 5.0
+@export var spawn_check_interval: float = 2.4
+@export var spawn_attempts_per_fill: int = 22
 @export var min_player_spawn_distance: float = 18.0
-@export var port_avoidance_distance: float = 48.0
-@export var fallback_port_avoidance_distance: float = 30.0
+@export var port_avoidance_distance: float = 42.0
+@export var fallback_port_avoidance_distance: float = 28.0
 @export var debug_creature_spawns: bool = false
 
 var _active_creatures: Array[Node] = []
@@ -190,9 +191,10 @@ func _fill_spawn_slots() -> void:
 	_cleanup_inactive_creatures()
 
 	var target_creature_count: int = _get_target_creature_count()
-	while _active_creatures.size() < target_creature_count:
-		if not _spawn_creature_if_possible():
-			break
+	var attempts_remaining: int = maxi(1, spawn_attempts_per_fill)
+	while _active_creatures.size() < target_creature_count and attempts_remaining > 0:
+		attempts_remaining -= 1
+		_spawn_creature_if_possible()
 
 
 func _cleanup_inactive_creatures() -> void:
@@ -213,15 +215,15 @@ func _get_current_danger_zone_id() -> String:
 
 func _get_target_creature_count() -> int:
 	var zone_id: String = _get_current_danger_zone_id()
-	var density: float = DangerZoneCatalog.get_enemy_density(zone_id)
-	var target_count: int = roundi(float(max_creatures) * density * 0.8)
-	return clampi(target_count, 1, 8)
+	var density: float = DangerZoneCatalog.get_marine_creature_density(zone_id)
+	var target_count: int = roundi(float(max_creatures) * density)
+	return clampi(target_count, 2, 12)
 
 
 func _get_respawn_delay() -> float:
 	var zone_id: String = _get_current_danger_zone_id()
-	var density: float = DangerZoneCatalog.get_enemy_density(zone_id)
-	return clampf(respawn_delay / maxf(0.5, density), 3.0, respawn_delay * 1.5)
+	var density: float = DangerZoneCatalog.get_marine_creature_density(zone_id)
+	return clampf(respawn_delay / maxf(0.6, density), 2.5, respawn_delay * 1.4)
 
 
 func _get_spawn_point_zone(spawn_point: Marker3D) -> String:
