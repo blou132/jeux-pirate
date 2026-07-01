@@ -57,7 +57,7 @@ layout_mode = 1
 offset_left = 16.0
 offset_top = 104.0
 offset_right = 252.0
-offset_bottom = 308.0
+offset_bottom = 336.0
 mouse_filter = 2
 
 [node name="CompactRow" type="VBoxContainer" parent="HUDRoot/CompactSailingPanel"]
@@ -79,7 +79,12 @@ text = "Vitesse: 0.0 nd"
 
 [node name="CompactDangerLabel" type="Label" parent="HUDRoot/CompactSailingPanel/CompactRow"]
 layout_mode = 2
-text = "Danger: 1"
+text = "Menace: 1"
+
+[node name="CompactZoneLabel" type="Label" parent="HUDRoot/CompactSailingPanel/CompactRow"]
+layout_mode = 2
+text = "Zone: Eaux sures"
+clip_text = true
 
 [node name="CompactFleetLabel" type="Label" parent="HUDRoot/CompactSailingPanel/CompactRow"]
 layout_mode = 2
@@ -169,7 +174,11 @@ theme_override_font_sizes/font_size = 16
 
 [node name="DangerLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2
-text = "Danger: 1"
+text = "Danger global: 1"
+
+[node name="ZoneLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
+layout_mode = 2
+text = "Zone: Eaux sures (niv. 1)"
 
 [node name="EnemiesDefeatedLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
 layout_mode = 2

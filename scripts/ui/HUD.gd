@@ -12,6 +12,7 @@ extends CanvasLayer
 @onready var compact_cargo_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactCargoLabel
 @onready var compact_speed_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactSpeedLabel
 @onready var compact_danger_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactDangerLabel
+@onready var compact_zone_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactZoneLabel
 @onready var compact_fleet_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactFleetLabel
 @onready var compact_order_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactOrderLabel
 @onready var compact_quest_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactQuestLabel
@@ -23,6 +24,7 @@ extends CanvasLayer
 @onready var sails_level_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/SailsLevelLabel
 @onready var cannons_level_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/CannonsLevelLabel
 @onready var danger_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/DangerLabel
+@onready var zone_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/ZoneLabel
 @onready var enemies_defeated_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/EnemiesDefeatedLabel
 @onready var ally_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/AllyLabel
 @onready var quest_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/QuestLabel
@@ -355,6 +357,17 @@ func _connect_game_state() -> void:
 	if _game_state.has_method("get_danger_level") and _game_state.has_method("get_enemies_defeated"):
 		_on_danger_changed(_game_state.get_danger_level(), _game_state.get_enemies_defeated())
 
+	var current_zone_callback: Callable = Callable(self, "_on_current_danger_zone_changed")
+	if _game_state.has_signal("current_danger_zone_changed") and not _game_state.is_connected("current_danger_zone_changed", current_zone_callback):
+		_game_state.connect("current_danger_zone_changed", current_zone_callback)
+
+	if _game_state.has_method("get_current_danger_zone_id") and _game_state.has_method("get_current_danger_zone_name") and _game_state.has_method("get_current_danger_zone_level"):
+		_on_current_danger_zone_changed(
+			String(_game_state.call("get_current_danger_zone_id")),
+			String(_game_state.call("get_current_danger_zone_name")),
+			int(_game_state.call("get_current_danger_zone_level"))
+		)
+
 	var player_ship_callback := Callable(self, "_on_player_ship_changed")
 	if _game_state.has_signal("player_ship_changed") and not _game_state.is_connected("player_ship_changed", player_ship_callback):
 		_game_state.connect("player_ship_changed", player_ship_callback)
@@ -383,9 +396,34 @@ func _on_treasure_resources_changed(map_fragments: int, ancient_relics: int) -> 
 
 
 func _on_danger_changed(danger_level: int, enemies_defeated: int) -> void:
-	danger_label.text = "Danger: %d" % danger_level
-	compact_danger_label.text = "Danger: %d" % danger_level
+	danger_label.text = "Danger global: %d" % danger_level
+	compact_danger_label.text = "Menace: %d" % danger_level
 	enemies_defeated_label.text = "Ennemis détruits: %d" % enemies_defeated
+
+
+func _on_current_danger_zone_changed(_zone_id: String, zone_name: String, zone_level: int) -> void:
+	zone_label.text = "Zone: %s (niv. %d)" % [zone_name, zone_level]
+	compact_zone_label.text = "Zone: %s" % _get_compact_zone_label(zone_name)
+
+
+func _get_compact_zone_label(zone_name: String) -> String:
+	match zone_name:
+		"Eaux sures":
+			return "Eaux sures"
+		"Zone surveillee":
+			return "Surveillee"
+		"Zone contestee":
+			return "Contestee"
+		"Zone hostile":
+			return "Hostile"
+		"Zone mortelle":
+			return "Mortelle"
+		"Territoire legendaire":
+			return "Legendaire"
+		"Enfers des mers":
+			return "Enfers"
+		_:
+			return zone_name
 
 
 func _on_player_ship_changed(_ship_id: String, _ship_name: String) -> void:
