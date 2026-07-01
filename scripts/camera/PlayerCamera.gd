@@ -148,6 +148,9 @@ func _adjust_zoom(delta_factor: float) -> void:
 
 
 func _adjust_camera_height(delta_height: float) -> void:
+	if _are_camera_controls_blocked():
+		return
+
 	_target_camera_height = _get_clamped_camera_height(_target_camera_height + delta_height)
 
 
