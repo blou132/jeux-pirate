@@ -104,12 +104,21 @@ func _find_world_bounds() -> Node:
 
 
 func _get_desired_position() -> Vector3:
-	var boat_back: Vector3 = _target.global_transform.basis.z.normalized()
+	var boat_back: Vector3 = _get_boat_back_direction()
 	var desired_position: Vector3 = _target.global_position
 	desired_position += boat_back * (camera_distance * _current_zoom_factor)
 	desired_position += Vector3.UP * camera_height
 	desired_position += _current_look_offset
 	return _clamp_to_world_bounds(desired_position)
+
+
+func _get_boat_back_direction() -> Vector3:
+	var boat_back: Vector3 = _target.global_transform.basis.z
+	boat_back.y = 0.0
+	if boat_back.length_squared() < 0.001:
+		return Vector3.BACK
+
+	return boat_back.normalized()
 
 
 func _adjust_zoom(delta_factor: float) -> void:
