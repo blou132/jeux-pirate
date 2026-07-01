@@ -26,6 +26,7 @@ extends CanvasLayer
 @onready var enemies_defeated_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/EnemiesDefeatedLabel
 @onready var ally_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/AllyLabel
 @onready var quest_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/QuestLabel
+@onready var exploration_progress_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/ExplorationProgressLabel
 @onready var reputation_panel: Control = $HUDRoot/RightReputationPanel
 @onready var reputation_label: Label = $HUDRoot/RightReputationPanel/ReputationVBox/ReputationLabel
 @onready var reputation_progress_label: Label = $HUDRoot/RightReputationPanel/ReputationVBox/ReputationProgressLabel
@@ -362,8 +363,13 @@ func _connect_game_state() -> void:
 	if _game_state.has_signal("cargo_changed") and not _game_state.is_connected("cargo_changed", cargo_callback):
 		_game_state.connect("cargo_changed", cargo_callback)
 
+	var exploration_callback := Callable(self, "_on_exploration_progress_changed")
+	if _game_state.has_signal("exploration_progress_changed") and not _game_state.is_connected("exploration_progress_changed", exploration_callback):
+		_game_state.connect("exploration_progress_changed", exploration_callback)
+
 	_refresh_player_ship_label()
 	_refresh_cargo_from_game_state()
+	_refresh_exploration_progress_from_game_state()
 
 
 func _on_resources_changed(gold: int, wood: int) -> void:
@@ -416,6 +422,27 @@ func _on_cargo_changed(_cargo_items: Dictionary, used: int, capacity: int) -> vo
 	var free_space: int = maxi(0, capacity - used)
 	cargo_label.text = "Cargaison: %d/%d - libre %d" % [used, capacity, free_space]
 	compact_cargo_label.text = "Cargo: %d/%d" % [used, capacity]
+
+
+func _refresh_exploration_progress_from_game_state() -> void:
+	if _game_state == null:
+		_on_exploration_progress_changed(0, 0)
+		return
+	if not _game_state.has_method("get_discovered_treasure_count") or not _game_state.has_method("get_explored_site_count"):
+		_on_exploration_progress_changed(0, 0)
+		return
+
+	_on_exploration_progress_changed(
+		int(_game_state.call("get_discovered_treasure_count")),
+		int(_game_state.call("get_explored_site_count"))
+	)
+
+
+func _on_exploration_progress_changed(discovered_treasures: int, explored_sites: int) -> void:
+	exploration_progress_label.text = "Exploration: %d tresor(s), %d site(s)" % [
+		discovered_treasures,
+		explored_sites,
+	]
 
 
 func _connect_reputation_system() -> void:

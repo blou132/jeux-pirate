@@ -206,6 +206,11 @@ layout_mode = 2
 text = "Mission : Chasse pirate - 0/3 ennemis"
 autowrap_mode = 3
 
+[node name="ExplorationProgressLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
+layout_mode = 2
+text = "Exploration: 0 tresor, 0 site"
+autowrap_mode = 3
+
 [node name="RightReputationPanel" type="PanelContainer" parent="HUDRoot"]
 layout_mode = 1
 anchor_left = 1.0
