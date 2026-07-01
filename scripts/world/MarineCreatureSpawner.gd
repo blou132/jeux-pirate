@@ -7,6 +7,7 @@ extends Node3D
 @export var spawn_check_interval: float = 3.0
 @export var min_player_spawn_distance: float = 18.0
 @export var port_avoidance_distance: float = 48.0
+@export var fallback_port_avoidance_distance: float = 30.0
 @export var debug_creature_spawns: bool = false
 
 var _active_creatures: Array[Node] = []
@@ -92,11 +93,9 @@ func _spawn_creature_if_possible() -> bool:
 
 func _pick_spawn_point() -> Marker3D:
 	_refresh_spawn_points()
-	var valid_points: Array[Marker3D] = []
-
-	for spawn_point in _spawn_points:
-		if _is_spawn_point_valid(spawn_point):
-			valid_points.append(spawn_point)
+	var valid_points: Array[Marker3D] = _get_valid_spawn_points(port_avoidance_distance)
+	if valid_points.is_empty() and fallback_port_avoidance_distance < port_avoidance_distance:
+		valid_points = _get_valid_spawn_points(fallback_port_avoidance_distance)
 
 	if valid_points.is_empty():
 		return null
@@ -104,7 +103,16 @@ func _pick_spawn_point() -> Marker3D:
 	return _pick_weighted_spawn_point(valid_points)
 
 
-func _is_spawn_point_valid(spawn_point: Marker3D) -> bool:
+func _get_valid_spawn_points(required_port_avoidance_distance: float) -> Array[Marker3D]:
+	var valid_points: Array[Marker3D] = []
+	for spawn_point in _spawn_points:
+		if _is_spawn_point_valid(spawn_point, required_port_avoidance_distance):
+			valid_points.append(spawn_point)
+
+	return valid_points
+
+
+func _is_spawn_point_valid(spawn_point: Marker3D, required_port_avoidance_distance: float) -> bool:
 	var player: Node3D = get_tree().get_first_node_in_group("player") as Node3D
 	if player != null:
 		var player_distance: float = spawn_point.global_position.distance_to(player.global_position)
@@ -117,7 +125,7 @@ func _is_spawn_point_valid(spawn_point: Marker3D) -> bool:
 
 		var port_node: Node3D = port as Node3D
 		var port_distance: float = spawn_point.global_position.distance_to(port_node.global_position)
-		if port_distance < port_avoidance_distance:
+		if port_distance < required_port_avoidance_distance:
 			return false
 
 	return true

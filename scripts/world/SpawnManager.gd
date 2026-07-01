@@ -7,6 +7,7 @@ extends Node3D
 @export var spawn_check_interval: float = 2.5
 @export var min_player_spawn_distance: float = 22.0
 @export var port_avoidance_distance: float = 45.0
+@export var fallback_port_avoidance_distance: float = 28.0
 
 var _active_enemies: Array[Node] = []
 var _spawn_points: Array[Marker3D] = []
@@ -91,11 +92,9 @@ func _spawn_enemy_if_possible() -> bool:
 
 func _pick_spawn_point() -> Marker3D:
 	_refresh_spawn_points()
-	var valid_points: Array[Marker3D] = []
-
-	for spawn_point in _spawn_points:
-		if _is_spawn_point_valid(spawn_point):
-			valid_points.append(spawn_point)
+	var valid_points: Array[Marker3D] = _get_valid_spawn_points(port_avoidance_distance)
+	if valid_points.is_empty() and fallback_port_avoidance_distance < port_avoidance_distance:
+		valid_points = _get_valid_spawn_points(fallback_port_avoidance_distance)
 
 	if valid_points.is_empty():
 		return null
@@ -103,17 +102,29 @@ func _pick_spawn_point() -> Marker3D:
 	return _pick_weighted_spawn_point(valid_points)
 
 
-func _is_spawn_point_valid(spawn_point: Marker3D) -> bool:
+func _get_valid_spawn_points(required_port_avoidance_distance: float) -> Array[Marker3D]:
+	var valid_points: Array[Marker3D] = []
+	for spawn_point in _spawn_points:
+		if _is_spawn_point_valid(spawn_point, required_port_avoidance_distance):
+			valid_points.append(spawn_point)
+
+	return valid_points
+
+
+func _is_spawn_point_valid(spawn_point: Marker3D, required_port_avoidance_distance: float) -> bool:
 	var player := get_tree().get_first_node_in_group("player") as Node3D
 	if player != null:
 		var player_distance := spawn_point.global_position.distance_to(player.global_position)
 		if player_distance < min_player_spawn_distance:
 			return false
 
-	var port := get_tree().get_first_node_in_group("ports") as Node3D
-	if port != null:
-		var port_distance := spawn_point.global_position.distance_to(port.global_position)
-		if port_distance < port_avoidance_distance:
+	for port in get_tree().get_nodes_in_group("ports"):
+		if not port is Node3D:
+			continue
+
+		var port_node: Node3D = port as Node3D
+		var port_distance: float = spawn_point.global_position.distance_to(port_node.global_position)
+		if port_distance < required_port_avoidance_distance:
 			return false
 
 	return true
