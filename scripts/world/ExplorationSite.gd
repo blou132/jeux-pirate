@@ -88,9 +88,9 @@ func explore() -> Dictionary:
 	_mark_explored()
 	_refresh_visual()
 	_grant_rewards(game_state, rewards)
-	_grant_renown()
+	var renown_gained: int = _grant_renown()
 
-	return _make_exploration_result(_build_reward_messages(rewards))
+	return _make_exploration_result(_build_reward_messages(rewards, renown_gained))
 
 
 func _refresh_label() -> void:
@@ -210,23 +210,29 @@ func _grant_rewards(game_state: Node, rewards: Dictionary) -> void:
 				game_state.call("add_cargo", item_key, amount)
 
 
-func _grant_renown() -> void:
+func _grant_renown() -> int:
 	var renown_reward: int = TreasureCatalog.get_renown_reward(treasure_id)
 	if renown_reward <= 0:
-		return
+		return 0
 
 	var reputation_system: Node = get_node_or_null("/root/ReputationSystem")
+	if reputation_system != null and reputation_system.has_method("record_treasure_discovered"):
+		return int(reputation_system.call("record_treasure_discovered", treasure_id, renown_reward))
 	if reputation_system != null and reputation_system.has_method("add_reputation"):
-		reputation_system.call("add_reputation", renown_reward, "treasure_discovered")
+		return int(reputation_system.call("add_reputation", renown_reward, "treasure_discovered"))
+
+	return 0
 
 
-func _build_reward_messages(rewards: Dictionary) -> Array[String]:
+func _build_reward_messages(rewards: Dictionary, renown_gained: int) -> Array[String]:
 	var messages: Array[String] = [
 		"Tresor decouvert : %s" % TreasureCatalog.get_treasure_name(treasure_id),
 	]
 	var reward_text: String = TreasureCatalog.get_reward_text(treasure_id)
 	if not reward_text.is_empty():
 		messages.append("Recompenses : %s" % reward_text)
+	if renown_gained <= 0 and TreasureCatalog.get_renown_reward(treasure_id) > 0:
+		messages.append("Renom au maximum")
 
 	return messages
 

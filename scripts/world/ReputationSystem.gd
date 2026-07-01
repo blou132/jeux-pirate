@@ -161,6 +161,11 @@ func record_ancient_relic_found(amount: int = 1) -> void:
 	add_reputation(ANCIENT_RELIC_REPUTATION * amount, "ancient_relic_found")
 
 
+func record_treasure_discovered(_treasure_id: String, renown_reward: int) -> int:
+	_treasures_found += 1
+	return add_reputation(renown_reward, "treasure_discovered")
+
+
 func record_ally_recruited(fleet_count: int, max_allies: int) -> void:
 	_max_fleet_size_reached = maxi(_max_fleet_size_reached, fleet_count)
 
