@@ -25,6 +25,8 @@ var _target_zoom_factor: float = 1.0
 var _current_look_offset: Vector3 = Vector3.ZERO
 var _target_look_offset: Vector3 = Vector3.ZERO
 var is_free_look_unlocked: bool = false
+var _free_look_anchor_position: Vector2 = Vector2.ZERO
+var _has_free_look_anchor: bool = false
 
 
 func _ready() -> void:
@@ -63,7 +65,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey:
 		var key_event: InputEventKey = event as InputEventKey
 		if key_event.pressed and not key_event.echo and key_event.keycode == KEY_V:
-			is_free_look_unlocked = not is_free_look_unlocked
+			_set_free_look_unlocked(not is_free_look_unlocked)
 			_show_lock_feedback()
 			get_viewport().set_input_as_handled()
 		elif key_event.pressed and not key_event.echo and key_event.keycode == KEY_C:
@@ -137,13 +139,30 @@ func _refresh_free_look_target() -> void:
 		return
 
 	var viewport: Viewport = get_viewport()
-	var viewport_center: Vector2 = viewport.get_visible_rect().size * 0.5
-	var mouse_from_center: Vector2 = viewport.get_mouse_position() - viewport_center
-	var planar_offset: Vector2 = mouse_from_center * look_offset_sensitivity
+	var mouse_from_anchor: Vector2 = viewport.get_mouse_position() - _get_free_look_anchor_position()
+	var planar_offset: Vector2 = mouse_from_anchor * look_offset_sensitivity
 	if planar_offset.length() > look_offset_max_distance:
 		planar_offset = planar_offset.normalized() * look_offset_max_distance
 
 	_target_look_offset = Vector3(planar_offset.x, 0.0, planar_offset.y)
+
+
+func _set_free_look_unlocked(is_unlocked: bool) -> void:
+	is_free_look_unlocked = is_unlocked
+	if is_free_look_unlocked:
+		_free_look_anchor_position = get_viewport().get_mouse_position()
+		_has_free_look_anchor = true
+	else:
+		_target_look_offset = Vector3.ZERO
+		_has_free_look_anchor = false
+
+
+func _get_free_look_anchor_position() -> Vector2:
+	if not _has_free_look_anchor:
+		_free_look_anchor_position = get_viewport().get_mouse_position()
+		_has_free_look_anchor = true
+
+	return _free_look_anchor_position
 
 func _clamp_to_world_bounds(world_position: Vector3) -> Vector3:
 	if not clamp_to_world_bounds:
