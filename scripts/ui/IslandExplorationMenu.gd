@@ -32,7 +32,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func open(island: Node) -> void:
 	_island = island
-	status_label.text = ""
+	status_label.text = _get_exploration_hint_text()
 	title_label.text = _get_island_name()
 	search_button.text = _get_explore_action_label()
 	root_control.visible = true
@@ -81,6 +81,13 @@ func _get_explore_action_label() -> String:
 		return String(_island.call("get_explore_action_label"))
 
 	return "Fouiller l'ile"
+
+
+func _get_exploration_hint_text() -> String:
+	if _island != null and _island.has_method("get_exploration_hint_text"):
+		return String(_island.call("get_exploration_hint_text"))
+
+	return ""
 
 
 func _show_exploration_result(result: Dictionary) -> void:

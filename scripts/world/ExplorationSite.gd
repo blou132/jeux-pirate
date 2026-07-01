@@ -51,6 +51,17 @@ func get_explore_action_label() -> String:
 	return "Explorer le site"
 
 
+func get_exploration_hint_text() -> String:
+	var lines: Array[String] = [
+		"Type : %s" % site_type,
+		"Zone : %s" % danger_zone,
+		"Tresor : %s" % TreasureCatalog.get_treasure_name(treasure_id),
+		"Requis : %s" % TreasureCatalog.get_requirement_text(treasure_id),
+		"Recompenses : %s" % TreasureCatalog.get_reward_text(treasure_id),
+	]
+	return _join_messages(lines)
+
+
 func explore() -> Dictionary:
 	if _is_explored():
 		_explored = true
@@ -146,14 +157,18 @@ func _build_requirement_status(game_state: Node) -> String:
 
 
 func _spend_unlock_requirements(game_state: Node) -> bool:
-	var cost: Dictionary = {
-		"map_fragments": TreasureCatalog.get_required_map_fragments(treasure_id),
-		"ancient_relics": TreasureCatalog.get_required_ancient_relics(treasure_id),
-	}
+	var cost: Dictionary = _build_unlock_cost()
 	if not game_state.has_method("spend_cost"):
 		return true
 
 	return bool(game_state.call("spend_cost", cost))
+
+
+func _build_unlock_cost() -> Dictionary:
+	return {
+		"map_fragments": TreasureCatalog.get_required_map_fragments(treasure_id),
+		"ancient_relics": TreasureCatalog.get_required_ancient_relics(treasure_id),
+	}
 
 
 func _get_cargo_block_reason(game_state: Node, cargo_reward: Dictionary) -> String:
