@@ -1,13 +1,14 @@
 extends Node3D
 
 @export var enemy_scene: PackedScene = preload("res://scenes/boats/EnemyShip.tscn")
-@export var max_enemies: int = 5
-@export var initial_spawn_count: int = 3
-@export var respawn_delay: float = 5.0
-@export var spawn_check_interval: float = 2.5
+@export var max_enemies: int = 8
+@export var initial_spawn_count: int = 4
+@export var respawn_delay: float = 4.5
+@export var spawn_check_interval: float = 2.0
+@export var spawn_attempts_per_fill: int = 16
 @export var min_player_spawn_distance: float = 22.0
-@export var port_avoidance_distance: float = 45.0
-@export var fallback_port_avoidance_distance: float = 28.0
+@export var port_avoidance_distance: float = 40.0
+@export var fallback_port_avoidance_distance: float = 26.0
 @export var debug_spawns: bool = false
 
 var _active_enemies: Array[Node] = []
@@ -172,9 +173,10 @@ func _fill_spawn_slots() -> void:
 	_cleanup_inactive_enemies()
 
 	var target_enemy_count: int = _get_target_enemy_count()
-	while _active_enemies.size() < target_enemy_count:
-		if not _spawn_enemy_if_possible():
-			break
+	var attempts_remaining: int = maxi(1, spawn_attempts_per_fill)
+	while _active_enemies.size() < target_enemy_count and attempts_remaining > 0:
+		attempts_remaining -= 1
+		_spawn_enemy_if_possible()
 
 
 func _cleanup_inactive_enemies() -> void:
