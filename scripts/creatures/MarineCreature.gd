@@ -19,6 +19,8 @@ signal defeated(world_position: Vector3, creature_id: String, rewards: Dictionar
 @export var flee_distance: float = 18.0
 @export var port_safe_radius: float = 45.0
 @export var port_expulsion_radius: float = 58.0
+@export var debug_creature_ai: bool = false
+@export var debug_creature_ai_interval: float = 1.0
 
 var health: int = 0
 var spawn_zone_id: String = DangerZoneCatalog.ZONE_SAFE
@@ -31,6 +33,7 @@ var _wander_timer: float = 0.0
 var _attack_cooldown_remaining: float = 0.0
 var _safe_zone_cooldown_remaining: float = 0.0
 var _spotted_feedback_shown: bool = false
+var _debug_creature_ai_cooldown_remaining: float = 0.0
 
 
 func _ready() -> void:
@@ -50,10 +53,12 @@ func _physics_process(delta: float) -> void:
 	_wander_timer = maxf(0.0, _wander_timer - delta)
 	_attack_cooldown_remaining = maxf(0.0, _attack_cooldown_remaining - delta)
 	_safe_zone_cooldown_remaining = maxf(0.0, _safe_zone_cooldown_remaining - delta)
+	_debug_creature_ai_cooldown_remaining = maxf(0.0, _debug_creature_ai_cooldown_remaining - delta)
 
 	if _is_position_inside_port_safe_zone(global_position):
 		_target = null
 		_safe_zone_cooldown_remaining = 2.0
+		_debug_ai("port escape")
 		_move_away_from_closest_port(delta)
 		return
 
@@ -219,14 +224,17 @@ func _process_passive_behavior(delta: float) -> void:
 		var flee_direction: Vector3 = global_position - threat.global_position
 		flee_direction.y = 0.0
 		if flee_direction.length_squared() > 0.01:
+			_debug_ai("flee", threat)
 			_move_along_direction(flee_direction.normalized(), delta, 1.25)
 			return
 
+	_debug_ai("passive patrol")
 	_patrol(delta)
 
 
 func _process_aggressive_behavior(delta: float) -> void:
 	if _safe_zone_cooldown_remaining > 0.0:
+		_debug_ai("safe cooldown")
 		_patrol(delta)
 		return
 
@@ -236,6 +244,7 @@ func _process_aggressive_behavior(delta: float) -> void:
 			_show_spotted_feedback()
 
 	if _target == null:
+		_debug_ai("aggressive patrol")
 		_patrol(delta)
 		return
 
@@ -243,16 +252,19 @@ func _process_aggressive_behavior(delta: float) -> void:
 	offset.y = 0.0
 	var distance: float = offset.length()
 	if distance > chase_leash_distance:
+		_debug_ai("leash disengage", _target)
 		_target = null
 		_patrol(delta)
 		return
 
 	if distance <= attack_range:
+		_debug_ai("attack", _target)
 		_attack_target(_target)
 		_slow_down(delta)
 		return
 
 	if offset.length_squared() > 0.01:
+		_debug_ai("chase", _target)
 		_move_along_direction(offset.normalized(), delta, 1.0 + (aggression * 0.18))
 	else:
 		_slow_down(delta)
@@ -420,3 +432,27 @@ func _move_away_from_closest_port(delta: float) -> void:
 	if offset_from_port.length() < port_expulsion_radius:
 		global_position = closest_port.global_position + (offset_from_port.normalized() * port_expulsion_radius)
 		global_position.y = 0.0
+
+
+func _debug_ai(state: String, target: Node = null) -> void:
+	if not debug_creature_ai:
+		return
+	if _debug_creature_ai_cooldown_remaining > 0.0:
+		return
+
+	var target_name: String = "none"
+	if target != null and is_instance_valid(target):
+		target_name = String(target.name)
+
+	print(
+		"MarineCreatureAI[%s] state=%s target=%s zone=%s hp=%d/%d"
+		% [
+			display_name,
+			state,
+			target_name,
+			DangerZoneCatalog.get_zone_name(spawn_zone_id),
+			health,
+			max_health,
+		]
+	)
+	_debug_creature_ai_cooldown_remaining = debug_creature_ai_interval
