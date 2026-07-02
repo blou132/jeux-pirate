@@ -628,7 +628,27 @@ func can_claim_faction_mission_reward(mission_id: String = "") -> bool:
 
 
 func claim_faction_mission_reward() -> String:
-	return "Recompenses de missions de faction non branchees"
+	_ensure_valid_faction_mission_state()
+	if active_faction_mission_id.is_empty():
+		return "Aucune mission de faction terminee"
+
+	var mission_id: String = active_faction_mission_id
+	if not can_claim_faction_mission_reward(mission_id):
+		return "Recompense de mission indisponible"
+
+	var state: Dictionary = _get_faction_mission_state(mission_id)
+	var mission_name: String = FactionMissionCatalog.get_mission_name(mission_id)
+	var reward_text: String = _build_faction_mission_reward_text(mission_id)
+	_apply_faction_mission_reward_resources(FactionMissionCatalog.get_reward(mission_id))
+	state["reward_claimed"] = true
+	state["completed"] = true
+	faction_mission_states[mission_id] = state
+	active_faction_mission_id = ""
+	_last_faction_mission_reward = "%s : %s" % [mission_name, reward_text]
+	faction_mission_reward_claimed.emit(mission_id, mission_name)
+	_emit_faction_mission_changed()
+	_debug_faction_mission("recompense -> %s" % _last_faction_mission_reward)
+	return "Recompense recue : %s\n%s" % [mission_name, reward_text]
 
 
 func get_faction_mission_debug_summary() -> String:
@@ -1278,7 +1298,10 @@ func _build_faction_mission_reward_text(mission_id: String) -> String:
 	if renown_reward > 0:
 		parts.append("%d renom" % renown_reward)
 
-	var creature_resources: Dictionary = reward.get("creature_resources", {})
+	var creature_resources: Dictionary = {}
+	var raw_creature_resources: Variant = reward.get("creature_resources", {})
+	if raw_creature_resources is Dictionary:
+		creature_resources = raw_creature_resources
 	for resource_id in creature_resources.keys():
 		var resource_key: String = String(resource_id)
 		var amount: int = maxi(0, int(creature_resources.get(resource_key, 0)))
@@ -1289,6 +1312,42 @@ func _build_faction_mission_reward_text(mission_id: String) -> String:
 		return "Aucune"
 
 	return ", ".join(parts)
+
+
+func _apply_faction_mission_reward_resources(reward: Dictionary) -> void:
+	var gold_reward: int = maxi(0, int(reward.get("gold", 0)))
+	var wood_reward: int = maxi(0, int(reward.get("wood", 0)))
+	var fragment_reward: int = maxi(0, int(reward.get("map_fragments", 0)))
+	var relic_reward: int = maxi(0, int(reward.get("ancient_relics", 0)))
+	var renown_reward: int = maxi(0, int(reward.get("renown", 0)))
+
+	if gold_reward > 0 or wood_reward > 0:
+		add_resources(gold_reward, wood_reward)
+	if fragment_reward > 0 or relic_reward > 0:
+		add_treasure_resources(fragment_reward, relic_reward, false)
+
+	var changed_creature_resources: bool = false
+	var creature_resource_rewards: Dictionary = {}
+	var raw_creature_resources: Variant = reward.get("creature_resources", {})
+	if raw_creature_resources is Dictionary:
+		creature_resource_rewards = raw_creature_resources
+	for resource_id in creature_resource_rewards.keys():
+		var resource_key: String = String(resource_id)
+		var amount: int = maxi(0, int(creature_resource_rewards.get(resource_key, 0)))
+		if amount <= 0:
+			continue
+
+		var current_amount: int = maxi(0, int(creature_resources.get(resource_key, 0)))
+		creature_resources[resource_key] = current_amount + amount
+		changed_creature_resources = true
+
+	if changed_creature_resources:
+		_emit_creature_resources_changed()
+
+	if renown_reward > 0:
+		var reputation_system: Node = get_node_or_null("/root/ReputationSystem")
+		if reputation_system != null and reputation_system.has_method("add_reputation"):
+			reputation_system.call("add_reputation", renown_reward, "faction_mission_reward")
 
 
 func _build_faction_mission_status_text(mission_id: String) -> String:
