@@ -296,6 +296,45 @@ layout_mode = 2
 text = "Titre : Loup de mer\nRéputation : Inconnu\nPoints : 0\nProchain rang : Recherché\nProgression : 0 / 100"
 autowrap_mode = 3
 
+[node name="FactionButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+text = "Allegeance"
+
+[node name="FactionContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="FactionIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer"]
+layout_mode = 2
+text = "Choisir une faction"
+horizontal_alignment = 1
+
+[node name="CurrentFactionLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer"]
+layout_mode = 2
+text = "Faction actuelle : Neutre"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="FactionList" type="ItemList" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer"]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+
+[node name="FactionDetailsLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer"]
+layout_mode = 2
+text = "Selectionne une faction"
+autowrap_mode = 3
+
+[node name="JoinFactionButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "Rejoindre"
+
+[node name="NeutralFactionButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "Redevenir neutre"
+
 [node name="RecruitAllyButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2

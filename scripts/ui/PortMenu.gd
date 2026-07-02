@@ -51,6 +51,13 @@ const REPAIR_HEALTH_PER_WOOD := 5
 @onready var pirate_status_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/PirateStatusButton
 @onready var pirate_status_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/PirateStatusContainer
 @onready var pirate_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/PirateStatusContainer/PirateStatusLabel
+@onready var faction_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionButton
+@onready var faction_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer
+@onready var current_faction_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer/CurrentFactionLabel
+@onready var faction_list: ItemList = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer/FactionList
+@onready var faction_details_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer/FactionDetailsLabel
+@onready var join_faction_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer/JoinFactionButton
+@onready var neutral_faction_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer/NeutralFactionButton
 @onready var recruit_ally_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/RecruitAllyButton
 @onready var quit_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/QuitButton
 
@@ -65,6 +72,8 @@ var _ship_ids: Array[String] = []
 var _selected_ship_id: String = ""
 var _trade_good_ids: Array[String] = []
 var _selected_trade_good_id: String = ""
+var _faction_ids: Array[String] = []
+var _selected_faction_id: String = FactionCatalog.FACTION_NEUTRAL
 
 
 func _ready() -> void:
@@ -76,6 +85,7 @@ func _ready() -> void:
 	trade_container.visible = false
 	missions_container.visible = false
 	pirate_status_container.visible = false
+	faction_container.visible = false
 	ports_button.pressed.connect(_on_ports_pressed)
 	port_list.item_selected.connect(_on_port_selected)
 	repair_button.pressed.connect(_on_repair_pressed)
@@ -97,6 +107,10 @@ func _ready() -> void:
 	accept_mission_button.pressed.connect(_on_accept_mission_pressed)
 	claim_mission_reward_button.pressed.connect(_on_claim_mission_reward_pressed)
 	pirate_status_button.pressed.connect(_on_pirate_status_pressed)
+	faction_button.pressed.connect(_on_faction_pressed)
+	faction_list.item_selected.connect(_on_faction_selected)
+	join_faction_button.pressed.connect(_on_join_faction_pressed)
+	neutral_faction_button.pressed.connect(_on_neutral_faction_pressed)
 	recruit_ally_button.pressed.connect(_on_recruit_ally_pressed)
 	quit_button.pressed.connect(close)
 	_connect_reputation_system()
@@ -122,6 +136,7 @@ func open(player: Node, port: Node = null) -> void:
 	trade_container.visible = false
 	missions_container.visible = false
 	pirate_status_container.visible = false
+	faction_container.visible = false
 	_reset_scroll()
 	_refresh_port_header()
 	_refresh_port_rows()
@@ -133,6 +148,7 @@ func open(player: Node, port: Node = null) -> void:
 	_refresh_trade_rows()
 	_refresh_mission_rows()
 	_refresh_pirate_status_panel()
+	_refresh_faction_rows()
 	root_control.visible = true
 	_previous_pause_state = get_tree().paused
 	get_tree().paused = true
@@ -200,6 +216,7 @@ func _on_ports_pressed() -> void:
 		trade_container.visible = false
 		missions_container.visible = false
 		pirate_status_container.visible = false
+		faction_container.visible = false
 		status_label.text = "Choisis un port"
 		_reset_scroll()
 		_refresh_port_rows()
@@ -396,6 +413,7 @@ func _on_upgrades_pressed() -> void:
 		trade_container.visible = false
 		missions_container.visible = false
 		pirate_status_container.visible = false
+		faction_container.visible = false
 		status_label.text = "Choisis une amélioration"
 		_reset_scroll()
 		_refresh_upgrade_rows()
@@ -709,6 +727,7 @@ func _on_shipyard_pressed() -> void:
 		trade_container.visible = false
 		missions_container.visible = false
 		pirate_status_container.visible = false
+		faction_container.visible = false
 		status_label.text = "Chantier naval"
 		_reset_scroll()
 		_refresh_shipyard_rows()
@@ -948,6 +967,7 @@ func _on_trade_pressed() -> void:
 		shipyard_container.visible = false
 		missions_container.visible = false
 		pirate_status_container.visible = false
+		faction_container.visible = false
 		status_label.text = "Commerce"
 		_reset_scroll()
 		_refresh_trade_rows()
@@ -1197,6 +1217,7 @@ func _on_missions_pressed() -> void:
 		shipyard_container.visible = false
 		trade_container.visible = false
 		pirate_status_container.visible = false
+		faction_container.visible = false
 		status_label.text = "Choisis une mission"
 		_reset_scroll()
 		_refresh_mission_rows()
@@ -1212,6 +1233,7 @@ func _on_pirate_status_pressed() -> void:
 		shipyard_container.visible = false
 		trade_container.visible = false
 		missions_container.visible = false
+		faction_container.visible = false
 		status_label.text = "Statut pirate"
 		_reset_scroll()
 		_refresh_pirate_status_panel()
@@ -1248,6 +1270,129 @@ func _refresh_pirate_status_panel() -> void:
 		next_title,
 		title_progress,
 	]
+
+
+func _on_faction_pressed() -> void:
+	faction_container.visible = not faction_container.visible
+	if faction_container.visible:
+		ports_container.visible = false
+		upgrades_container.visible = false
+		shipyard_container.visible = false
+		trade_container.visible = false
+		missions_container.visible = false
+		pirate_status_container.visible = false
+		status_label.text = "Choisis une allegeance"
+		_reset_scroll()
+		_refresh_faction_rows()
+	else:
+		status_label.text = ""
+
+
+func _refresh_faction_rows() -> void:
+	faction_list.clear()
+	_faction_ids.clear()
+
+	var game_state: Node = _get_game_state()
+	var current_faction_id: String = FactionCatalog.FACTION_NEUTRAL
+	if game_state != null and game_state.has_method("get_player_faction_id"):
+		current_faction_id = String(game_state.call("get_player_faction_id"))
+
+	current_faction_label.text = "Faction actuelle : %s\nBonus actif : %s" % [
+		FactionCatalog.get_player_faction_name(current_faction_id),
+		FactionCatalog.get_player_bonus_summary(current_faction_id),
+	]
+
+	for faction_id in FactionCatalog.get_player_faction_ids():
+		_faction_ids.append(faction_id)
+		faction_list.add_item(_build_faction_row_text(faction_id, current_faction_id))
+
+	var selected_index: int = _get_faction_index(_selected_faction_id)
+	if selected_index < 0:
+		selected_index = _get_faction_index(current_faction_id)
+	if selected_index < 0 and not _faction_ids.is_empty():
+		selected_index = 0
+
+	if selected_index >= 0:
+		_selected_faction_id = _faction_ids[selected_index]
+		faction_list.select(selected_index)
+
+	_refresh_selected_faction()
+
+
+func _build_faction_row_text(faction_id: String, current_faction_id: String) -> String:
+	var status: String = "disponible"
+	if faction_id == current_faction_id:
+		status = "actuelle"
+
+	return "%s - %s" % [FactionCatalog.get_player_faction_name(faction_id), status]
+
+
+func _on_faction_selected(index: int) -> void:
+	if index < 0 or index >= _faction_ids.size():
+		return
+
+	_selected_faction_id = _faction_ids[index]
+	_refresh_selected_faction()
+
+
+func _refresh_selected_faction() -> void:
+	if _selected_faction_id.is_empty() or not FactionCatalog.has_player_faction(_selected_faction_id):
+		_selected_faction_id = FactionCatalog.FACTION_NEUTRAL
+
+	var game_state: Node = _get_game_state()
+	var current_faction_id: String = FactionCatalog.FACTION_NEUTRAL
+	if game_state != null and game_state.has_method("get_player_faction_id"):
+		current_faction_id = String(game_state.call("get_player_faction_id"))
+
+	faction_details_label.text = "%s\n%s\nStyle : %s\nBonus : %s" % [
+		FactionCatalog.get_player_faction_name(_selected_faction_id),
+		FactionCatalog.get_player_description(_selected_faction_id),
+		_get_player_faction_style(_selected_faction_id),
+		FactionCatalog.get_player_bonus_summary(_selected_faction_id),
+	]
+
+	join_faction_button.text = "Rejoindre : %s" % FactionCatalog.get_player_faction_name(_selected_faction_id)
+	join_faction_button.disabled = game_state == null or _selected_faction_id == current_faction_id
+	neutral_faction_button.disabled = game_state == null or current_faction_id == FactionCatalog.FACTION_NEUTRAL
+
+
+func _on_join_faction_pressed() -> void:
+	var game_state: Node = _get_game_state()
+	if game_state == null or not game_state.has_method("set_player_faction"):
+		status_label.text = "Choix de faction indisponible"
+		return
+
+	status_label.text = String(game_state.call("set_player_faction", _selected_faction_id))
+	_refresh_faction_rows()
+
+
+func _on_neutral_faction_pressed() -> void:
+	var game_state: Node = _get_game_state()
+	if game_state == null or not game_state.has_method("set_player_faction"):
+		status_label.text = "Choix de faction indisponible"
+		return
+
+	_selected_faction_id = FactionCatalog.FACTION_NEUTRAL
+	status_label.text = String(game_state.call("set_player_faction", FactionCatalog.FACTION_NEUTRAL))
+	_refresh_faction_rows()
+
+
+func _get_faction_index(faction_id: String) -> int:
+	if faction_id.is_empty():
+		return -1
+
+	for index in range(_faction_ids.size()):
+		if _faction_ids[index] == faction_id:
+			return index
+
+	return -1
+
+
+func _get_player_faction_style(faction_id: String) -> String:
+	if faction_id == FactionCatalog.FACTION_NEUTRAL:
+		return "independance"
+
+	return FactionCatalog.get_style(faction_id)
 
 
 func _on_mission_selected(index: int) -> void:
