@@ -32,6 +32,7 @@ extends CanvasLayer
 @onready var enemies_defeated_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/EnemiesDefeatedLabel
 @onready var ally_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/AllyLabel
 @onready var quest_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/QuestLabel
+@onready var faction_mission_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/FactionMissionLabel
 @onready var exploration_progress_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/ExplorationProgressLabel
 @onready var creature_resources_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/CreatureResourcesLabel
 @onready var reputation_panel: Control = $HUDRoot/RightReputationPanel
@@ -401,12 +402,29 @@ func _connect_game_state() -> void:
 	if _game_state.has_signal("player_faction_changed") and not _game_state.is_connected("player_faction_changed", player_faction_callback):
 		_game_state.connect("player_faction_changed", player_faction_callback)
 
+	var faction_mission_callback: Callable = Callable(self, "_on_faction_mission_changed")
+	if _game_state.has_signal("faction_mission_changed") and not _game_state.is_connected("faction_mission_changed", faction_mission_callback):
+		_game_state.connect("faction_mission_changed", faction_mission_callback)
+
+	var faction_mission_progress_callback: Callable = Callable(self, "_on_faction_mission_progress_changed")
+	if _game_state.has_signal("faction_mission_progress_changed") and not _game_state.is_connected("faction_mission_progress_changed", faction_mission_progress_callback):
+		_game_state.connect("faction_mission_progress_changed", faction_mission_progress_callback)
+
+	var faction_mission_completed_callback: Callable = Callable(self, "_on_faction_mission_completed")
+	if _game_state.has_signal("faction_mission_completed") and not _game_state.is_connected("faction_mission_completed", faction_mission_completed_callback):
+		_game_state.connect("faction_mission_completed", faction_mission_completed_callback)
+
+	var faction_mission_reward_callback: Callable = Callable(self, "_on_faction_mission_reward_claimed")
+	if _game_state.has_signal("faction_mission_reward_claimed") and not _game_state.is_connected("faction_mission_reward_claimed", faction_mission_reward_callback):
+		_game_state.connect("faction_mission_reward_claimed", faction_mission_reward_callback)
+
 	_refresh_player_ship_label()
 	_refresh_cargo_from_game_state()
 	_refresh_exploration_progress_from_game_state()
 	_refresh_creature_resources_from_game_state()
 	_refresh_territory_control_from_game_state()
 	_refresh_player_faction_from_game_state()
+	_refresh_faction_mission_label()
 
 
 func _on_resources_changed(gold: int, wood: int) -> void:
@@ -960,6 +978,22 @@ func _on_quest_reward_claimed(_quest_id: String, _quest_name: String) -> void:
 	_refresh_quest_label()
 
 
+func _on_faction_mission_changed(_mission_id: String) -> void:
+	_refresh_faction_mission_label()
+
+
+func _on_faction_mission_progress_changed(_mission_id: String, _progress: int, _target: int) -> void:
+	_refresh_faction_mission_label()
+
+
+func _on_faction_mission_completed(_mission_id: String, _mission_name: String) -> void:
+	_refresh_faction_mission_label()
+
+
+func _on_faction_mission_reward_claimed(_mission_id: String, _mission_name: String) -> void:
+	_refresh_faction_mission_label()
+
+
 func _refresh_quest_label() -> void:
 	if _quest_system == null:
 		quest_label.visible = false
@@ -998,6 +1032,36 @@ func _get_quest_summary_text() -> String:
 		return _quest_system.get_active_quest_summary()
 
 	return ""
+
+
+func _refresh_faction_mission_label() -> void:
+	if _game_state == null or not _game_state.has_method("get_active_faction_mission"):
+		faction_mission_label.visible = false
+		return
+
+	var raw_view: Variant = _game_state.call("get_active_faction_mission")
+	if not (raw_view is Dictionary):
+		faction_mission_label.text = "Mission de faction : aucune"
+		faction_mission_label.visible = true
+		return
+
+	var view: Dictionary = raw_view
+	if view.is_empty():
+		faction_mission_label.text = "Mission de faction : aucune"
+		faction_mission_label.visible = true
+		return
+
+	var title: String = "Mission de faction : %s" % String(view.get("name", "Mission"))
+	if bool(view.get("completed", false)) and not bool(view.get("reward_claimed", false)):
+		title = "Mission de faction terminee : %s" % String(view.get("name", "Mission"))
+
+	faction_mission_label.text = "%s\nObjectif : %s\nProgression : %s\nRecompense : %s" % [
+		title,
+		String(view.get("objective_text", "")),
+		String(view.get("progress_text", "")),
+		String(view.get("reward_text", "")),
+	]
+	faction_mission_label.visible = true
 
 
 func _join_quest_lines(lines: Array) -> String:
