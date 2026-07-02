@@ -3,6 +3,8 @@ extends CanvasLayer
 
 signal faction_choice_confirmed(faction_id: String, message: String)
 
+@export var debug_start_faction_choice: bool = false
+
 @onready var root_control: Control = $Root
 @onready var cards_grid: GridContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/CardsGrid
 @onready var selected_summary_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/SelectedSummaryLabel
@@ -13,6 +15,7 @@ signal faction_choice_confirmed(faction_id: String, message: String)
 var _selected_faction_id: String = ""
 var _pending_faction_id: String = ""
 var _card_buttons: Dictionary = {}
+var _last_debug_state: String = "Ecran non affiche"
 
 
 func _ready() -> void:
@@ -38,6 +41,7 @@ func open() -> void:
 			_selected_faction_id = faction_ids[0]
 	root_control.visible = true
 	_refresh_selection()
+	_debug_choice("ecran affiche")
 
 
 func close() -> void:
@@ -90,6 +94,7 @@ func _select_faction(faction_id: String) -> void:
 	_selected_faction_id = faction_id
 	_pending_faction_id = ""
 	_refresh_selection()
+	_debug_choice("selection -> %s" % FactionCatalog.get_player_faction_name(faction_id))
 
 
 func _refresh_selection() -> void:
@@ -140,6 +145,7 @@ func _on_prepare_pressed() -> void:
 
 	_pending_faction_id = _selected_faction_id
 	_refresh_selection()
+	_debug_choice("serment prepare -> %s" % FactionCatalog.get_player_faction_name(_pending_faction_id))
 
 
 func _on_confirm_pressed() -> void:
@@ -156,10 +162,12 @@ func _on_confirm_pressed() -> void:
 	warning_label.text = result_message
 	if game_state.has_method("is_player_faction_locked") and bool(game_state.call("is_player_faction_locked")):
 		var confirmed_faction_id: String = _pending_faction_id
+		_debug_choice("choix valide -> %s" % FactionCatalog.get_player_faction_name(confirmed_faction_id))
 		close()
 		faction_choice_confirmed.emit(confirmed_faction_id, result_message)
 	else:
 		warning_label.text = lock_result
+		_debug_choice("validation refusee -> %s" % lock_result)
 
 
 func _is_faction_already_locked() -> bool:
@@ -172,6 +180,39 @@ func _is_faction_already_locked() -> bool:
 
 func _get_game_state() -> Node:
 	return get_node_or_null("/root/GameState")
+
+
+func get_debug_summary() -> String:
+	var game_state: Node = _get_game_state()
+	var locked_text: String = "inconnu"
+	var legacy_text: String = "inconnu"
+	if game_state != null and game_state.has_method("is_player_faction_locked"):
+		locked_text = "oui" if bool(game_state.call("is_player_faction_locked")) else "non"
+	if game_state != null and game_state.has_method("was_legacy_faction_state_detected"):
+		legacy_text = "oui" if bool(game_state.call("was_legacy_faction_state_detected")) else "non"
+
+	return "Ecran choix faction affiche : %s\nFaction selectionnee : %s\nFaction verrouillee : %s\nAncienne sauvegarde detectee : %s\nDernier etat : %s" % [
+		"oui" if is_open() else "non",
+		FactionCatalog.get_player_faction_name(_selected_faction_id) if FactionCatalog.has_faction(_selected_faction_id) else "aucune",
+		locked_text,
+		legacy_text,
+		_last_debug_state,
+	]
+
+
+func print_debug_summary() -> void:
+	if not debug_start_faction_choice:
+		return
+
+	print(get_debug_summary())
+
+
+func _debug_choice(message: String) -> void:
+	_last_debug_state = message
+	if not debug_start_faction_choice:
+		return
+
+	print("StartFactionChoice: %s" % message)
 
 
 func _format_short_list(raw_items: Variant) -> String:
