@@ -616,6 +616,9 @@ func complete_faction_mission() -> String:
 
 func can_claim_faction_mission_reward(mission_id: String = "") -> bool:
 	_ensure_valid_faction_mission_state()
+	if not is_player_faction_locked() or is_player_neutral():
+		return false
+
 	var checked_mission_id: String = mission_id
 	if checked_mission_id.is_empty():
 		checked_mission_id = active_faction_mission_id
@@ -1251,8 +1254,12 @@ func _get_faction_mission_state(mission_id: String) -> Dictionary:
 	if mission_id.is_empty():
 		return _make_initial_faction_mission_state()
 	if faction_mission_states.has(mission_id):
-		var state: Dictionary = faction_mission_states[mission_id]
-		return state.duplicate(true)
+		var raw_state: Variant = faction_mission_states[mission_id]
+		if raw_state is Dictionary:
+			var state: Dictionary = raw_state
+			var normalized_state: Dictionary = _make_initial_faction_mission_state()
+			normalized_state.merge(state, true)
+			return normalized_state.duplicate(true)
 
 	return _make_initial_faction_mission_state()
 
@@ -1419,6 +1426,19 @@ func _ensure_valid_faction_mission_state() -> void:
 		return
 	if FactionMissionCatalog.get_mission_faction_id(active_faction_mission_id) != get_player_faction_id():
 		active_faction_mission_id = ""
+		return
+
+	var state: Dictionary = _get_faction_mission_state(active_faction_mission_id)
+	if bool(state.get("reward_claimed", false)):
+		active_faction_mission_id = ""
+		return
+
+	var target: int = FactionMissionCatalog.get_target(active_faction_mission_id)
+	var progress: int = clampi(int(state.get("progress", 0)), 0, target)
+	state["progress"] = progress
+	if bool(state.get("completed", false)):
+		state["progress"] = target
+	faction_mission_states[active_faction_mission_id] = state
 
 
 func _emit_faction_mission_changed() -> void:
