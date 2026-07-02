@@ -375,6 +375,8 @@ func lock_player_faction(faction_id: String) -> String:
 	player_faction_locked = true
 	_last_player_faction_change = "Voie definitive : %s" % get_player_faction_name()
 	_emit_player_faction_changed()
+	_ensure_valid_faction_mission_state()
+	_emit_faction_mission_changed()
 	_debug_player_faction("voie verrouillee -> %s" % get_player_faction_name())
 	return "%s\nVotre allegeance est desormais definitive" % _get_player_faction_path_message(player_faction_id)
 
