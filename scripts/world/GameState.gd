@@ -16,6 +16,8 @@ signal player_faction_changed(faction_id: String, faction_name: String, bonus_su
 const ENEMIES_PER_DANGER_LEVEL := 3
 const STARTING_PLAYER_SHIP_ID := "barque"
 
+@export var debug_player_faction: bool = false
+
 var danger_level: int = 1
 var current_danger_zone_id: String = DangerZoneCatalog.ZONE_SAFE
 var enemies_defeated: int = 0
@@ -32,6 +34,8 @@ var active_player_ship_id: String = STARTING_PLAYER_SHIP_ID
 var owned_player_ship_ids: Array[String] = [STARTING_PLAYER_SHIP_ID]
 var cargo_items: Dictionary = {}
 var player_faction_id: String = FactionCatalog.FACTION_NEUTRAL
+var _last_player_faction_change: String = "Neutre"
+var _last_player_faction_territory_bonus: String = "Aucun"
 
 
 func _ready() -> void:
@@ -312,7 +316,9 @@ func set_player_faction(faction_id: String) -> String:
 		return "Allegeance actuelle : %s" % get_player_faction_name()
 
 	player_faction_id = normalized_faction_id
+	_last_player_faction_change = FactionCatalog.get_player_faction_name(player_faction_id)
 	_emit_player_faction_changed()
+	_debug_player_faction("allegeance -> %s" % _last_player_faction_change)
 	return FactionCatalog.get_player_join_message(player_faction_id)
 
 
@@ -346,6 +352,22 @@ func get_player_territory_bonus_faction() -> String:
 
 func get_player_territory_bonus_amount() -> int:
 	return FactionCatalog.get_player_territory_bonus_amount(get_player_faction_id())
+
+
+func get_player_faction_debug_summary() -> String:
+	return "Faction joueur : %s\nBonus : %s\nDernier choix : %s\nDernier effet territoire : %s" % [
+		get_player_faction_name(),
+		get_player_faction_bonus_summary(),
+		_last_player_faction_change,
+		_last_player_faction_territory_bonus,
+	]
+
+
+func print_player_faction_debug() -> void:
+	if not debug_player_faction:
+		return
+
+	print(get_player_faction_debug_summary())
 
 
 func get_zone_control(zone_id_or_name: String) -> Dictionary:
@@ -842,16 +864,29 @@ func _apply_player_faction_territory_bonus(zone_id_or_name: String, action_id: S
 		FactionCatalog.FACTION_PIRATES:
 			if action_id == "exploration":
 				add_faction_influence(zone_id, FactionCatalog.FACTION_PIRATES, 1, "allegeance pirate")
+				_record_player_faction_territory_debug(zone_id, action_id, FactionCatalog.FACTION_PIRATES)
 		FactionCatalog.FACTION_NAVY:
 			if action_id == "enemy_destroyed":
 				reduce_faction_influence(zone_id, FactionCatalog.FACTION_PIRATES, 1, "serment marine")
 				add_faction_influence(zone_id, FactionCatalog.FACTION_NAVY, 1, "serment marine")
+				_record_player_faction_territory_debug(zone_id, action_id, FactionCatalog.FACTION_NAVY)
 		FactionCatalog.FACTION_MERCHANTS:
 			if action_id == "trade_completed":
 				add_faction_influence(zone_id, FactionCatalog.FACTION_MERCHANTS, 1, "allegeance marchande")
+				_record_player_faction_territory_debug(zone_id, action_id, FactionCatalog.FACTION_MERCHANTS)
 		FactionCatalog.FACTION_SMUGGLERS:
 			if action_id == "rare_creature_resource" or action_id == "exploration":
 				add_faction_influence(zone_id, FactionCatalog.FACTION_SMUGGLERS, 1, "reseau contrebandier")
+				_record_player_faction_territory_debug(zone_id, action_id, FactionCatalog.FACTION_SMUGGLERS)
+
+
+func _record_player_faction_territory_debug(zone_id: String, action_id: String, faction_id: String) -> void:
+	_last_player_faction_territory_bonus = "%s : +1 %s via %s" % [
+		DangerZoneCatalog.get_zone_name(zone_id),
+		FactionCatalog.get_player_faction_name(faction_id),
+		action_id,
+	]
+	_debug_player_faction(_last_player_faction_territory_bonus)
 
 
 func _get_quest_system() -> Node:
@@ -914,6 +949,13 @@ func _emit_player_faction_changed() -> void:
 		get_player_faction_name(),
 		get_player_faction_bonus_summary()
 	)
+
+
+func _debug_player_faction(message: String) -> void:
+	if not debug_player_faction:
+		return
+
+	print("PlayerFaction: %s" % message)
 
 
 func _emit_cargo_changed() -> void:
