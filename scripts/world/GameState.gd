@@ -119,6 +119,7 @@ func record_enemy_destroyed() -> void:
 	enemies_defeated += 1
 	danger_level = 1 + int(enemies_defeated / ENEMIES_PER_DANGER_LEVEL)
 	danger_changed.emit(danger_level, enemies_defeated)
+	_record_enemy_destroyed_territory_change()
 	var quest_system := _get_quest_system()
 	if quest_system != null and quest_system.has_method("record_enemy_destroyed"):
 		quest_system.record_enemy_destroyed()
@@ -149,7 +150,7 @@ func is_exploration_site_explored(site_id: String) -> bool:
 	return bool(explored_exploration_sites.get(site_id, false))
 
 
-func mark_exploration_site_explored(site_id: String, treasure_id: String = "") -> bool:
+func mark_exploration_site_explored(site_id: String, treasure_id: String = "", zone_id_or_name: String = "") -> bool:
 	if site_id.is_empty():
 		return false
 	if bool(explored_exploration_sites.get(site_id, false)):
@@ -161,6 +162,7 @@ func mark_exploration_site_explored(site_id: String, treasure_id: String = "") -
 		discovered_treasures[treasure_id] = current_count + 1
 
 	exploration_progress_changed.emit(get_discovered_treasure_count(), get_explored_site_count())
+	_record_exploration_territory_change(zone_id_or_name, treasure_id)
 	return true
 
 
@@ -170,8 +172,9 @@ func reset_exploration_sites() -> void:
 	exploration_progress_changed.emit(0, 0)
 
 
-func record_marine_creature_defeated(_creature_id: String) -> void:
+func record_marine_creature_defeated(creature_id: String) -> void:
 	marine_creatures_defeated += 1
+	_record_marine_creature_territory_change(creature_id)
 	_emit_creature_resources_changed()
 
 
@@ -612,6 +615,23 @@ func sell_trade_good(item_id: String, amount: int = 1) -> String:
 	return "Marchandise vendue : %s x%d" % [CargoCatalog.get_good_name(item_id), amount]
 
 
+func record_trade_completed(zone_id_or_name: String, amount: int = 1) -> void:
+	var influence_amount: int = clampi(amount, 1, 2)
+	var zone_id: String = DangerZoneCatalog.normalize_zone_id(zone_id_or_name)
+	add_faction_influence(
+		zone_id,
+		FactionCatalog.FACTION_MERCHANTS,
+		influence_amount,
+		"commerce au port"
+	)
+	reduce_faction_influence(
+		zone_id,
+		FactionCatalog.FACTION_PIRATES,
+		1,
+		"routes marchandes securisees"
+	)
+
+
 func get_owned_player_ship_ids() -> Array[String]:
 	_ensure_valid_player_ship_state()
 	return owned_player_ship_ids.duplicate()
@@ -682,6 +702,51 @@ func equip_player_ship(ship_id: String) -> String:
 	player_ship_changed.emit(active_player_ship_id, get_active_player_ship_name())
 	_emit_cargo_changed()
 	return "%s équipé" % get_active_player_ship_name()
+
+
+func _record_enemy_destroyed_territory_change() -> void:
+	var zone_id: String = get_current_danger_zone_id_safe()
+	reduce_faction_influence(zone_id, FactionCatalog.FACTION_PIRATES, 2, "pirate detruit")
+	add_faction_influence(zone_id, FactionCatalog.FACTION_NAVY, 1, "pirate detruit")
+	add_faction_influence(zone_id, FactionCatalog.FACTION_MERCHANTS, 1, "route securisee")
+
+
+func _record_marine_creature_territory_change(creature_id: String) -> void:
+	var creature_level: int = 1
+	if not creature_id.is_empty() and MarineCreatureCatalog.has_creature(creature_id):
+		creature_level = MarineCreatureCatalog.get_creature_level(creature_id)
+	if creature_level < 2:
+		return
+
+	var zone_id: String = get_current_danger_zone_id_safe()
+	var abyss_reduction: int = 2
+	if creature_level >= 5:
+		abyss_reduction = 3
+
+	reduce_faction_influence(zone_id, FactionCatalog.FACTION_ABYSS_CULT, abyss_reduction, "creature marine vaincue")
+	add_faction_influence(zone_id, FactionCatalog.FACTION_NAVY, 1, "routes maritimes protegees")
+	if creature_level >= 4:
+		add_faction_influence(zone_id, FactionCatalog.FACTION_MERCHANTS, 1, "commerce rassure")
+
+
+func _record_exploration_territory_change(zone_id_or_name: String, treasure_id: String) -> void:
+	var zone_id: String = get_current_danger_zone_id_safe()
+	if not zone_id_or_name.strip_edges().is_empty():
+		zone_id = DangerZoneCatalog.normalize_zone_id(zone_id_or_name)
+
+	var zone_level: int = DangerZoneCatalog.get_zone_level(zone_id)
+	if zone_level >= 5:
+		reduce_faction_influence(zone_id, FactionCatalog.FACTION_ABYSS_CULT, 2, "tresor explore")
+		add_faction_influence(zone_id, FactionCatalog.FACTION_SMUGGLERS, 1, "rumeurs de tresor")
+		return
+
+	if not treasure_id.is_empty() and TreasureCatalog.get_required_ancient_relics(treasure_id) > 0:
+		reduce_faction_influence(zone_id, FactionCatalog.FACTION_ABYSS_CULT, 1, "relique recuperee")
+		add_faction_influence(zone_id, FactionCatalog.FACTION_MERCHANTS, 1, "decouverte revendable")
+		return
+
+	reduce_faction_influence(zone_id, FactionCatalog.FACTION_PIRATES, 1, "site explore")
+	add_faction_influence(zone_id, FactionCatalog.FACTION_MERCHANTS, 1, "cartographie utile")
 
 
 func _get_quest_system() -> Node:

@@ -313,7 +313,7 @@ func _mark_explored() -> bool:
 	_explored = true
 	var game_state: Node = _get_game_state()
 	if game_state != null and game_state.has_method("mark_exploration_site_explored"):
-		return bool(game_state.call("mark_exploration_site_explored", _get_site_key(), treasure_id))
+		return bool(game_state.call("mark_exploration_site_explored", _get_site_key(), treasure_id, danger_zone))
 
 	return true
 

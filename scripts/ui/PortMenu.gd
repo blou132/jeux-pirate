@@ -1091,7 +1091,9 @@ func _on_buy_trade_pressed() -> void:
 		_set_trade_status("Commerce indisponible")
 		return
 
-	_set_trade_status(String(game_state.call("buy_trade_good", _selected_trade_good_id, 1)))
+	var trade_result: String = String(game_state.call("buy_trade_good", _selected_trade_good_id, 1))
+	_set_trade_status(trade_result)
+	_record_trade_territory_progress(game_state, trade_result)
 	_refresh_trade_rows()
 
 
@@ -1110,8 +1112,23 @@ func _on_sell_trade_pressed() -> void:
 		_set_trade_status("Commerce indisponible")
 		return
 
-	_set_trade_status(String(game_state.call("sell_trade_good", _selected_trade_good_id, 1)))
+	var trade_result: String = String(game_state.call("sell_trade_good", _selected_trade_good_id, 1))
+	_set_trade_status(trade_result)
+	_record_trade_territory_progress(game_state, trade_result)
 	_refresh_trade_rows()
+
+
+func _record_trade_territory_progress(game_state: Node, trade_result: String) -> void:
+	if game_state == null or not game_state.has_method("record_trade_completed"):
+		return
+	if not trade_result.begins_with("Marchandise achetee") and not trade_result.begins_with("Marchandise vendue"):
+		return
+
+	game_state.call("record_trade_completed", _get_active_port_danger_zone_id(), 1)
+
+
+func _get_active_port_danger_zone_id() -> String:
+	return DangerZoneCatalog.normalize_zone_id(PortCatalog.get_port_danger_zone(_active_port_id))
 
 
 func _set_trade_status(message: String) -> void:
