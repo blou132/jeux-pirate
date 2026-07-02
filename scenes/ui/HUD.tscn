@@ -91,6 +91,11 @@ layout_mode = 2
 text = "Controle: Marine"
 clip_text = true
 
+[node name="CompactPlayerFactionLabel" type="Label" parent="HUDRoot/CompactSailingPanel/CompactRow"]
+layout_mode = 2
+text = "Faction: Neutre"
+clip_text = true
+
 [node name="CompactFleetLabel" type="Label" parent="HUDRoot/CompactSailingPanel/CompactRow"]
 layout_mode = 2
 text = "Flotte: 0/3"
@@ -192,6 +197,14 @@ text = "Controle de territoire:
 Marine royale : 45 %
 Ligue marchande : 45 %
 Dominant : Marine royale"
+autowrap_mode = 3
+
+[node name="PlayerFactionLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
+custom_minimum_size = Vector2(0, 74)
+layout_mode = 2
+text = "Allegeance joueur : Neutre
+Bonus : aucun
+Controle local : Marine royale"
 autowrap_mode = 3
 
 [node name="EnemiesDefeatedLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]

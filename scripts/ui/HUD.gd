@@ -14,6 +14,7 @@ extends CanvasLayer
 @onready var compact_danger_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactDangerLabel
 @onready var compact_zone_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactZoneLabel
 @onready var compact_territory_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactTerritoryLabel
+@onready var compact_player_faction_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactPlayerFactionLabel
 @onready var compact_fleet_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactFleetLabel
 @onready var compact_order_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactOrderLabel
 @onready var compact_quest_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactQuestLabel
@@ -27,6 +28,7 @@ extends CanvasLayer
 @onready var danger_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/DangerLabel
 @onready var zone_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/ZoneLabel
 @onready var territory_control_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/TerritoryControlLabel
+@onready var player_faction_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/PlayerFactionLabel
 @onready var enemies_defeated_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/EnemiesDefeatedLabel
 @onready var ally_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/AllyLabel
 @onready var quest_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/QuestLabel
@@ -395,11 +397,16 @@ func _connect_game_state() -> void:
 	if _game_state.has_signal("territory_dominant_faction_changed") and not _game_state.is_connected("territory_dominant_faction_changed", territory_dominant_callback):
 		_game_state.connect("territory_dominant_faction_changed", territory_dominant_callback)
 
+	var player_faction_callback: Callable = Callable(self, "_on_player_faction_changed")
+	if _game_state.has_signal("player_faction_changed") and not _game_state.is_connected("player_faction_changed", player_faction_callback):
+		_game_state.connect("player_faction_changed", player_faction_callback)
+
 	_refresh_player_ship_label()
 	_refresh_cargo_from_game_state()
 	_refresh_exploration_progress_from_game_state()
 	_refresh_creature_resources_from_game_state()
 	_refresh_territory_control_from_game_state()
+	_refresh_player_faction_from_game_state()
 
 
 func _on_resources_changed(gold: int, wood: int) -> void:
@@ -429,6 +436,7 @@ func _on_territory_control_changed(zone_id: String, control: Dictionary) -> void
 		return
 
 	_refresh_territory_labels(zone_id, control)
+	_refresh_player_faction_from_game_state()
 
 
 func _on_territory_dominant_faction_changed(zone_id: String, _faction_id: String, _faction_name: String, message: String) -> void:
@@ -436,6 +444,10 @@ func _on_territory_dominant_faction_changed(zone_id: String, _faction_id: String
 		return
 
 	show_zone_notification(message, 3.0)
+
+
+func _on_player_faction_changed(_faction_id: String, _faction_name: String, _bonus_summary: String) -> void:
+	_refresh_player_faction_from_game_state()
 
 
 func _refresh_territory_control_from_game_state() -> void:
@@ -486,6 +498,35 @@ func _refresh_territory_labels(zone_id: String, control: Dictionary) -> void:
 					break
 
 	territory_control_label.text = "\n".join(lines)
+	_refresh_player_faction_from_game_state()
+
+
+func _refresh_player_faction_from_game_state() -> void:
+	if _game_state == null:
+		compact_player_faction_label.text = "Faction: Neutre"
+		player_faction_label.text = "Allegeance joueur : Neutre\nBonus : aucun\nControle local : inconnu"
+		return
+
+	var faction_name: String = "Neutre"
+	var bonus_summary: String = "Aucun bonus, aucune penalite."
+	if _game_state.has_method("get_player_faction_name"):
+		faction_name = String(_game_state.call("get_player_faction_name"))
+	if _game_state.has_method("get_player_faction_bonus_summary"):
+		bonus_summary = String(_game_state.call("get_player_faction_bonus_summary"))
+
+	var local_control_name: String = "inconnu"
+	if _game_state.has_method("get_current_zone_control"):
+		var control_value: Variant = _game_state.call("get_current_zone_control")
+		if control_value is Dictionary:
+			var control: Dictionary = control_value
+			local_control_name = String(control.get("dominant_faction_name", "inconnu"))
+
+	compact_player_faction_label.text = "Faction: %s" % _get_compact_player_faction_label(faction_name)
+	player_faction_label.text = "Allegeance joueur : %s\nBonus : %s\nControle local : %s" % [
+		faction_name,
+		bonus_summary,
+		local_control_name,
+	]
 
 
 func _is_current_territory_zone(zone_id: String) -> bool:
@@ -501,6 +542,20 @@ func _get_compact_faction_label(faction_id: String) -> String:
 		return "--"
 
 	return FactionCatalog.get_hud_label(faction_id)
+
+
+func _get_compact_player_faction_label(faction_name: String) -> String:
+	match faction_name:
+		"Marine royale":
+			return "Marine"
+		"Ligue marchande":
+			return "Marchands"
+		"Contrebandiers":
+			return "Contrebande"
+		"Cultes abyssaux":
+			return "Abysses"
+		_:
+			return faction_name
 
 
 func _get_compact_zone_label(zone_name: String) -> String:
