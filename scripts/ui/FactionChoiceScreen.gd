@@ -123,6 +123,7 @@ func _refresh_selection() -> void:
 	confirm_button.text = "Confirmer definitivement"
 	if _pending_faction_id == _selected_faction_id:
 		warning_label.text = "Confirmer cette voie ?\nCe choix est definitif pour cette partie.\nPour jouer une autre faction, il faudra commencer une nouvelle partie."
+		prepare_button.text = "Serment prepare"
 	else:
 		warning_label.text = "Choisissez une voie. Le serment se confirme en deux etapes."
 
@@ -144,12 +145,15 @@ func _on_confirm_pressed() -> void:
 		warning_label.text = "Choix de faction indisponible."
 		return
 
-	var result_message: String = String(game_state.call("lock_player_faction", _pending_faction_id))
+	var lock_result: String = String(game_state.call("lock_player_faction", _pending_faction_id))
+	var result_message: String = "Voie choisie : %s\nVotre allegeance est definitive pour cette partie." % FactionCatalog.get_player_faction_name(_pending_faction_id)
 	warning_label.text = result_message
 	if game_state.has_method("is_player_faction_locked") and bool(game_state.call("is_player_faction_locked")):
 		var confirmed_faction_id: String = _pending_faction_id
 		close()
 		faction_choice_confirmed.emit(confirmed_faction_id, result_message)
+	else:
+		warning_label.text = lock_result
 
 
 func _is_faction_already_locked() -> bool:
