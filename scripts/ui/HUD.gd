@@ -13,6 +13,7 @@ extends CanvasLayer
 @onready var compact_speed_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactSpeedLabel
 @onready var compact_danger_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactDangerLabel
 @onready var compact_zone_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactZoneLabel
+@onready var compact_territory_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactTerritoryLabel
 @onready var compact_fleet_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactFleetLabel
 @onready var compact_order_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactOrderLabel
 @onready var compact_quest_label: Label = $HUDRoot/CompactSailingPanel/CompactRow/CompactQuestLabel
@@ -25,6 +26,7 @@ extends CanvasLayer
 @onready var cannons_level_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/CannonsLevelLabel
 @onready var danger_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/DangerLabel
 @onready var zone_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/ZoneLabel
+@onready var territory_control_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/TerritoryControlLabel
 @onready var enemies_defeated_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/EnemiesDefeatedLabel
 @onready var ally_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/AllyLabel
 @onready var quest_label: Label = $HUDRoot/LeftStatusPanel/LeftVBox/QuestLabel
@@ -385,10 +387,15 @@ func _connect_game_state() -> void:
 	if _game_state.has_signal("creature_resources_changed") and not _game_state.is_connected("creature_resources_changed", creature_resources_callback):
 		_game_state.connect("creature_resources_changed", creature_resources_callback)
 
+	var territory_callback: Callable = Callable(self, "_on_territory_control_changed")
+	if _game_state.has_signal("territory_control_changed") and not _game_state.is_connected("territory_control_changed", territory_callback):
+		_game_state.connect("territory_control_changed", territory_callback)
+
 	_refresh_player_ship_label()
 	_refresh_cargo_from_game_state()
 	_refresh_exploration_progress_from_game_state()
 	_refresh_creature_resources_from_game_state()
+	_refresh_territory_control_from_game_state()
 
 
 func _on_resources_changed(gold: int, wood: int) -> void:
@@ -410,6 +417,79 @@ func _on_danger_changed(danger_level: int, enemies_defeated: int) -> void:
 func _on_current_danger_zone_changed(_zone_id: String, zone_name: String, zone_level: int) -> void:
 	zone_label.text = "Zone: %s (niv. %d)" % [zone_name, zone_level]
 	compact_zone_label.text = "Zone: %s" % _get_compact_zone_label(zone_name)
+	_refresh_territory_control_from_game_state()
+
+
+func _on_territory_control_changed(zone_id: String, control: Dictionary) -> void:
+	if not _is_current_territory_zone(zone_id):
+		return
+
+	_refresh_territory_labels(zone_id, control)
+
+
+func _refresh_territory_control_from_game_state() -> void:
+	if _game_state == null:
+		compact_territory_label.text = "Controle: --"
+		territory_control_label.text = "Controle de territoire indisponible"
+		return
+	if not _game_state.has_method("get_current_danger_zone_id") or not _game_state.has_method("get_zone_control"):
+		compact_territory_label.text = "Controle: --"
+		territory_control_label.text = "Controle de territoire indisponible"
+		return
+
+	var zone_id: String = String(_game_state.call("get_current_danger_zone_id"))
+	var control_value: Variant = _game_state.call("get_zone_control", zone_id)
+	if not (control_value is Dictionary):
+		compact_territory_label.text = "Controle: --"
+		territory_control_label.text = "Controle de territoire indisponible"
+		return
+
+	var control: Dictionary = control_value
+	_refresh_territory_labels(zone_id, control)
+
+
+func _refresh_territory_labels(zone_id: String, control: Dictionary) -> void:
+	var dominant_faction: String = String(control.get("dominant_faction", ""))
+	compact_territory_label.text = "Controle: %s" % _get_compact_faction_label(dominant_faction)
+
+	var lines: Array[String] = ["Controle de territoire:"]
+	if _game_state != null and _game_state.has_method("get_zone_control_lines"):
+		var control_lines_value: Variant = _game_state.call("get_zone_control_lines", zone_id)
+		if control_lines_value is Array:
+			for raw_line in control_lines_value:
+				lines.append(String(raw_line))
+	else:
+		lines.append("Dominant : %s" % String(control.get("dominant_faction_name", "Inconnu")))
+		lines.append("Stabilite : %s" % String(control.get("stability", "moyenne")))
+		lines.append("Conflit : %s" % String(control.get("conflict", "moyen")))
+
+	if _game_state != null and _game_state.has_method("get_zone_effect_lines"):
+		var effect_lines_value: Variant = _game_state.call("get_zone_effect_lines", zone_id)
+		if effect_lines_value is Array:
+			lines.append("Effets actifs:")
+			var effect_count: int = 0
+			for raw_effect in effect_lines_value:
+				lines.append(String(raw_effect))
+				effect_count += 1
+				if effect_count >= 3:
+					break
+
+	territory_control_label.text = "\n".join(lines)
+
+
+func _is_current_territory_zone(zone_id: String) -> bool:
+	if _game_state == null or not _game_state.has_method("get_current_danger_zone_id"):
+		return false
+
+	var current_zone_id: String = DangerZoneCatalog.normalize_zone_id(String(_game_state.call("get_current_danger_zone_id")))
+	return current_zone_id == DangerZoneCatalog.normalize_zone_id(zone_id)
+
+
+func _get_compact_faction_label(faction_id: String) -> String:
+	if faction_id.is_empty():
+		return "--"
+
+	return FactionCatalog.get_hud_label(faction_id)
 
 
 func _get_compact_zone_label(zone_name: String) -> String:
