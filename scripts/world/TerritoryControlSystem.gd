@@ -189,6 +189,17 @@ func get_debug_summary(zone_id_or_name: String = "") -> String:
 	return "\n".join(lines)
 
 
+func get_last_change_summary() -> String:
+	return _last_change_summary
+
+
+func print_debug_summary(zone_id_or_name: String = "") -> void:
+	if not debug_territory_control:
+		return
+
+	print(get_debug_summary(zone_id_or_name))
+
+
 func _initialize_zone_controls() -> void:
 	_zone_controls.clear()
 	for zone_id in DangerZoneCatalog.get_zone_ids():
@@ -244,6 +255,7 @@ func _set_zone_influence(zone_id: String, raw_influence: Dictionary, preferred_a
 		dominant_faction_changed.emit(zone_id, new_dominant, FactionCatalog.get_faction_name(new_dominant), message)
 
 	_debug("changed %s -> %s | %s" % [old_dominant, new_dominant, _last_change_summary])
+	print_debug_summary(zone_id)
 	return new_control.duplicate(true)
 
 
