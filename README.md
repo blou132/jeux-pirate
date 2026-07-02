@@ -56,6 +56,8 @@ La v0.15.1 restaure les spawns pirates et creatures apres la v0.15 : les spawner
 
 La v0.15.2 augmente la presence pirates/creatures, repartit mieux les points de spawn par region et corrige les degats de contact des creatures marines.
 
+La v0.16 ajoute une premiere base de controle de territoire : cinq factions influencent les zones, les spawns pirates, les creatures marines, les ports, le commerce et le HUD.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -388,6 +390,19 @@ La v0.15.2 augmente la presence pirates/creatures, repartit mieux les points de 
 - Le HUD detaille affiche creatures vaincues et ressources marines possedees.
 - Une aide debug desactivee par defaut peut afficher l'etat IA des creatures, les spawns marins, les spawns pirates et les raisons d'echec de spawn.
 
+## Etat v0.16
+
+- `FactionCatalog` centralise les cinq factions : Pirates, Marine royale, Ligue marchande, Contrebandiers et Cultes abyssaux.
+- `TerritoryControlSystem` suit pour chaque zone de danger une influence par faction, une faction dominante, une stabilite et un niveau de conflit.
+- Repartition initiale : Eaux sures partagees entre Marine royale et Ligue marchande, zones contestee/hostile plus pirates, zones mortelle/legendaire/abysses plus abyssales.
+- Les actions du joueur modifient legerement l'influence : pirates detruits, creatures dangereuses vaincues, sites explores et commerce au port.
+- Les spawns pirates utilisent un multiplicateur territorial : pirates dominants = plus de rencontres, Marine/Ligue marchande = moins de pirates, Cultes abyssaux = pirates moins centraux.
+- Les creatures marines utilisent aussi le controle : Cultes abyssaux = plus de creatures et creatures dangereuses plus probables, Marine/Ligue marchande = routes un peu plus sures.
+- Le menu de port affiche le controle de la zone, la stabilite, le conflit et les effets actifs sur commerce, reparations et securite.
+- Le HUD compact affiche la faction dominante de la zone courante.
+- Le HUD detaille affiche les influences par faction, le dominant, la stabilite, le conflit et les principaux effets.
+- Une notification apparait seulement quand une faction devient dominante dans la zone courante.
+
 ## Lancement
 
 1. Installer Godot 4.x.
@@ -434,6 +449,8 @@ Les marqueurs `AimPoint`, `LeftCannonPoint` et `RightCannonPoint` peuvent être 
 
 Les lignes de bordée ennemies peuvent être affichées avec `debug_show_broadside_lines` dans `EnemyShipAI`. Elles servent à vérifier si la ligne latérale passe près du `AimPoint`.
 
+Le controle territorial possede `debug_territory_control` dans `TerritoryControlSystem`. Desactive par defaut, il peut imprimer la zone, le dominant, les influences, la derniere action et les multiplicateurs appliques.
+
 ## Structure
 
 - `scenes/` : scenes Godot reutilisables
@@ -446,6 +463,8 @@ Les lignes de bordée ennemies peuvent être affichées avec `debug_show_broadsi
 - `UpgradeSystem` est configure en autoload pour suivre les niveaux d'amélioration.
 - `QuestSystem` est configure en autoload pour suivre les missions actives et les récompenses.
 - `ReputationSystem` est configure en autoload pour suivre réputation, rangs, titres pirates et feedback de progression.
+- `TerritoryControlSystem` est configure en autoload pour suivre l'influence des factions par zone.
+- `FactionCatalog` centralise les factions, leurs libelles HUD et leurs effets sur spawns, commerce, reparations et securite.
 - `DangerZoneCatalog` centralise les zones de danger, leurs niveaux, types d'ennemis, densites, ports, tresors et multiplicateurs de recompense.
 - `MarineCreatureCatalog` centralise les creatures marines, leurs zones, comportements, stats et recompenses.
 - `MarineCreatureSpawner` gere les creatures actives, les points de spawn marins et la densite par zone.

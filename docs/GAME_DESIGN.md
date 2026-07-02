@@ -149,6 +149,15 @@ Le joueur incarne le capitaine d'un petit navire independant qui construit progr
 6. Les ressources rares restent des compteurs separes de la cargaison commerciale.
 7. Les ports restent des zones sures : les creatures decrochent ou sont repoussees au respawn.
 
+## Boucle de jeu v0.16
+
+1. Le joueur navigue dans une zone deja definie par `DangerZoneCatalog`.
+2. Le HUD affiche la faction dominante dans cette zone.
+3. Les combats, creatures vaincues, explorations et ventes au port changent legerement l'influence locale.
+4. Une faction peut devenir dominante si son influence depasse les autres.
+5. Le controle modifie la densite des pirates, la presence des creatures et les effets visibles au port.
+6. Le menu de port expose les effets territoriaux sans lancer encore de conquete ou diplomatie avancee.
+
 ## Port et progression
 
 Le port sert de premier point sûr et de première interface de progression. Il établit le rythme attendu : partir en mer, obtenir des ressources, revenir au port, réparer, améliorer le bateau, accepter des missions et recruter un premier soutien allié.
@@ -567,6 +576,35 @@ La premiere refonte UI doit rendre le prototype plus lisible sans changer les sy
 - Les rangs de renom sont : Inconnu, Recherché, Craint, Redouté, Célèbre, Légendaire, Fléau des mers, Roi des pirates.
 - Les titres pirates sont : Loup de mer, Capitaine, Seigneur des vagues, Maître des flottes, Conquérant des mers, Fléau des mers, Souverain des mers, Roi des océans, Empereur des océans, Légende éternelle.
 - L'interface doit nommer clairement `Renom` ou `Réputation` pour la premiere liste, et `Titre pirate` pour la deuxieme.
+
+## Controle de territoire v0.16
+
+La v0.16 ajoute une couche de monde dynamique legere. Elle ne cree pas encore de guerre totale, de diplomatie avancee ou de conquete de port, mais elle donne aux zones un etat politique lisible.
+
+Factions officielles :
+
+- Pirates : pillage, chaos, combat naval ; augmente les spawns pirates et rend les zones moins sures.
+- Marine royale : ordre et securite ; reduit les pirates, securise les ports et rend les reparations plus favorables.
+- Ligue marchande : routes maritimes et richesse ; rend le commerce plus avantageux et reduit legerement le danger direct.
+- Contrebandiers : marche noir et objets rares ; valorise les ressources rares et cree une influence mixte.
+- Cultes abyssaux : monstres marins et zones maudites ; augmente les creatures marines et les menaces dangereuses.
+
+Chaque zone possede une influence par faction totalisant environ 100 %, une faction dominante, une stabilite et un niveau de conflit. Les influences initiales suivent la progression de danger : les Eaux sures sont surtout Marine/Ligue marchande, la Zone contestee est partagee avec les pirates, et les zones mortelles/abyssales favorisent les Cultes abyssaux.
+
+Actions joueur :
+
+- Detruire un pirate reduit legerement les Pirates et renforce Marine/Ligue marchande dans la zone courante.
+- Vaincre une creature dangereuse reduit les Cultes abyssaux et rassure les routes maritimes.
+- Explorer un site ou recuperer un tresor affaiblit un peu Pirates ou Cultes abyssaux selon le niveau de zone.
+- Faire du commerce au port renforce la Ligue marchande de la zone du port.
+
+Effets de gameplay :
+
+- Les spawns pirates sont multiplies par l'influence territoriale, avec un minimum de rencontres conserve.
+- Les creatures marines augmentent sous influence abyssale, surtout les creatures dangereuses.
+- Les ports affichent les effets actifs : commerce, reparations, securite ou marche noir.
+- Le HUD compact affiche le controle dominant, tandis que le HUD detaille affiche influence, stabilite, conflit et effets.
+- Un feedback apparait seulement quand une nouvelle faction devient dominante dans la zone courante.
 
 ## Piliers a long terme
 

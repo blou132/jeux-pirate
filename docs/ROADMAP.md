@@ -186,9 +186,24 @@ Correctif v0.15.2 :
 
 ## v0.16 - Controle de territoire
 
-- Preparer des zones controlables ou contestables.
-- Relier territoire, ports et reputation.
+- Ajouter `FactionCatalog` avec Pirates, Marine royale, Ligue marchande, Contrebandiers et Cultes abyssaux.
+- Ajouter `TerritoryControlSystem` avec influence par faction, dominant, stabilite et conflit par zone.
+- Initialiser le controle des sept zones de danger avec une repartition coherent avec leur risque.
+- Faire evoluer legerement l'influence via combats, creatures vaincues, exploration et commerce.
+- Appliquer le controle aux spawns pirates sans vider les zones.
+- Appliquer le controle aux creatures marines, surtout sous influence abyssale.
+- Afficher les effets territoriaux dans les ports et le commerce.
+- Afficher la faction dominante dans le HUD compact.
+- Afficher influence, stabilite, conflit et effets dans le HUD detaille.
+- Ajouter un feedback quand une faction devient dominante.
 - Garder une version simple avant toute strategie avancee.
+
+## v0.17 - Missions de factions et evenements dynamiques
+
+- Ajouter des missions liees aux factions.
+- Ajouter des evenements de zone bases sur le controle territorial.
+- Preparer des reactions plus visibles des ports selon la faction dominante.
+- Garder hors scope la diplomatie avancee et la conquete complete de ports.
 
 ## v1.0 - Polish global
 
