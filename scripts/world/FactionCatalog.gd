@@ -33,6 +33,13 @@ const NEUTRAL_PLAYER_FACTION: Dictionary = {
 	"base_relation": "neutre",
 	"player_bonus": "Aucun bonus, aucune penalite.",
 	"join_message": "Vous etes redevenu neutre",
+	"ship_combat_gold_multiplier": 1.00,
+	"pirate_renown_multiplier": 1.00,
+	"trade_profit_multiplier": 1.00,
+	"rare_creature_resource_multiplier": 1.00,
+	"dangerous_creature_reward_multiplier": 1.00,
+	"territory_bonus_faction": "",
+	"territory_bonus_amount": 0,
 }
 
 const FACTIONS: Dictionary = {
@@ -44,6 +51,13 @@ const FACTIONS: Dictionary = {
 		"base_relation": "hostile",
 		"player_bonus": "+10 % or sur les combats contre navires ennemis.",
 		"join_message": "Vous avez rejoint les Pirates",
+		"ship_combat_gold_multiplier": 1.10,
+		"pirate_renown_multiplier": 1.00,
+		"trade_profit_multiplier": 1.00,
+		"rare_creature_resource_multiplier": 1.00,
+		"dangerous_creature_reward_multiplier": 1.00,
+		"territory_bonus_faction": FACTION_PIRATES,
+		"territory_bonus_amount": 1,
 		"pirate_spawn_multiplier": 1.25,
 		"marine_spawn_multiplier": 1.05,
 		"dangerous_creature_multiplier": 1.05,
@@ -63,6 +77,13 @@ const FACTIONS: Dictionary = {
 		"base_relation": "neutre",
 		"player_bonus": "+10 % renom contre les pirates et influence marine accrue.",
 		"join_message": "Vous avez prete serment a la Marine royale",
+		"ship_combat_gold_multiplier": 1.00,
+		"pirate_renown_multiplier": 1.10,
+		"trade_profit_multiplier": 1.00,
+		"rare_creature_resource_multiplier": 1.00,
+		"dangerous_creature_reward_multiplier": 1.00,
+		"territory_bonus_faction": FACTION_NAVY,
+		"territory_bonus_amount": 1,
 		"pirate_spawn_multiplier": 0.75,
 		"marine_spawn_multiplier": 0.90,
 		"dangerous_creature_multiplier": 0.90,
@@ -82,6 +103,13 @@ const FACTIONS: Dictionary = {
 		"base_relation": "amicale",
 		"player_bonus": "+5 % benefice commerce et influence marchande accrue.",
 		"join_message": "Vous soutenez desormais la Ligue marchande",
+		"ship_combat_gold_multiplier": 1.00,
+		"pirate_renown_multiplier": 1.00,
+		"trade_profit_multiplier": 1.05,
+		"rare_creature_resource_multiplier": 1.00,
+		"dangerous_creature_reward_multiplier": 1.00,
+		"territory_bonus_faction": FACTION_MERCHANTS,
+		"territory_bonus_amount": 1,
 		"pirate_spawn_multiplier": 0.85,
 		"marine_spawn_multiplier": 0.95,
 		"dangerous_creature_multiplier": 0.92,
@@ -101,6 +129,13 @@ const FACTIONS: Dictionary = {
 		"base_relation": "mefiante",
 		"player_bonus": "+10 % ressources rares de creatures marines.",
 		"join_message": "Vous travaillez avec les Contrebandiers",
+		"ship_combat_gold_multiplier": 1.00,
+		"pirate_renown_multiplier": 1.00,
+		"trade_profit_multiplier": 1.00,
+		"rare_creature_resource_multiplier": 1.10,
+		"dangerous_creature_reward_multiplier": 1.00,
+		"territory_bonus_faction": FACTION_SMUGGLERS,
+		"territory_bonus_amount": 1,
 		"pirate_spawn_multiplier": 1.05,
 		"marine_spawn_multiplier": 1.00,
 		"dangerous_creature_multiplier": 1.00,
@@ -120,6 +155,13 @@ const FACTIONS: Dictionary = {
 		"base_relation": "hostile",
 		"player_bonus": "+10 % or et ressources sur creatures marines dangereuses.",
 		"join_message": "Vous avez accepte les murmures des Cultes abyssaux",
+		"ship_combat_gold_multiplier": 1.00,
+		"pirate_renown_multiplier": 1.00,
+		"trade_profit_multiplier": 1.00,
+		"rare_creature_resource_multiplier": 1.00,
+		"dangerous_creature_reward_multiplier": 1.10,
+		"territory_bonus_faction": FACTION_ABYSS_CULT,
+		"territory_bonus_amount": 1,
 		"pirate_spawn_multiplier": 0.85,
 		"marine_spawn_multiplier": 1.25,
 		"dangerous_creature_multiplier": 1.25,
@@ -211,6 +253,21 @@ static func get_player_bonus_summary(faction_id: String) -> String:
 static func get_player_join_message(faction_id: String) -> String:
 	var faction: Dictionary = get_player_faction(faction_id)
 	return String(faction.get("join_message", "Allegeance mise a jour"))
+
+
+static func get_player_bonus_modifier(faction_id: String, key: String, default_value: float = 1.0) -> float:
+	var faction: Dictionary = get_player_faction(faction_id)
+	return float(faction.get(key, default_value))
+
+
+static func get_player_territory_bonus_faction(faction_id: String) -> String:
+	var faction: Dictionary = get_player_faction(faction_id)
+	return String(faction.get("territory_bonus_faction", ""))
+
+
+static func get_player_territory_bonus_amount(faction_id: String) -> int:
+	var faction: Dictionary = get_player_faction(faction_id)
+	return maxi(0, int(faction.get("territory_bonus_amount", 0)))
 
 
 static func get_style(faction_id: String) -> String:

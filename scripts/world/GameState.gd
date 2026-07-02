@@ -315,6 +315,34 @@ func get_player_faction_bonus_summary() -> String:
 	return FactionCatalog.get_player_bonus_summary(get_player_faction_id())
 
 
+func get_player_ship_combat_gold_multiplier() -> float:
+	return FactionCatalog.get_player_bonus_modifier(get_player_faction_id(), "ship_combat_gold_multiplier", 1.0)
+
+
+func get_player_pirate_renown_multiplier() -> float:
+	return FactionCatalog.get_player_bonus_modifier(get_player_faction_id(), "pirate_renown_multiplier", 1.0)
+
+
+func get_player_trade_profit_multiplier() -> float:
+	return FactionCatalog.get_player_bonus_modifier(get_player_faction_id(), "trade_profit_multiplier", 1.0)
+
+
+func get_player_rare_creature_resource_multiplier() -> float:
+	return FactionCatalog.get_player_bonus_modifier(get_player_faction_id(), "rare_creature_resource_multiplier", 1.0)
+
+
+func get_player_dangerous_creature_reward_multiplier() -> float:
+	return FactionCatalog.get_player_bonus_modifier(get_player_faction_id(), "dangerous_creature_reward_multiplier", 1.0)
+
+
+func get_player_territory_bonus_faction() -> String:
+	return FactionCatalog.get_player_territory_bonus_faction(get_player_faction_id())
+
+
+func get_player_territory_bonus_amount() -> int:
+	return FactionCatalog.get_player_territory_bonus_amount(get_player_faction_id())
+
+
 func get_zone_control(zone_id_or_name: String) -> Dictionary:
 	var territory_system: Node = _get_territory_control_system()
 	if territory_system != null and territory_system.has_method("get_zone_control"):
