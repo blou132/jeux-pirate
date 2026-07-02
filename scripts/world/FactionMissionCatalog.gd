@@ -22,6 +22,14 @@ const MISSION_IDS: Array[String] = [
 	"abyss_collect_relics",
 ]
 
+const MISSION_IDS_BY_FACTION: Dictionary = {
+	FactionCatalog.FACTION_PIRATES: ["pirates_plunder_ships", "pirates_hidden_routes"],
+	FactionCatalog.FACTION_NAVY: ["navy_secure_waters", "navy_protect_routes"],
+	FactionCatalog.FACTION_MERCHANTS: ["merchants_trade_run", "merchants_market_profit"],
+	FactionCatalog.FACTION_SMUGGLERS: ["smugglers_rare_cargo", "smugglers_contested_cache"],
+	FactionCatalog.FACTION_ABYSS_CULT: ["abyss_hunt_creatures", "abyss_collect_relics"],
+}
+
 const MISSIONS: Dictionary = {
 	"pirates_plunder_ships": {
 		"id": "pirates_plunder_ships",
@@ -181,6 +189,9 @@ static func get_mission_ids() -> Array[String]:
 
 
 static func get_mission_ids_for_faction(faction_id: String) -> Array[String]:
+	if MISSION_IDS_BY_FACTION.has(faction_id):
+		return _get_string_array(MISSION_IDS_BY_FACTION[faction_id])
+
 	var ids: Array[String] = []
 	for mission_id in MISSION_IDS:
 		if get_mission_faction_id(mission_id) == faction_id:
@@ -261,3 +272,16 @@ static func get_objective_label(objective_type: String) -> String:
 			return "ressources rares"
 
 	return "objectifs"
+
+
+static func _get_string_array(raw_value: Variant) -> Array[String]:
+	var values: Array[String] = []
+	if not (raw_value is Array):
+		return values
+
+	for raw_item in raw_value:
+		var item: String = String(raw_item)
+		if not item.is_empty():
+			values.append(item)
+
+	return values
