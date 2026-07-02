@@ -1410,11 +1410,11 @@ func _on_join_faction_pressed() -> void:
 		return
 
 	if _is_player_faction_locked(game_state):
+		var lock_message: String = "Impossible de changer de faction dans cette partie"
 		if game_state.has_method("get_player_faction_lock_message"):
-			status_label.text = String(game_state.call("get_player_faction_lock_message"))
-		else:
-			status_label.text = "Impossible de changer de faction dans cette partie"
-		_show_faction_feedback("Impossible de changer de faction dans cette partie")
+			lock_message = String(game_state.call("get_player_faction_lock_message"))
+		status_label.text = lock_message
+		_show_faction_feedback(lock_message, 3.0)
 		_refresh_faction_rows()
 		return
 
@@ -1425,8 +1425,9 @@ func _on_join_faction_pressed() -> void:
 		_refresh_selected_faction()
 		return
 
-	status_label.text = String(game_state.call("lock_player_faction", _selected_faction_id))
-	_show_faction_feedback(status_label.text)
+	var result_message: String = String(game_state.call("lock_player_faction", _selected_faction_id))
+	status_label.text = result_message
+	_show_faction_feedback(result_message, 3.0)
 	_pending_faction_id = ""
 	_refresh_faction_rows()
 
@@ -1439,7 +1440,7 @@ func _on_neutral_faction_pressed() -> void:
 
 	if _is_player_faction_locked(game_state):
 		status_label.text = "Impossible de changer de faction dans cette partie"
-		_show_faction_feedback("Commencez une nouvelle partie pour choisir une autre voie")
+		_show_faction_feedback("Impossible de changer de faction dans cette partie\nCommencez une nouvelle partie pour choisir une autre voie", 3.0)
 		_refresh_faction_rows()
 		return
 
@@ -1483,10 +1484,10 @@ func _get_faction_confirmation_message(faction_id: String) -> String:
 	return "Confirmer l'allegeance aux %s ? Ce choix est definitif pour cette partie." % FactionCatalog.get_player_faction_name(faction_id)
 
 
-func _show_faction_feedback(message: String) -> void:
+func _show_faction_feedback(message: String, duration: float = 2.0) -> void:
 	var hud: Node = get_tree().get_first_node_in_group("hud")
 	if hud != null and hud.has_method("show_temporary_context_message"):
-		hud.call("show_temporary_context_message", message, 2.0)
+		hud.call("show_temporary_context_message", message, duration)
 
 
 func _on_mission_selected(index: int) -> void:
