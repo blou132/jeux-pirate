@@ -166,6 +166,7 @@ func _pick_creature_config(zone_id: String) -> Dictionary:
 		var weight: int = MarineCreatureCatalog.get_spawn_weight(creature_id, normalized_zone_id)
 		if weight <= 0 and normalized_zone_id != DangerZoneCatalog.ZONE_SAFE:
 			weight = MarineCreatureCatalog.get_spawn_weight(creature_id, DangerZoneCatalog.ZONE_SAFE)
+		weight = _apply_territory_creature_weight(weight, creature_id, normalized_zone_id)
 		for i in range(weight):
 			weighted_creature_ids.append(creature_id)
 
@@ -223,14 +224,17 @@ func _get_current_danger_zone_id() -> String:
 func _get_target_creature_count() -> int:
 	var zone_id: String = _get_current_danger_zone_id()
 	var density: float = DangerZoneCatalog.get_marine_creature_density(zone_id)
-	var target_count: int = roundi(float(max_creatures) * density)
+	var territory_multiplier: float = _get_marine_creature_spawn_multiplier(zone_id)
+	var target_count: int = roundi(float(max_creatures) * density * territory_multiplier)
 	return clampi(target_count, 2, 12)
 
 
 func _get_respawn_delay() -> float:
 	var zone_id: String = _get_current_danger_zone_id()
 	var density: float = DangerZoneCatalog.get_marine_creature_density(zone_id)
-	return clampf(respawn_delay / maxf(0.6, density), 2.5, respawn_delay * 1.4)
+	var territory_multiplier: float = _get_marine_creature_spawn_multiplier(zone_id)
+	var spawn_pressure: float = density * territory_multiplier
+	return clampf(respawn_delay / maxf(0.6, spawn_pressure), 2.5, respawn_delay * 1.4)
 
 
 func _get_spawn_point_zone(spawn_point: Marker3D) -> String:
@@ -266,6 +270,30 @@ func _get_spawn_point_weight(spawn_point: Marker3D) -> int:
 		return 2
 
 	return 1
+
+
+func _apply_territory_creature_weight(base_weight: int, creature_id: String, zone_id_or_name: String) -> int:
+	if base_weight <= 0:
+		return 0
+
+	var multiplier: float = _get_creature_spawn_weight_multiplier(zone_id_or_name, creature_id)
+	return maxi(1, roundi(float(base_weight) * multiplier))
+
+
+func _get_marine_creature_spawn_multiplier(zone_id_or_name: String) -> float:
+	var game_state: Node = get_node_or_null("/root/GameState")
+	if game_state != null and game_state.has_method("get_marine_creature_spawn_multiplier"):
+		return clampf(float(game_state.call("get_marine_creature_spawn_multiplier", zone_id_or_name)), 0.65, 1.45)
+
+	return 1.0
+
+
+func _get_creature_spawn_weight_multiplier(zone_id_or_name: String, creature_id: String) -> float:
+	var game_state: Node = get_node_or_null("/root/GameState")
+	if game_state != null and game_state.has_method("get_creature_spawn_weight_multiplier"):
+		return clampf(float(game_state.call("get_creature_spawn_weight_multiplier", zone_id_or_name, creature_id)), 0.70, 1.55)
+
+	return 1.0
 
 
 func _debug_spawn(message: String) -> void:
