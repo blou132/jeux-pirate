@@ -391,6 +391,10 @@ func _connect_game_state() -> void:
 	if _game_state.has_signal("territory_control_changed") and not _game_state.is_connected("territory_control_changed", territory_callback):
 		_game_state.connect("territory_control_changed", territory_callback)
 
+	var territory_dominant_callback: Callable = Callable(self, "_on_territory_dominant_faction_changed")
+	if _game_state.has_signal("territory_dominant_faction_changed") and not _game_state.is_connected("territory_dominant_faction_changed", territory_dominant_callback):
+		_game_state.connect("territory_dominant_faction_changed", territory_dominant_callback)
+
 	_refresh_player_ship_label()
 	_refresh_cargo_from_game_state()
 	_refresh_exploration_progress_from_game_state()
@@ -425,6 +429,13 @@ func _on_territory_control_changed(zone_id: String, control: Dictionary) -> void
 		return
 
 	_refresh_territory_labels(zone_id, control)
+
+
+func _on_territory_dominant_faction_changed(zone_id: String, _faction_id: String, _faction_name: String, message: String) -> void:
+	if not _is_current_territory_zone(zone_id):
+		return
+
+	show_zone_notification(message, 3.0)
 
 
 func _refresh_territory_control_from_game_state() -> void:
