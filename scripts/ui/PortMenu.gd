@@ -48,6 +48,13 @@ const REPAIR_HEALTH_PER_WOOD := 5
 @onready var mission_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/MissionsContainer/MissionStatusLabel
 @onready var accept_mission_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/MissionsContainer/AcceptMissionButton
 @onready var claim_mission_reward_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/MissionsContainer/ClaimMissionRewardButton
+@onready var faction_missions_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionMissionsButton
+@onready var faction_missions_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionMissionsContainer
+@onready var faction_missions_intro_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionMissionsContainer/FactionMissionsIntroLabel
+@onready var faction_mission_list: ItemList = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionMissionsContainer/FactionMissionList
+@onready var faction_mission_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionMissionsContainer/FactionMissionStatusLabel
+@onready var accept_faction_mission_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionMissionsContainer/AcceptFactionMissionButton
+@onready var claim_faction_mission_reward_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionMissionsContainer/ClaimFactionMissionRewardButton
 @onready var pirate_status_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/PirateStatusButton
 @onready var pirate_status_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/PirateStatusContainer
 @onready var pirate_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/PirateStatusContainer/PirateStatusLabel
@@ -69,6 +76,8 @@ var _active_port_id: String = PortCatalog.STARTING_PORT_ID
 var _port_ids: Array[String] = []
 var _mission_ids: Array[String] = []
 var _selected_mission_id: String = ""
+var _faction_mission_ids: Array[String] = []
+var _selected_faction_mission_id: String = ""
 var _ship_ids: Array[String] = []
 var _selected_ship_id: String = ""
 var _trade_good_ids: Array[String] = []
@@ -86,6 +95,7 @@ func _ready() -> void:
 	shipyard_container.visible = false
 	trade_container.visible = false
 	missions_container.visible = false
+	faction_missions_container.visible = false
 	pirate_status_container.visible = false
 	faction_container.visible = false
 	ports_button.pressed.connect(_on_ports_pressed)
@@ -108,6 +118,10 @@ func _ready() -> void:
 	mission_list.item_selected.connect(_on_mission_selected)
 	accept_mission_button.pressed.connect(_on_accept_mission_pressed)
 	claim_mission_reward_button.pressed.connect(_on_claim_mission_reward_pressed)
+	faction_missions_button.pressed.connect(_on_faction_missions_pressed)
+	faction_mission_list.item_selected.connect(_on_faction_mission_selected)
+	accept_faction_mission_button.pressed.connect(_on_accept_faction_mission_pressed)
+	claim_faction_mission_reward_button.pressed.connect(_on_claim_faction_mission_reward_pressed)
 	pirate_status_button.pressed.connect(_on_pirate_status_pressed)
 	faction_button.pressed.connect(_on_faction_pressed)
 	faction_list.item_selected.connect(_on_faction_selected)
@@ -137,6 +151,7 @@ func open(player: Node, port: Node = null) -> void:
 	shipyard_container.visible = false
 	trade_container.visible = false
 	missions_container.visible = false
+	faction_missions_container.visible = false
 	pirate_status_container.visible = false
 	faction_container.visible = false
 	_reset_scroll()
@@ -149,6 +164,7 @@ func open(player: Node, port: Node = null) -> void:
 	_refresh_shipyard_rows()
 	_refresh_trade_rows()
 	_refresh_mission_rows()
+	_refresh_faction_mission_rows()
 	_refresh_pirate_status_panel()
 	_refresh_faction_rows()
 	root_control.visible = true
@@ -217,6 +233,7 @@ func _on_ports_pressed() -> void:
 		shipyard_container.visible = false
 		trade_container.visible = false
 		missions_container.visible = false
+		faction_missions_container.visible = false
 		pirate_status_container.visible = false
 		faction_container.visible = false
 		status_label.text = "Choisis un port"
@@ -271,6 +288,8 @@ func _refresh_after_port_change() -> void:
 		trade_container.visible = false
 	if missions_container.visible and not _is_service_available(PortCatalog.SERVICE_MISSIONS):
 		missions_container.visible = false
+	if faction_missions_container.visible and not _is_service_available(PortCatalog.SERVICE_MISSIONS):
+		faction_missions_container.visible = false
 
 	_refresh_repair_button()
 	_refresh_ally_repair_button()
@@ -279,6 +298,7 @@ func _refresh_after_port_change() -> void:
 	_refresh_shipyard_rows()
 	_refresh_trade_rows()
 	_refresh_mission_rows()
+	_refresh_faction_mission_rows()
 
 
 func _get_port_index(port_id: String) -> int:
@@ -414,6 +434,7 @@ func _on_upgrades_pressed() -> void:
 		shipyard_container.visible = false
 		trade_container.visible = false
 		missions_container.visible = false
+		faction_missions_container.visible = false
 		pirate_status_container.visible = false
 		faction_container.visible = false
 		status_label.text = "Choisis une amélioration"
@@ -728,6 +749,7 @@ func _on_shipyard_pressed() -> void:
 		upgrades_container.visible = false
 		trade_container.visible = false
 		missions_container.visible = false
+		faction_missions_container.visible = false
 		pirate_status_container.visible = false
 		faction_container.visible = false
 		status_label.text = "Chantier naval"
@@ -968,6 +990,7 @@ func _on_trade_pressed() -> void:
 		upgrades_container.visible = false
 		shipyard_container.visible = false
 		missions_container.visible = false
+		faction_missions_container.visible = false
 		pirate_status_container.visible = false
 		faction_container.visible = false
 		status_label.text = "Commerce"
@@ -1218,11 +1241,34 @@ func _on_missions_pressed() -> void:
 		upgrades_container.visible = false
 		shipyard_container.visible = false
 		trade_container.visible = false
+		faction_missions_container.visible = false
 		pirate_status_container.visible = false
 		faction_container.visible = false
 		status_label.text = "Choisis une mission"
 		_reset_scroll()
 		_refresh_mission_rows()
+	else:
+		status_label.text = ""
+
+
+func _on_faction_missions_pressed() -> void:
+	if not _is_service_available(PortCatalog.SERVICE_MISSIONS):
+		faction_missions_container.visible = false
+		status_label.text = "Missions de faction indisponibles dans ce port"
+		return
+
+	faction_missions_container.visible = not faction_missions_container.visible
+	if faction_missions_container.visible:
+		ports_container.visible = false
+		upgrades_container.visible = false
+		shipyard_container.visible = false
+		trade_container.visible = false
+		missions_container.visible = false
+		pirate_status_container.visible = false
+		faction_container.visible = false
+		status_label.text = "Missions de faction"
+		_reset_scroll()
+		_refresh_faction_mission_rows()
 	else:
 		status_label.text = ""
 
@@ -1235,6 +1281,7 @@ func _on_pirate_status_pressed() -> void:
 		shipyard_container.visible = false
 		trade_container.visible = false
 		missions_container.visible = false
+		faction_missions_container.visible = false
 		faction_container.visible = false
 		status_label.text = "Statut pirate"
 		_reset_scroll()
@@ -1282,6 +1329,7 @@ func _on_faction_pressed() -> void:
 		shipyard_container.visible = false
 		trade_container.visible = false
 		missions_container.visible = false
+		faction_missions_container.visible = false
 		pirate_status_container.visible = false
 		_pending_faction_id = ""
 		status_label.text = "Choisis une voie"
@@ -1664,6 +1712,179 @@ func _get_mission_index(quest_id: String) -> int:
 
 	for index in range(_mission_ids.size()):
 		if _mission_ids[index] == quest_id:
+			return index
+
+	return -1
+
+
+func _refresh_faction_mission_rows() -> void:
+	faction_mission_list.clear()
+	_faction_mission_ids.clear()
+
+	if not _is_service_available(PortCatalog.SERVICE_MISSIONS):
+		faction_missions_button.text = "Missions de faction indisponibles"
+		faction_missions_button.disabled = true
+		faction_missions_intro_label.text = "Aucune mission de faction disponible dans ce port."
+		faction_mission_status_label.text = "Change de port pour trouver des contrats de faction."
+		accept_faction_mission_button.disabled = true
+		claim_faction_mission_reward_button.disabled = true
+		return
+
+	faction_missions_button.text = "Missions de faction"
+	faction_missions_button.disabled = false
+	var game_state: Node = _get_game_state()
+	if game_state == null or not game_state.has_method("get_faction_mission_views"):
+		faction_missions_intro_label.text = "Missions de faction indisponibles."
+		faction_mission_status_label.text = "Systeme de faction indisponible."
+		accept_faction_mission_button.disabled = true
+		claim_faction_mission_reward_button.disabled = true
+		return
+
+	var faction_name: String = "Neutre"
+	if game_state.has_method("get_player_faction_name"):
+		faction_name = String(game_state.call("get_player_faction_name"))
+	var faction_locked: bool = false
+	if game_state.has_method("is_player_faction_locked"):
+		faction_locked = bool(game_state.call("is_player_faction_locked"))
+	var is_neutral: bool = true
+	if game_state.has_method("is_player_neutral"):
+		is_neutral = bool(game_state.call("is_player_neutral"))
+
+	if not faction_locked or is_neutral:
+		_selected_faction_mission_id = ""
+		faction_missions_intro_label.text = "Vous etes Neutre.\nChoisissez une voie de faction pour acceder aux missions de faction."
+		faction_mission_status_label.text = "Aucune mission de faction disponible tant que l'allegeance n'est pas verrouillee."
+		accept_faction_mission_button.disabled = true
+		claim_faction_mission_reward_button.disabled = true
+		return
+
+	faction_missions_intro_label.text = "Voie : %s\nUne seule mission de faction active a la fois." % faction_name
+	var raw_views: Variant = game_state.call("get_faction_mission_views")
+	if raw_views is Array:
+		for raw_view in raw_views:
+			if not (raw_view is Dictionary):
+				continue
+
+			var view: Dictionary = raw_view
+			var mission_id: String = String(view.get("id", ""))
+			if mission_id.is_empty():
+				continue
+
+			_faction_mission_ids.append(mission_id)
+			faction_mission_list.add_item(_build_faction_mission_row_text(view))
+
+	if _faction_mission_ids.is_empty():
+		_selected_faction_mission_id = ""
+		faction_mission_status_label.text = "Aucune mission de faction disponible pour cette voie."
+		accept_faction_mission_button.disabled = true
+		claim_faction_mission_reward_button.disabled = true
+		return
+
+	var selected_index: int = _get_faction_mission_index(_selected_faction_mission_id)
+	if selected_index < 0:
+		selected_index = 0
+		_selected_faction_mission_id = _faction_mission_ids[selected_index]
+
+	faction_mission_list.select(selected_index)
+	_refresh_selected_faction_mission()
+
+
+func _refresh_selected_faction_mission() -> void:
+	var game_state: Node = _get_game_state()
+	if game_state == null or not game_state.has_method("get_faction_mission_view") or _selected_faction_mission_id.is_empty():
+		faction_mission_status_label.text = "Mission de faction indisponible."
+		accept_faction_mission_button.disabled = true
+		claim_faction_mission_reward_button.disabled = true
+		return
+
+	var raw_view: Variant = game_state.call("get_faction_mission_view", _selected_faction_mission_id)
+	if not (raw_view is Dictionary):
+		faction_mission_status_label.text = "Mission de faction inconnue."
+		accept_faction_mission_button.disabled = true
+		claim_faction_mission_reward_button.disabled = true
+		return
+
+	var view: Dictionary = raw_view
+	var lines: Array[String] = []
+	lines.append("Mission : %s" % String(view.get("name", "Mission")))
+	lines.append(String(view.get("description", "")))
+	lines.append("Objectif : %s" % String(view.get("objective_text", "")))
+	lines.append("Progression : %s" % String(view.get("progress_text", "")))
+	lines.append("Zone conseillee : %s" % String(view.get("recommended_zone", "Toutes zones")))
+	lines.append("Difficulte : %s" % String(view.get("difficulty", "normale")))
+	lines.append("Recompense : %s" % String(view.get("reward_text", "")))
+	lines.append("Statut : %s" % String(view.get("status_text", "")))
+	faction_mission_status_label.text = "\n".join(lines)
+	accept_faction_mission_button.disabled = not bool(view.get("can_accept", false))
+	claim_faction_mission_reward_button.disabled = not bool(view.get("can_claim", false))
+
+
+func _build_faction_mission_row_text(view: Dictionary) -> String:
+	var name: String = String(view.get("name", "Mission"))
+	var progress: String = String(view.get("short_progress_text", String(view.get("progress_text", ""))))
+	var status: String = String(view.get("status_text", "Disponible"))
+	if bool(view.get("active", false)):
+		return "[Active] %s - %s" % [name, progress]
+	if bool(view.get("completed", false)) and not bool(view.get("reward_claimed", false)):
+		return "[Terminee] %s - recompense a recuperer" % name
+	if bool(view.get("reward_claimed", false)):
+		return "[Recuperee] %s" % name
+
+	return "[Disponible] %s - %s" % [name, status]
+
+
+func _on_faction_mission_selected(index: int) -> void:
+	if index < 0 or index >= _faction_mission_ids.size():
+		return
+
+	_selected_faction_mission_id = _faction_mission_ids[index]
+	_refresh_selected_faction_mission()
+
+
+func _on_accept_faction_mission_pressed() -> void:
+	if not _is_service_available(PortCatalog.SERVICE_MISSIONS):
+		status_label.text = "Missions de faction indisponibles dans ce port"
+		_refresh_faction_mission_rows()
+		return
+
+	var game_state: Node = _get_game_state()
+	if game_state == null or not game_state.has_method("accept_faction_mission"):
+		status_label.text = "Missions de faction indisponibles"
+		return
+
+	status_label.text = String(game_state.call("accept_faction_mission", _selected_faction_mission_id))
+	_show_faction_mission_feedback(status_label.text)
+	_refresh_faction_mission_rows()
+
+
+func _on_claim_faction_mission_reward_pressed() -> void:
+	if not _is_service_available(PortCatalog.SERVICE_MISSIONS):
+		status_label.text = "Missions de faction indisponibles dans ce port"
+		_refresh_faction_mission_rows()
+		return
+
+	var game_state: Node = _get_game_state()
+	if game_state == null or not game_state.has_method("claim_faction_mission_reward"):
+		status_label.text = "Missions de faction indisponibles"
+		return
+
+	status_label.text = String(game_state.call("claim_faction_mission_reward"))
+	_show_faction_mission_feedback(status_label.text, 2.5)
+	_refresh_faction_mission_rows()
+
+
+func _show_faction_mission_feedback(message: String, duration: float = 2.0) -> void:
+	var hud: Node = get_tree().get_first_node_in_group("hud")
+	if hud != null and hud.has_method("show_temporary_context_message"):
+		hud.call("show_temporary_context_message", message, duration)
+
+
+func _get_faction_mission_index(mission_id: String) -> int:
+	if mission_id.is_empty():
+		return -1
+
+	for index in range(_faction_mission_ids.size()):
+		if _faction_mission_ids[index] == mission_id:
 			return index
 
 	return -1

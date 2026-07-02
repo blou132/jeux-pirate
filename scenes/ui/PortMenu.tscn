@@ -277,6 +277,40 @@ custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
 text = "Récupérer la récompense"
 
+[node name="FactionMissionsButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
+custom_minimum_size = Vector2(0, 34)
+layout_mode = 2
+text = "Missions de faction"
+
+[node name="FactionMissionsContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="FactionMissionsIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionMissionsContainer"]
+layout_mode = 2
+text = "Missions de faction"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="FactionMissionList" type="ItemList" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionMissionsContainer"]
+custom_minimum_size = Vector2(0, 110)
+layout_mode = 2
+
+[node name="FactionMissionStatusLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionMissionsContainer"]
+layout_mode = 2
+text = "Mission de faction : aucune"
+autowrap_mode = 3
+
+[node name="AcceptFactionMissionButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionMissionsContainer"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "Accepter"
+
+[node name="ClaimFactionMissionRewardButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionMissionsContainer"]
+custom_minimum_size = Vector2(0, 32)
+layout_mode = 2
+text = "Recuperer la recompense"
+
 [node name="PirateStatusButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
 custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
