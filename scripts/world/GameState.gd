@@ -658,14 +658,22 @@ func claim_faction_mission_reward() -> String:
 
 func get_faction_mission_debug_summary() -> String:
 	var active_name: String = "Aucune"
+	var active_status: String = "Aucune"
+	var pending_reward: String = "Aucune"
 	if not active_faction_mission_id.is_empty() and FactionMissionCatalog.has_mission(active_faction_mission_id):
 		active_name = FactionMissionCatalog.get_mission_name(active_faction_mission_id)
+		active_status = _build_faction_mission_status_text(active_faction_mission_id)
+		var state: Dictionary = _get_faction_mission_state(active_faction_mission_id)
+		if bool(state.get("completed", false)) and not bool(state.get("reward_claimed", false)):
+			pending_reward = _build_faction_mission_reward_text(active_faction_mission_id)
 
-	return "Faction joueur : %s\nMission active : %s\nProgression : %s\nDernier objectif : %s\nDerniere recompense : %s\nDerniere influence : %s" % [
+	return "Faction joueur : %s\nMission active : %s\nStatut actif : %s\nProgression : %s\nDernier objectif : %s\nRecompense en attente : %s\nDerniere recompense : %s\nDerniere influence : %s" % [
 		get_player_faction_name(),
 		active_name,
+		active_status,
 		_build_faction_mission_progress_text(active_faction_mission_id),
 		_last_faction_mission_objective,
+		pending_reward,
 		_last_faction_mission_reward,
 		_last_faction_mission_influence,
 	]
