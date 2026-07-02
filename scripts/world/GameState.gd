@@ -141,6 +141,8 @@ func record_enemy_destroyed() -> void:
 	danger_level = 1 + int(enemies_defeated / ENEMIES_PER_DANGER_LEVEL)
 	danger_changed.emit(danger_level, enemies_defeated)
 	_record_enemy_destroyed_territory_change()
+	update_faction_mission_progress(FactionMissionCatalog.OBJECTIVE_DESTROY_SHIP, 1)
+	update_faction_mission_progress(FactionMissionCatalog.OBJECTIVE_DESTROY_PIRATE, 1)
 	var quest_system := _get_quest_system()
 	if quest_system != null and quest_system.has_method("record_enemy_destroyed"):
 		quest_system.record_enemy_destroyed()
@@ -184,6 +186,7 @@ func mark_exploration_site_explored(site_id: String, treasure_id: String = "", z
 
 	exploration_progress_changed.emit(get_discovered_treasure_count(), get_explored_site_count())
 	_record_exploration_territory_change(zone_id_or_name, treasure_id)
+	update_faction_mission_progress(FactionMissionCatalog.OBJECTIVE_EXPLORE_SITE, 1)
 	return true
 
 
@@ -196,6 +199,7 @@ func reset_exploration_sites() -> void:
 func record_marine_creature_defeated(creature_id: String) -> void:
 	marine_creatures_defeated += 1
 	_record_marine_creature_territory_change(creature_id)
+	update_faction_mission_progress(FactionMissionCatalog.OBJECTIVE_DEFEAT_MARINE_CREATURE, 1)
 	_emit_creature_resources_changed()
 
 
@@ -206,6 +210,7 @@ func add_creature_resource(resource_id: String, amount: int) -> void:
 	var current_amount: int = maxi(0, int(creature_resources.get(resource_id, 0)))
 	creature_resources[resource_id] = current_amount + amount
 	_apply_player_faction_territory_bonus(get_current_danger_zone_id_safe(), "rare_creature_resource")
+	update_faction_mission_progress(FactionMissionCatalog.OBJECTIVE_COLLECT_RARE_RESOURCE, amount)
 	_emit_creature_resources_changed()
 
 
@@ -985,6 +990,7 @@ func sell_trade_good(item_id: String, amount: int = 1) -> String:
 
 	var total_price: int = _get_trade_sell_price(item_id) * amount
 	add_resources(total_price, 0)
+	update_faction_mission_progress(FactionMissionCatalog.OBJECTIVE_TRADE_PROFIT, total_price)
 	return "Marchandise vendue : %s x%d" % [CargoCatalog.get_good_name(item_id), amount]
 
 
@@ -999,6 +1005,7 @@ func _get_trade_sell_price(item_id: String) -> int:
 func record_trade_completed(zone_id_or_name: String, amount: int = 1) -> void:
 	var influence_amount: int = clampi(amount, 1, 2)
 	var zone_id: String = DangerZoneCatalog.normalize_zone_id(zone_id_or_name)
+	update_faction_mission_progress(FactionMissionCatalog.OBJECTIVE_TRADE_TRANSACTION, amount)
 	add_faction_influence(
 		zone_id,
 		FactionCatalog.FACTION_MERCHANTS,
