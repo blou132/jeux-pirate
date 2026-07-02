@@ -503,16 +503,19 @@ func _refresh_territory_labels(zone_id: String, control: Dictionary) -> void:
 
 func _refresh_player_faction_from_game_state() -> void:
 	if _game_state == null:
-		compact_player_faction_label.text = "Faction: Neutre"
-		player_faction_label.text = "Allegeance joueur : Neutre\nBonus : aucun\nControle local : inconnu"
+		compact_player_faction_label.text = "Allegeance: Neutre\nChoix ouvert"
+		player_faction_label.text = "Voie du joueur : Neutre\nStatut : choix non effectue\nBonus : aucun\nControle local : inconnu"
 		return
 
 	var faction_name: String = "Neutre"
 	var bonus_summary: String = "Aucun bonus, aucune penalite."
+	var lock_status: String = "choix non effectue"
 	if _game_state.has_method("get_player_faction_name"):
 		faction_name = String(_game_state.call("get_player_faction_name"))
 	if _game_state.has_method("get_player_faction_bonus_summary"):
 		bonus_summary = String(_game_state.call("get_player_faction_bonus_summary"))
+	if _game_state.has_method("get_player_faction_lock_status"):
+		lock_status = String(_game_state.call("get_player_faction_lock_status"))
 
 	var local_control_name: String = "inconnu"
 	if _game_state.has_method("get_current_zone_control"):
@@ -521,9 +524,17 @@ func _refresh_player_faction_from_game_state() -> void:
 			var control: Dictionary = control_value
 			local_control_name = String(control.get("dominant_faction_name", "inconnu"))
 
-	compact_player_faction_label.text = "Faction: %s" % _get_compact_player_faction_label(faction_name)
-	player_faction_label.text = "Allegeance joueur : %s\nBonus : %s\nControle local : %s" % [
+	var compact_lock_status: String = "Choix ouvert"
+	if _game_state.has_method("is_player_faction_locked") and bool(_game_state.call("is_player_faction_locked")):
+		compact_lock_status = "Voie verrouillee"
+
+	compact_player_faction_label.text = "Allegeance: %s\n%s" % [
+		_get_compact_player_faction_label(faction_name),
+		compact_lock_status,
+	]
+	player_faction_label.text = "Voie du joueur : %s\nStatut : %s\nBonus : %s\nControle local : %s" % [
 		faction_name,
+		lock_status,
 		bonus_summary,
 		local_control_name,
 	]

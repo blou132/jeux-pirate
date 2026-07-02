@@ -93,7 +93,8 @@ clip_text = true
 
 [node name="CompactPlayerFactionLabel" type="Label" parent="HUDRoot/CompactSailingPanel/CompactRow"]
 layout_mode = 2
-text = "Faction: Neutre"
+text = "Allegeance: Neutre
+Choix ouvert"
 clip_text = true
 
 [node name="CompactFleetLabel" type="Label" parent="HUDRoot/CompactSailingPanel/CompactRow"]
@@ -200,9 +201,10 @@ Dominant : Marine royale"
 autowrap_mode = 3
 
 [node name="PlayerFactionLabel" type="Label" parent="HUDRoot/LeftStatusPanel/LeftVBox"]
-custom_minimum_size = Vector2(0, 74)
+custom_minimum_size = Vector2(0, 96)
 layout_mode = 2
-text = "Allegeance joueur : Neutre
+text = "Voie du joueur : Neutre
+Statut : choix non effectue
 Bonus : aucun
 Controle local : Marine royale"
 autowrap_mode = 3
