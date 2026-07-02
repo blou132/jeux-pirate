@@ -1,0 +1,97 @@
+[gd_scene load_steps=3 format=3 uid="uid://faction_choice_screen_v01"]
+
+[ext_resource type="Script" path="res://scripts/ui/FactionChoiceScreen.gd" id="1_choice"]
+[ext_resource type="Theme" path="res://scenes/ui/PirateTheme.tres" id="2_theme"]
+
+[node name="FactionChoiceScreen" type="CanvasLayer"]
+layer = 40
+script = ExtResource("1_choice")
+
+[node name="Root" type="Control" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_theme")
+
+[node name="Backdrop" type="ColorRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.008, 0.006, 0.005, 0.88)
+
+[node name="CenterContainer" type="CenterContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="Root/CenterContainer"]
+custom_minimum_size = Vector2(1180, 660)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Factions du monde"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 28
+
+[node name="SubtitleLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Choisissez votre alliance... ou votre ennemi"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 255)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="ContentContainer" type="VBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CardsGrid" type="GridContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+columns = 5
+
+[node name="SelectedSummaryLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 92)
+layout_mode = 2
+text = "Selectionnez une faction."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="WarningLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 74)
+layout_mode = 2
+text = "Choisissez une voie. Le serment se confirme en deux etapes."
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="ActionRow" type="HBoxContainer" parent="Root/CenterContainer/PanelContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="PrepareButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ActionRow"]
+custom_minimum_size = Vector2(260, 42)
+layout_mode = 2
+text = "Preparer le serment"
+
+[node name="ConfirmButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ActionRow"]
+custom_minimum_size = Vector2(260, 42)
+layout_mode = 2
+text = "Confirmer definitivement"
