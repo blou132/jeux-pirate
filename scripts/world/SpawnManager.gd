@@ -214,6 +214,7 @@ func _pick_enemy_variant(danger_zone: String) -> Dictionary:
 	for config in variants:
 		var variant_id := String(config.get("id", ""))
 		var weight := _get_variant_weight(variant_id, danger_level, danger_zone)
+		weight = _apply_territory_variant_weight(weight, variant_id, danger_zone)
 		for i in range(weight):
 			weighted_variants.append(config)
 
@@ -348,14 +349,17 @@ func _get_current_danger_zone_id() -> String:
 func _get_target_enemy_count() -> int:
 	var zone_id: String = _get_current_danger_zone_id()
 	var density: float = DangerZoneCatalog.get_enemy_density(zone_id)
-	var target_count: int = roundi(float(max_enemies) * density)
+	var territory_multiplier: float = _get_pirate_spawn_multiplier(zone_id)
+	var target_count: int = roundi(float(max_enemies) * density * territory_multiplier)
 	return clampi(target_count, 1, 12)
 
 
 func _get_respawn_delay() -> float:
 	var zone_id: String = _get_current_danger_zone_id()
 	var density: float = DangerZoneCatalog.get_enemy_density(zone_id)
-	return clampf(respawn_delay / maxf(0.5, density), 2.5, respawn_delay * 1.5)
+	var territory_multiplier: float = _get_pirate_spawn_multiplier(zone_id)
+	var spawn_pressure: float = density * territory_multiplier
+	return clampf(respawn_delay / maxf(0.5, spawn_pressure), 2.5, respawn_delay * 1.5)
 
 
 func _get_spawn_point_zone(spawn_point: Marker3D) -> String:
@@ -440,6 +444,46 @@ func _get_variant_weight(variant_id: String, danger_level: int, danger_zone: Str
 					return 12 + danger_level
 
 	return 1
+
+
+func _apply_territory_variant_weight(base_weight: int, variant_id: String, zone_id_or_name: String) -> int:
+	if base_weight <= 0:
+		return 0
+
+	var dominant_faction: String = _get_zone_dominant_faction(zone_id_or_name)
+	var multiplier: float = 1.0
+	match dominant_faction:
+		FactionCatalog.FACTION_PIRATES:
+			multiplier = 1.20
+		FactionCatalog.FACTION_NAVY:
+			multiplier = 0.75
+		FactionCatalog.FACTION_MERCHANTS:
+			multiplier = 0.85
+		FactionCatalog.FACTION_SMUGGLERS:
+			if variant_id == "small_pirate":
+				multiplier = 1.10
+			else:
+				multiplier = 0.95
+		FactionCatalog.FACTION_ABYSS_CULT:
+			multiplier = 0.85
+
+	return maxi(1, roundi(float(base_weight) * multiplier))
+
+
+func _get_pirate_spawn_multiplier(zone_id_or_name: String) -> float:
+	var game_state: Node = get_node_or_null("/root/GameState")
+	if game_state != null and game_state.has_method("get_pirate_spawn_multiplier"):
+		return clampf(float(game_state.call("get_pirate_spawn_multiplier", zone_id_or_name)), 0.55, 1.40)
+
+	return 1.0
+
+
+func _get_zone_dominant_faction(zone_id_or_name: String) -> String:
+	var game_state: Node = get_node_or_null("/root/GameState")
+	if game_state != null and game_state.has_method("get_zone_dominant_faction"):
+		return String(game_state.call("get_zone_dominant_faction", zone_id_or_name))
+
+	return FactionCatalog.FACTION_PIRATES
 
 
 func _debug_spawn(message: String) -> void:
