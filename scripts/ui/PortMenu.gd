@@ -1370,6 +1370,8 @@ func _refresh_selected_faction() -> void:
 	var warning_line: String = "Ce choix est definitif pour cette partie."
 	if _selected_faction_id == FactionCatalog.FACTION_NEUTRAL:
 		warning_line = "Neutre est l'etat de depart : aucun bonus, aucune penalite."
+	elif _pending_faction_id == _selected_faction_id:
+		warning_line = "Confirmation en attente : cliquez sur Confirmer definitivement pour verrouiller cette voie."
 	if is_locked:
 		warning_line = "Impossible de changer de faction dans cette partie."
 
@@ -1418,7 +1420,7 @@ func _on_join_faction_pressed() -> void:
 
 	if _pending_faction_id != _selected_faction_id:
 		_pending_faction_id = _selected_faction_id
-		status_label.text = "Confirmer l'allegeance aux %s ? Ce choix est definitif pour cette partie." % FactionCatalog.get_player_faction_name(_selected_faction_id)
+		status_label.text = _get_faction_confirmation_message(_selected_faction_id)
 		_show_faction_feedback(status_label.text)
 		_refresh_selected_faction()
 		return
@@ -1475,6 +1477,10 @@ func _is_player_faction_locked(game_state: Node) -> bool:
 		return bool(game_state.call("is_player_faction_locked"))
 
 	return false
+
+
+func _get_faction_confirmation_message(faction_id: String) -> String:
+	return "Confirmer l'allegeance aux %s ? Ce choix est definitif pour cette partie." % FactionCatalog.get_player_faction_name(faction_id)
 
 
 func _show_faction_feedback(message: String) -> void:
