@@ -538,7 +538,7 @@ func _is_current_territory_zone(zone_id: String) -> bool:
 
 
 func _get_compact_faction_label(faction_id: String) -> String:
-	if faction_id.is_empty():
+	if faction_id.is_empty() or not FactionCatalog.has_faction(faction_id):
 		return "--"
 
 	return FactionCatalog.get_hud_label(faction_id)

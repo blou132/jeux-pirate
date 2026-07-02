@@ -297,6 +297,10 @@ func can_join_faction(faction_id: String) -> bool:
 	return FactionCatalog.has_player_faction(faction_id)
 
 
+func is_player_faction_valid() -> bool:
+	return FactionCatalog.has_player_faction(player_faction_id)
+
+
 func set_player_faction(faction_id: String) -> String:
 	if not can_join_faction(faction_id):
 		player_faction_id = FactionCatalog.FACTION_NEUTRAL

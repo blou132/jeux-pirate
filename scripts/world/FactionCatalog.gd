@@ -216,8 +216,11 @@ static func get_player_faction(faction_id: String) -> Dictionary:
 
 
 static func get_faction_name(faction_id: String) -> String:
+	if not has_faction(faction_id):
+		return "Inconnu"
+
 	var faction: Dictionary = get_faction(faction_id)
-	return String(faction.get("name", faction_id))
+	return String(faction.get("name", "Inconnu"))
 
 
 static func get_player_faction_name(faction_id: String) -> String:
@@ -226,6 +229,9 @@ static func get_player_faction_name(faction_id: String) -> String:
 
 
 static func get_hud_label(faction_id: String) -> String:
+	if not has_faction(faction_id):
+		return "Inconnu"
+
 	var faction: Dictionary = get_faction(faction_id)
 	return String(faction.get("hud_label", get_faction_name(faction_id)))
 
@@ -291,11 +297,17 @@ static func get_port_safety_label(faction_id: String) -> String:
 
 
 static func get_port_effect_text(faction_id: String) -> String:
+	if not has_faction(faction_id):
+		return "Controle territorial inconnu."
+
 	var faction: Dictionary = get_faction(faction_id)
 	return String(faction.get("port_effect", "Controle territorial sans effet special."))
 
 
 static func get_dominance_message(faction_id: String, zone_name: String) -> String:
+	if not has_faction(faction_id):
+		return "Le controle de %s devient incertain" % zone_name
+
 	var faction: Dictionary = get_faction(faction_id)
 	var template: String = String(faction.get("dominance_message", "%s controle %s"))
 	return template % zone_name
