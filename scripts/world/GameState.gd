@@ -9,6 +9,8 @@ signal owned_player_ships_changed(owned_ship_ids: Array[String])
 signal cargo_changed(cargo_items: Dictionary, used: int, capacity: int)
 signal exploration_progress_changed(discovered_treasures: int, explored_sites: int)
 signal creature_resources_changed(resources: Dictionary, creatures_defeated: int)
+signal territory_control_changed(zone_id: String, control: Dictionary)
+signal territory_dominant_faction_changed(zone_id: String, faction_id: String, faction_name: String, message: String)
 
 const ENEMIES_PER_DANGER_LEVEL := 3
 const STARTING_PLAYER_SHIP_ID := "barque"
@@ -35,6 +37,7 @@ func _ready() -> void:
 	_emit_cargo_changed()
 	_emit_current_danger_zone_changed()
 	_emit_creature_resources_changed()
+	call_deferred("_connect_territory_control_system")
 
 
 func add_resources(gold_amount: int, wood_amount: int) -> void:
@@ -241,6 +244,7 @@ func set_current_danger_zone(zone_id_or_name: String) -> bool:
 
 	current_danger_zone_id = normalized_zone_id
 	_emit_current_danger_zone_changed()
+	_emit_current_territory_control_changed()
 	return true
 
 
@@ -266,6 +270,156 @@ func get_current_danger_zone_level() -> int:
 
 func get_current_danger_reward_multiplier() -> float:
 	return DangerZoneCatalog.get_reward_multiplier(current_danger_zone_id)
+
+
+func get_zone_control(zone_id_or_name: String) -> Dictionary:
+	var territory_system: Node = _get_territory_control_system()
+	if territory_system != null and territory_system.has_method("get_zone_control"):
+		var control_value: Variant = territory_system.call("get_zone_control", zone_id_or_name)
+		if control_value is Dictionary:
+			var control: Dictionary = control_value
+			return control.duplicate(true)
+
+	return {}
+
+
+func get_current_zone_control() -> Dictionary:
+	return get_zone_control(current_danger_zone_id)
+
+
+func get_zone_dominant_faction(zone_id_or_name: String) -> String:
+	var territory_system: Node = _get_territory_control_system()
+	if territory_system != null and territory_system.has_method("get_zone_dominant_faction"):
+		return String(territory_system.call("get_zone_dominant_faction", zone_id_or_name))
+
+	return FactionCatalog.FACTION_NAVY
+
+
+func get_current_zone_dominant_faction() -> String:
+	return get_zone_dominant_faction(current_danger_zone_id)
+
+
+func get_faction_influence(zone_id_or_name: String, faction_id: String) -> int:
+	var territory_system: Node = _get_territory_control_system()
+	if territory_system != null and territory_system.has_method("get_faction_influence"):
+		return clampi(int(territory_system.call("get_faction_influence", zone_id_or_name, faction_id)), 0, 100)
+
+	return 0
+
+
+func add_faction_influence(zone_id_or_name: String, faction_id: String, amount: int, reason: String = "") -> Dictionary:
+	var territory_system: Node = _get_territory_control_system()
+	if territory_system != null and territory_system.has_method("add_faction_influence"):
+		var control_value: Variant = territory_system.call("add_faction_influence", zone_id_or_name, faction_id, amount, reason)
+		if control_value is Dictionary:
+			var control: Dictionary = control_value
+			return control.duplicate(true)
+
+	return get_zone_control(zone_id_or_name)
+
+
+func reduce_faction_influence(zone_id_or_name: String, faction_id: String, amount: int, reason: String = "") -> Dictionary:
+	var territory_system: Node = _get_territory_control_system()
+	if territory_system != null and territory_system.has_method("reduce_faction_influence"):
+		var control_value: Variant = territory_system.call("reduce_faction_influence", zone_id_or_name, faction_id, amount, reason)
+		if control_value is Dictionary:
+			var control: Dictionary = control_value
+			return control.duplicate(true)
+
+	return get_zone_control(zone_id_or_name)
+
+
+func normalize_zone_influence(zone_id_or_name: String) -> Dictionary:
+	var territory_system: Node = _get_territory_control_system()
+	if territory_system != null and territory_system.has_method("normalize_zone_influence"):
+		var control_value: Variant = territory_system.call("normalize_zone_influence", zone_id_or_name)
+		if control_value is Dictionary:
+			var control: Dictionary = control_value
+			return control.duplicate(true)
+
+	return get_zone_control(zone_id_or_name)
+
+
+func get_zone_control_lines(zone_id_or_name: String) -> Array[String]:
+	var territory_system: Node = _get_territory_control_system()
+	if territory_system != null and territory_system.has_method("get_zone_control_lines"):
+		var raw_lines: Variant = territory_system.call("get_zone_control_lines", zone_id_or_name)
+		if raw_lines is Array:
+			var lines: Array[String] = []
+			for raw_line in raw_lines:
+				lines.append(String(raw_line))
+			return lines
+
+	return []
+
+
+func get_zone_effect_lines(zone_id_or_name: String) -> Array[String]:
+	var territory_system: Node = _get_territory_control_system()
+	if territory_system != null and territory_system.has_method("get_zone_effect_lines"):
+		var raw_lines: Variant = territory_system.call("get_zone_effect_lines", zone_id_or_name)
+		if raw_lines is Array:
+			var lines: Array[String] = []
+			for raw_line in raw_lines:
+				lines.append(String(raw_line))
+			return lines
+
+	return []
+
+
+func get_current_zone_control_lines() -> Array[String]:
+	return get_zone_control_lines(current_danger_zone_id)
+
+
+func get_current_zone_effect_lines() -> Array[String]:
+	return get_zone_effect_lines(current_danger_zone_id)
+
+
+func get_compact_zone_control_text(zone_id_or_name: String) -> String:
+	var territory_system: Node = _get_territory_control_system()
+	if territory_system != null and territory_system.has_method("get_compact_zone_control_text"):
+		return String(territory_system.call("get_compact_zone_control_text", zone_id_or_name))
+
+	return "Controle: %s" % FactionCatalog.get_hud_label(get_zone_dominant_faction(zone_id_or_name))
+
+
+func get_pirate_spawn_multiplier(zone_id_or_name: String) -> float:
+	var territory_system: Node = _get_territory_control_system()
+	if territory_system != null and territory_system.has_method("get_pirate_spawn_multiplier"):
+		return clampf(float(territory_system.call("get_pirate_spawn_multiplier", zone_id_or_name)), 0.55, 1.40)
+
+	return 1.0
+
+
+func get_marine_creature_spawn_multiplier(zone_id_or_name: String) -> float:
+	var territory_system: Node = _get_territory_control_system()
+	if territory_system != null and territory_system.has_method("get_marine_creature_spawn_multiplier"):
+		return clampf(float(territory_system.call("get_marine_creature_spawn_multiplier", zone_id_or_name)), 0.65, 1.45)
+
+	return 1.0
+
+
+func get_creature_spawn_weight_multiplier(zone_id_or_name: String, creature_id: String) -> float:
+	var territory_system: Node = _get_territory_control_system()
+	if territory_system != null and territory_system.has_method("get_creature_spawn_weight_multiplier"):
+		return clampf(float(territory_system.call("get_creature_spawn_weight_multiplier", zone_id_or_name, creature_id)), 0.70, 1.55)
+
+	return 1.0
+
+
+func get_trade_sell_multiplier(zone_id_or_name: String) -> float:
+	var territory_system: Node = _get_territory_control_system()
+	if territory_system != null and territory_system.has_method("get_trade_sell_multiplier"):
+		return clampf(float(territory_system.call("get_trade_sell_multiplier", zone_id_or_name)), 0.85, 1.15)
+
+	return 1.0
+
+
+func get_repair_cost_multiplier(zone_id_or_name: String) -> float:
+	var territory_system: Node = _get_territory_control_system()
+	if territory_system != null and territory_system.has_method("get_repair_cost_multiplier"):
+		return clampf(float(territory_system.call("get_repair_cost_multiplier", zone_id_or_name)), 0.85, 1.20)
+
+	return 1.0
 
 
 func get_gold() -> int:
@@ -532,6 +686,42 @@ func equip_player_ship(ship_id: String) -> String:
 
 func _get_quest_system() -> Node:
 	return get_node_or_null("/root/QuestSystem")
+
+
+func _get_territory_control_system() -> Node:
+	return get_node_or_null("/root/TerritoryControlSystem")
+
+
+func _connect_territory_control_system() -> void:
+	var territory_system: Node = _get_territory_control_system()
+	if territory_system == null:
+		return
+
+	var control_callback: Callable = Callable(self, "_on_territory_zone_control_changed")
+	if territory_system.has_signal("zone_control_changed") and not territory_system.is_connected("zone_control_changed", control_callback):
+		territory_system.connect("zone_control_changed", control_callback)
+
+	var dominant_callback: Callable = Callable(self, "_on_territory_dominant_faction_changed")
+	if territory_system.has_signal("dominant_faction_changed") and not territory_system.is_connected("dominant_faction_changed", dominant_callback):
+		territory_system.connect("dominant_faction_changed", dominant_callback)
+
+	_emit_current_territory_control_changed()
+
+
+func _on_territory_zone_control_changed(zone_id: String, control: Dictionary) -> void:
+	territory_control_changed.emit(zone_id, control.duplicate(true))
+
+
+func _on_territory_dominant_faction_changed(zone_id: String, faction_id: String, faction_name: String, message: String) -> void:
+	territory_dominant_faction_changed.emit(zone_id, faction_id, faction_name, message)
+
+
+func _emit_current_territory_control_changed() -> void:
+	var control: Dictionary = get_zone_control(current_danger_zone_id)
+	if control.is_empty():
+		return
+
+	territory_control_changed.emit(current_danger_zone_id, control)
 
 
 func _ensure_valid_player_ship_state() -> void:
