@@ -518,19 +518,19 @@ func can_accept_faction_mission(mission_id: String) -> bool:
 func accept_faction_mission(mission_id: String) -> String:
 	_ensure_valid_faction_mission_state()
 	if not FactionMissionCatalog.has_mission(mission_id):
-		return "Mission de faction indisponible"
+		return _show_faction_mission_message("Mission de faction indisponible")
 	if not is_player_faction_locked() or is_player_neutral():
-		return "Vous etes Neutre. Choisissez une voie de faction pour acceder aux missions de faction."
+		return _show_faction_mission_message("Vous etes Neutre. Choisissez une voie de faction pour acceder aux missions de faction.", 3.0)
 	if FactionMissionCatalog.get_mission_faction_id(mission_id) != get_player_faction_id():
-		return "Mission inaccessible : mauvaise faction"
+		return _show_faction_mission_message("Mission inaccessible : mauvaise faction")
 	if not active_faction_mission_id.is_empty():
-		return "Une mission de faction est deja active"
+		return _show_faction_mission_message("Une mission de faction est deja active")
 
 	var state: Dictionary = _get_faction_mission_state(mission_id)
 	if bool(state.get("reward_claimed", false)):
-		return "Recompense deja recuperee"
+		return _show_faction_mission_message("Recompense deja recuperee")
 	if bool(state.get("completed", false)):
-		return "Mission deja terminee"
+		return _show_faction_mission_message("Mission deja terminee")
 
 	state["progress"] = 0
 	state["completed"] = false
@@ -540,10 +540,10 @@ func accept_faction_mission(mission_id: String) -> String:
 	_last_faction_mission_objective = "Mission acceptee : %s" % FactionMissionCatalog.get_mission_name(mission_id)
 	_emit_faction_mission_changed()
 	_debug_faction_mission(_last_faction_mission_objective)
-	return "Mission acceptee : %s\n%s" % [
+	return _show_faction_mission_message("Mission acceptee : %s\n%s" % [
 		FactionMissionCatalog.get_mission_name(mission_id),
 		FactionMissionCatalog.get_accept_text(mission_id),
-	]
+	])
 
 
 func cancel_faction_mission() -> String:
@@ -587,6 +587,7 @@ func update_faction_mission_progress(objective_type: String, amount: int) -> voi
 		complete_faction_mission()
 	else:
 		_emit_faction_mission_progress(mission_id)
+		_show_faction_mission_message("Progression : %s" % _build_faction_mission_progress_text(mission_id), 1.5)
 
 
 func complete_faction_mission() -> String:
@@ -610,7 +611,7 @@ func complete_faction_mission() -> String:
 	faction_mission_completed.emit(mission_id, FactionMissionCatalog.get_mission_name(mission_id))
 	_emit_faction_mission_changed()
 	_debug_faction_mission("terminee -> %s" % FactionMissionCatalog.get_mission_name(mission_id))
-	return "Mission terminee : %s" % FactionMissionCatalog.get_mission_name(mission_id)
+	return _show_faction_mission_message("Mission terminee : %s" % FactionMissionCatalog.get_mission_name(mission_id), 2.5)
 
 
 func can_claim_faction_mission_reward(mission_id: String = "") -> bool:
@@ -649,7 +650,7 @@ func claim_faction_mission_reward() -> String:
 	faction_mission_reward_claimed.emit(mission_id, mission_name)
 	_emit_faction_mission_changed()
 	_debug_faction_mission("recompense -> %s" % _last_faction_mission_reward)
-	return "Recompense recue : %s\n%s" % [mission_name, reward_text]
+	return _show_faction_mission_message("Recompense recue : %s\n%s" % [mission_name, reward_text], 2.5)
 
 
 func get_faction_mission_debug_summary() -> String:
@@ -672,6 +673,14 @@ func print_faction_mission_debug() -> void:
 		return
 
 	print(get_faction_mission_debug_summary())
+
+
+func _show_faction_mission_message(message: String, duration: float = 2.0) -> String:
+	var hud: Node = get_tree().get_first_node_in_group("hud")
+	if hud != null and hud.has_method("show_temporary_context_message"):
+		hud.call("show_temporary_context_message", message, duration)
+
+	return message
 
 
 func get_zone_control(zone_id_or_name: String) -> Dictionary:

@@ -1853,7 +1853,6 @@ func _on_accept_faction_mission_pressed() -> void:
 		return
 
 	status_label.text = String(game_state.call("accept_faction_mission", _selected_faction_mission_id))
-	_show_faction_mission_feedback(status_label.text)
 	_refresh_faction_mission_rows()
 
 
@@ -1869,14 +1868,7 @@ func _on_claim_faction_mission_reward_pressed() -> void:
 		return
 
 	status_label.text = String(game_state.call("claim_faction_mission_reward"))
-	_show_faction_mission_feedback(status_label.text, 2.5)
 	_refresh_faction_mission_rows()
-
-
-func _show_faction_mission_feedback(message: String, duration: float = 2.0) -> void:
-	var hud: Node = get_tree().get_first_node_in_group("hud")
-	if hud != null and hud.has_method("show_temporary_context_message"):
-		hud.call("show_temporary_context_message", message, duration)
 
 
 func _get_faction_mission_index(mission_id: String) -> int:
