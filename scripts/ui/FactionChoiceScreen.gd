@@ -52,13 +52,17 @@ func _build_faction_cards() -> void:
 	for child in cards_grid.get_children():
 		child.queue_free()
 	_card_buttons.clear()
+	cards_grid.add_theme_constant_override("h_separation", 8)
+	cards_grid.add_theme_constant_override("v_separation", 8)
 
 	for faction_id in FactionCatalog.get_faction_ids():
 		var button: Button = Button.new()
-		button.custom_minimum_size = Vector2(196, 184)
+		button.custom_minimum_size = Vector2(210, 220)
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.size_flags_vertical = Control.SIZE_EXPAND_FILL
 		button.focus_mode = Control.FOCUS_NONE
+		button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		button.add_theme_font_size_override("font_size", 13)
 		button.text = _build_card_text(faction_id)
 		button.pressed.connect(Callable(self, "_on_card_pressed").bind(faction_id))
 		cards_grid.add_child(button)
@@ -96,8 +100,10 @@ func _refresh_selection() -> void:
 			continue
 		if faction_id == _selected_faction_id:
 			button.modulate = Color(1.0, 0.86, 0.48, 1.0)
+			button.add_theme_color_override("font_color", Color(0.12, 0.08, 0.02, 1.0))
 		else:
 			button.modulate = Color(1.0, 1.0, 1.0, 0.82)
+			button.remove_theme_color_override("font_color")
 
 	if _selected_faction_id.is_empty():
 		selected_summary_label.text = "Selectionnez une faction."
