@@ -62,6 +62,8 @@ La v0.16.1 permet au joueur de choisir une allegeance de faction depuis le port,
 
 La v0.16.2 rend cette allegeance definitive pour la partie : le joueur commence neutre, confirme une seule voie de faction, puis doit recommencer une nouvelle partie plus tard pour tester une autre voie.
 
+La v0.17 ajoute des missions de factions liees a la voie verrouillee du joueur : chaque faction propose des objectifs simples, une seule mission de faction peut etre active, les recompenses se recuperent au port et la reussite modifie legerement le controle territorial.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -434,6 +436,18 @@ La v0.16.2 rend cette allegeance definitive pour la partie : le joueur commence 
 - Pour jouer une autre faction, il faudra recommencer une nouvelle partie quand ce flux sera ajoute.
 - La roadmap prevoit une generation procedurale future pour varier iles, ports, tresors, secrets et zones de danger selon les parties.
 
+## Etat v0.17
+
+- `FactionMissionCatalog` centralise les missions de factions pour Pirates, Marine royale, Ligue marchande, Contrebandiers et Cultes abyssaux.
+- Le joueur doit verrouiller une vraie allegeance pour acceder aux missions de faction ; Neutre affiche un message d'explication au port.
+- Une seule mission de faction peut etre active a la fois pour garder le prototype lisible.
+- Les objectifs v0.17 utilisent les actions deja jouables : detruire des navires, vaincre des creatures, faire du commerce, gagner de l'or par vente, explorer des sites et recuperer des ressources rares.
+- Le menu du port ajoute `Missions de faction` avec liste, objectif, progression, recompense, acceptation et recuperation de recompense.
+- Le HUD detaille affiche la mission de faction active, son objectif, sa progression et sa recompense.
+- Les recompenses peuvent donner or, bois, fragments, reliques, renom et ressources rares, sans double paiement.
+- Chaque mission terminee applique une influence territoriale faible : +2 a +5 pour la faction concernee et -1 a -4 pour une faction opposee.
+- Le debug `debug_faction_missions` dans `GameState` reste desactive par defaut et peut imprimer la faction, la mission active, la progression, la recompense en attente et l'influence appliquee.
+
 ## Lancement
 
 1. Installer Godot 4.x.
@@ -496,6 +510,7 @@ Le controle territorial possede `debug_territory_control` dans `TerritoryControl
 - `ReputationSystem` est configure en autoload pour suivre réputation, rangs, titres pirates et feedback de progression.
 - `TerritoryControlSystem` est configure en autoload pour suivre l'influence des factions par zone.
 - `FactionCatalog` centralise les factions, leurs libelles HUD et leurs effets sur spawns, commerce, reparations et securite.
+- `FactionMissionCatalog` centralise les missions de faction, leurs objectifs, recompenses et effets d'influence.
 - `DangerZoneCatalog` centralise les zones de danger, leurs niveaux, types d'ennemis, densites, ports, tresors et multiplicateurs de recompense.
 - `MarineCreatureCatalog` centralise les creatures marines, leurs zones, comportements, stats et recompenses.
 - `MarineCreatureSpawner` gere les creatures actives, les points de spawn marins et la densite par zone.

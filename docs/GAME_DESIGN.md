@@ -176,6 +176,28 @@ Le joueur incarne le capitaine d'un petit navire independant qui construit progr
 5. Apres validation, le port et `GameState` refusent tout changement de faction.
 6. Le HUD compact et detaille indiquent si la voie est verrouillee ou si le choix n'est pas encore effectue.
 
+## Boucle de jeu v0.17
+
+1. Le joueur choisit et verrouille une vraie allegeance au port.
+2. Il ouvre `Missions de faction` dans un port proposant des contrats.
+3. S'il est encore Neutre, le menu explique qu'une voie doit etre choisie.
+4. Si sa voie est verrouillee, il voit uniquement les missions de sa faction.
+5. Il accepte une seule mission de faction active a la fois.
+6. La progression vient des actions deja jouables : combat naval, creatures, commerce, exploration ou ressources rares.
+7. Le HUD detaille affiche mission, objectif, progression et recompense.
+8. Une mission terminee se recompense au port, sans double paiement.
+9. La recompense peut donner ressources, renom et un petit changement d'influence territoriale.
+
+## Missions de factions v0.17
+
+- Pirates : piller des navires et explorer des routes cachees pour renforcer l'influence pirate.
+- Marine royale : detruire des pirates et proteger les routes marchandes.
+- Ligue marchande : realiser du commerce et generer du profit au port.
+- Contrebandiers : recuperer des ressources rares et explorer des caches contestees.
+- Cultes abyssaux : vaincre des creatures marines et reunir des ressources anciennes.
+- Le systeme reste volontairement simple : pas de diplomatie avancee, pas de generation procedurale de contrats et pas de conquete complete de ports.
+- Les effets territoriaux restent faibles pour soutenir la sensation de monde vivant sans destabiliser la carte.
+
 ## Port et progression
 
 Le port sert de premier point sûr et de première interface de progression. Il établit le rythme attendu : partir en mer, obtenir des ressources, revenir au port, réparer, améliorer le bateau, accepter des missions et recruter un premier soutien allié.

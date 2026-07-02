@@ -219,12 +219,18 @@ Correctif v0.15.2 :
 - Appliquer les bonus seulement si une vraie faction est verrouillee.
 - Documenter que les autres voies demanderont une nouvelle partie plus tard.
 
-## v0.17 - Missions de factions et evenements dynamiques
+## v0.17 - Missions de factions
 
-- Ajouter des missions liees aux factions.
-- Ajouter des evenements de zone bases sur le controle territorial.
-- Preparer des reactions plus visibles des ports selon la faction dominante.
-- Garder hors scope la diplomatie avancee et la conquete complete de ports.
+- Ajouter `FactionMissionCatalog` avec des missions par voie : Pirates, Marine royale, Ligue marchande, Contrebandiers et Cultes abyssaux.
+- Limiter l'acces aux missions de faction a la voie definitivement verrouillee du joueur.
+- Afficher un message clair si le joueur est encore Neutre.
+- Garder une seule mission de faction active a la fois pour v0.17.
+- Ajouter la section `Missions de faction` au port.
+- Brancher la progression sur les actions existantes : pirates detruits, creatures vaincues, commerce, profit de vente, exploration et ressources rares.
+- Ajouter recompenses : or, bois, fragments, reliques, renom et ressources rares.
+- Appliquer de faibles effets de controle territorial a la recuperation de recompense.
+- Afficher la mission de faction active dans le HUD detaille.
+- Garder hors scope la diplomatie avancee, la generation procedurale de contrats et la conquete complete de ports.
 
 ## v0.18 - Generation procedurale de carte
 
@@ -236,7 +242,7 @@ Correctif v0.15.2 :
 - Generer ou semi-generer les zones de danger.
 - Garder une carte lisible et testable avant toute extension massive.
 
-## v1.0 - Polish global
+## v1.0 - Polish global / demo complete
 
 - Boucle complete : partir du port, naviguer, combattre, looter, reparer, ameliorer, recruter, commercer et accomplir des missions.
 - Zone de jeu limitee mais coherente.
