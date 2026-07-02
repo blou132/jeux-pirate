@@ -344,6 +344,10 @@ func _grant_creature_rewards(_world_position: Vector3, creature_id: String, rewa
 	var reward_messages: Array[String] = ["%s vaincu" % MarineCreatureCatalog.get_creature_name(creature_id)]
 	var gold_reward: int = maxi(0, int(rewards.get("gold", 0)))
 	var wood_reward: int = maxi(0, int(rewards.get("wood", 0)))
+	var creature_level: int = MarineCreatureCatalog.get_creature_level(creature_id)
+	if game_state != null and creature_level >= 2 and game_state.has_method("get_player_dangerous_creature_reward_multiplier"):
+		var reward_multiplier: float = float(game_state.call("get_player_dangerous_creature_reward_multiplier"))
+		gold_reward = maxi(0, roundi(float(gold_reward) * reward_multiplier))
 	if game_state != null and game_state.has_method("add_resources") and (gold_reward > 0 or wood_reward > 0):
 		game_state.call("add_resources", gold_reward, wood_reward)
 		if gold_reward > 0:
@@ -359,6 +363,9 @@ func _grant_creature_rewards(_world_position: Vector3, creature_id: String, rewa
 	var rare_resource_id: String = String(rewards.get("rare_resource_id", ""))
 	var rare_resource_amount: int = maxi(0, int(rewards.get("rare_resource_amount", 0)))
 	var rare_resource_chance: float = clampf(float(rewards.get("rare_resource_chance", 0.0)), 0.0, 1.0)
+	if game_state != null and game_state.has_method("get_player_rare_creature_resource_multiplier"):
+		var rare_multiplier: float = float(game_state.call("get_player_rare_creature_resource_multiplier"))
+		rare_resource_chance = clampf(rare_resource_chance * rare_multiplier, 0.0, 1.0)
 	if not rare_resource_id.is_empty() and rare_resource_amount > 0 and randf() <= rare_resource_chance:
 		if game_state != null and game_state.has_method("add_creature_resource"):
 			game_state.call("add_creature_resource", rare_resource_id, rare_resource_amount)

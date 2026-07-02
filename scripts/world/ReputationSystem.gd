@@ -132,6 +132,10 @@ func record_enemy_destroyed(enemy_type_id: String) -> void:
 	if ENEMY_REPUTATION_REWARDS.has(enemy_type_id):
 		reward = int(ENEMY_REPUTATION_REWARDS[enemy_type_id])
 
+	var game_state: Node = get_node_or_null("/root/GameState")
+	if game_state != null and game_state.has_method("get_player_pirate_renown_multiplier"):
+		reward = maxi(0, roundi(float(reward) * float(game_state.call("get_player_pirate_renown_multiplier"))))
+
 	add_reputation(reward, "enemy_destroyed")
 
 

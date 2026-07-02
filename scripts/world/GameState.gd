@@ -613,7 +613,7 @@ func get_trade_good_view(item_id: String) -> Dictionary:
 		"name": CargoCatalog.get_good_name(item_id),
 		"weight": weight,
 		"buy_price": CargoCatalog.get_buy_price(item_id),
-		"sell_price": CargoCatalog.get_sell_price(item_id),
+		"sell_price": _get_trade_sell_price(item_id),
 		"quantity": quantity,
 		"used_space": quantity * weight,
 		"can_buy": can_buy_trade_good(item_id, 1),
@@ -679,9 +679,17 @@ func sell_trade_good(item_id: String, amount: int = 1) -> String:
 	if not remove_cargo(item_id, amount):
 		return "Aucune marchandise a vendre"
 
-	var total_price: int = CargoCatalog.get_sell_price(item_id) * amount
+	var total_price: int = _get_trade_sell_price(item_id) * amount
 	add_resources(total_price, 0)
 	return "Marchandise vendue : %s x%d" % [CargoCatalog.get_good_name(item_id), amount]
+
+
+func _get_trade_sell_price(item_id: String) -> int:
+	if not CargoCatalog.has_good(item_id):
+		return 0
+
+	var base_price: int = CargoCatalog.get_sell_price(item_id)
+	return maxi(0, roundi(float(base_price) * get_player_trade_profit_multiplier()))
 
 
 func record_trade_completed(zone_id_or_name: String, amount: int = 1) -> void:

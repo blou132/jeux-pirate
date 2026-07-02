@@ -255,12 +255,13 @@ func _destroy() -> void:
 	angular_velocity = 0.0
 	velocity = Vector3.ZERO
 	var sink_position := global_position
+	var final_gold_reward: int = _get_adjusted_reward_gold()
 	var loot_system := get_tree().get_first_node_in_group("loot_system")
 	if loot_system != null and loot_system.has_method("drop_from_ship"):
-		loot_system.drop_from_ship(sink_position, reward_gold, reward_wood)
+		loot_system.drop_from_ship(sink_position, final_gold_reward, reward_wood)
 
-	_show_defeat_feedback()
-	destroyed.emit(sink_position, reward_gold, reward_wood)
+	_show_defeat_feedback(final_gold_reward, reward_wood)
+	destroyed.emit(sink_position, final_gold_reward, reward_wood)
 	queue_free()
 
 
@@ -334,14 +335,24 @@ func _make_material(color: Color) -> StandardMaterial3D:
 	return material
 
 
-func _show_defeat_feedback() -> void:
+func _get_adjusted_reward_gold() -> int:
+	var adjusted_reward: int = reward_gold
+	var game_state: Node = get_node_or_null("/root/GameState")
+	if game_state != null and game_state.has_method("get_player_ship_combat_gold_multiplier"):
+		var multiplier: float = float(game_state.call("get_player_ship_combat_gold_multiplier"))
+		adjusted_reward = roundi(float(reward_gold) * multiplier)
+
+	return maxi(0, adjusted_reward)
+
+
+func _show_defeat_feedback(gold_amount: int, wood_amount: int) -> void:
 	var hud := get_tree().get_first_node_in_group("hud")
 	if hud == null:
 		return
 
-	var message := "%s vaincu : +%d or, +%d bois" % [display_name, reward_gold, reward_wood]
+	var message := "%s vaincu : +%d or, +%d bois" % [display_name, gold_amount, wood_amount]
 	if _last_damage_source != null and is_instance_valid(_last_damage_source) and _last_damage_source.is_in_group("ally_ships"):
-		message = "Allié a coulé %s : +%d or, +%d bois" % [display_name, reward_gold, reward_wood]
+		message = "Allié a coulé %s : +%d or, +%d bois" % [display_name, gold_amount, wood_amount]
 
 	if hud.has_method("show_temporary_context_message"):
 		hud.show_temporary_context_message(message, 2.4)
