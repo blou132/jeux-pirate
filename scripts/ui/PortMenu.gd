@@ -186,6 +186,9 @@ func _refresh_port_header() -> void:
 		PortCatalog.get_shipyard_level(_active_port_id),
 	]
 	port_info_label.text += "\nServices : %s" % ", ".join(PortCatalog.get_service_names(_active_port_id))
+	var territory_text: String = _get_port_territory_text()
+	if not territory_text.is_empty():
+		port_info_label.text += "\n" + territory_text
 	ports_button.text = "Ports disponibles : %s" % PortCatalog.get_port_category(_active_port_id)
 
 
@@ -224,6 +227,9 @@ func _refresh_port_rows() -> void:
 
 	port_list.select(selected_index)
 	port_services_label.text = PortCatalog.get_port_details_text(_active_port_id)
+	var territory_text: String = _get_port_territory_text()
+	if not territory_text.is_empty():
+		port_services_label.text += "\n\n" + territory_text
 
 
 func _on_port_selected(index: int) -> void:
@@ -1129,6 +1135,35 @@ func _record_trade_territory_progress(game_state: Node, trade_result: String) ->
 
 func _get_active_port_danger_zone_id() -> String:
 	return DangerZoneCatalog.normalize_zone_id(PortCatalog.get_port_danger_zone(_active_port_id))
+
+
+func _get_port_territory_text() -> String:
+	var zone_id: String = _get_active_port_danger_zone_id()
+	var game_state: Node = _get_game_state()
+	if game_state == null:
+		return ""
+
+	var lines: Array[String] = []
+	if game_state.has_method("get_zone_control"):
+		var control_value: Variant = game_state.call("get_zone_control", zone_id)
+		if control_value is Dictionary:
+			var control: Dictionary = control_value
+			lines.append("Controle : %s | Stabilite : %s | Conflit : %s" % [
+				String(control.get("dominant_faction_name", "Inconnu")),
+				String(control.get("stability", "moyenne")),
+				String(control.get("conflict", "moyen")),
+			])
+
+	if game_state.has_method("get_zone_effect_lines"):
+		var effect_lines_value: Variant = game_state.call("get_zone_effect_lines", zone_id)
+		if effect_lines_value is Array:
+			for raw_line in effect_lines_value:
+				lines.append(String(raw_line))
+
+	if lines.is_empty():
+		return ""
+
+	return "Territoire :\n%s" % "\n".join(lines)
 
 
 func _set_trade_status(message: String) -> void:
