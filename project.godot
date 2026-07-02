@@ -25,6 +25,7 @@ GameState="*res://scripts/world/GameState.gd"
 UpgradeSystem="*res://scripts/world/UpgradeSystem.gd"
 QuestSystem="*res://scripts/world/QuestSystem.gd"
 ReputationSystem="*res://scripts/world/ReputationSystem.gd"
+TerritoryControlSystem="*res://scripts/world/TerritoryControlSystem.gd"
 
 [display]
 
