@@ -58,6 +58,8 @@ La v0.15.2 augmente la presence pirates/creatures, repartit mieux les points de 
 
 La v0.16 ajoute une premiere base de controle de territoire : cinq factions influencent les zones, les spawns pirates, les creatures marines, les ports, le commerce et le HUD.
 
+La v0.16.1 permet au joueur de choisir une allegeance de faction depuis le port, de rester neutre ou de changer plus tard, avec bonus faibles et affichage HUD.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -402,6 +404,21 @@ La v0.16 ajoute une premiere base de controle de territoire : cinq factions infl
 - Le HUD compact affiche la faction dominante de la zone courante.
 - Le HUD detaille affiche les influences par faction, le dominant, la stabilite, le conflit et les principaux effets.
 - Une notification apparait seulement quand une faction devient dominante dans la zone courante.
+
+## Extension v0.16.1
+
+- Le joueur commence avec l'allegeance `Neutre`.
+- Le menu du port ajoute une section `Allegeance` pour rejoindre Pirates, Marine royale, Ligue marchande, Contrebandiers ou Cultes abyssaux.
+- Le joueur peut redevenir neutre ou changer de faction plus tard.
+- Neutre : aucun bonus, aucune penalite.
+- Pirates : +10 % or sur les combats contre navires ennemis.
+- Marine royale : +10 % renom contre les pirates et influence marine accrue contre eux.
+- Ligue marchande : +5 % sur les ventes commerciales et influence marchande accrue par commerce.
+- Contrebandiers : +10 % de chance sur les ressources rares de creatures et influence contrebandiere par exploration/ressources rares.
+- Cultes abyssaux : +10 % or sur creatures dangereuses, sans rendre les monstres allies.
+- Le HUD compact affiche la faction du joueur.
+- Le HUD detaille affiche l'allegeance, le bonus actif et le controle local.
+- Les factions inconnues reviennent a `Neutre` pour eviter les etats invalides.
 
 ## Lancement
 

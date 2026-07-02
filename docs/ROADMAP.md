@@ -198,6 +198,17 @@ Correctif v0.15.2 :
 - Ajouter un feedback quand une faction devient dominante.
 - Garder une version simple avant toute strategie avancee.
 
+## v0.16.1 - Allegeance de faction joueur
+
+- Ajouter l'etat `player_faction_id` dans `GameState`, par defaut `neutral`.
+- Permettre de rejoindre ou quitter une faction depuis le menu du port.
+- Garder le choix reversible et non bloquant.
+- Afficher l'allegeance dans le HUD compact et detaille.
+- Appliquer des bonus faibles : combat naval, renom contre pirates, commerce, ressources rares ou creatures dangereuses.
+- Relier legerement l'allegeance aux changements d'influence territoriale.
+- Ajouter des garde-fous pour les factions invalides.
+- Ajouter un debug d'allegeance desactive par defaut.
+
 ## v0.17 - Missions de factions et evenements dynamiques
 
 - Ajouter des missions liees aux factions.

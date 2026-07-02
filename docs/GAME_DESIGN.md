@@ -158,6 +158,15 @@ Le joueur incarne le capitaine d'un petit navire independant qui construit progr
 5. Le controle modifie la densite des pirates, la presence des creatures et les effets visibles au port.
 6. Le menu de port expose les effets territoriaux sans lancer encore de conquete ou diplomatie avancee.
 
+## Boucle de jeu v0.16.1
+
+1. Le joueur ouvre le port et consulte la section `Allegeance`.
+2. Il peut rester neutre, rejoindre une faction ou redevenir neutre plus tard.
+3. Le HUD compact affiche l'allegeance courante.
+4. Le HUD detaille rappelle le bonus actif et le controle local.
+5. Les actions deja jouables appliquent de petits bonus selon la faction choisie.
+6. Les bonus influencent legerement le territoire sans creer encore de diplomatie avancee.
+
 ## Port et progression
 
 Le port sert de premier point sûr et de première interface de progression. Il établit le rythme attendu : partir en mer, obtenir des ressources, revenir au port, réparer, améliorer le bateau, accepter des missions et recruter un premier soutien allié.
@@ -605,6 +614,23 @@ Effets de gameplay :
 - Les ports affichent les effets actifs : commerce, reparations, securite ou marche noir.
 - Le HUD compact affiche le controle dominant, tandis que le HUD detaille affiche influence, stabilite, conflit et effets.
 - Un feedback apparait seulement quand une nouvelle faction devient dominante dans la zone courante.
+
+## Allegeance joueur v0.16.1
+
+L'allegeance du joueur est volontairement reversible. Elle ne doit pas bloquer la progression et ne transforme pas encore les factions en ennemis ou allies permanents.
+
+Choix disponibles :
+
+- Neutre : aucun bonus, aucune penalite.
+- Pirates : +10 % or sur les combats contre navires ennemis.
+- Marine royale : +10 % renom contre les pirates et reduction supplementaire de leur influence.
+- Ligue marchande : +5 % sur les ventes commerciales et influence marchande accrue par commerce.
+- Contrebandiers : +10 % de chance d'obtenir les ressources rares de creatures, plus un leger gain d'influence par exploration/ressources rares.
+- Cultes abyssaux : +10 % or sur creatures marines dangereuses, sans rendre les creatures alliees.
+
+Le choix se fait au port dans une section `Allegeance`. La faction actuelle, la description et le bonus sont affiches avant validation. Un bouton permet de redevenir neutre.
+
+Le HUD compact affiche l'allegeance en mer. Le HUD detaille affiche l'allegeance, le bonus actif et la faction dominante locale pour aider le joueur a comprendre s'il navigue dans un territoire favorable ou hostile.
 
 ## Piliers a long terme
 
