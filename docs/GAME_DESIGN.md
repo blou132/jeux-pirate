@@ -632,6 +632,22 @@ Le choix se fait au port dans une section `Allegeance`. La faction actuelle, la 
 
 Le HUD compact affiche l'allegeance en mer. Le HUD detaille affiche l'allegeance, le bonus actif et la faction dominante locale pour aider le joueur a comprendre s'il navigue dans un territoire favorable ou hostile.
 
+## Voies de faction v0.16.2
+
+La v0.16.2 transforme l'allegeance en choix de voie pour la partie courante. Le joueur commence toujours neutre, sans bonus ni penalite, puis peut choisir une seule vraie faction depuis le port.
+
+Regle de partie :
+
+- Neutre est l'etat de depart et ne verrouille pas la partie.
+- Choisir Pirates, Marine royale, Ligue marchande, Contrebandiers ou Cultes abyssaux verrouille immediatement cette voie apres confirmation.
+- Une voie verrouillee ne peut plus etre changee pendant la partie.
+- Le joueur ne peut pas redevenir neutre apres validation.
+- Pour tester une autre voie, il faudra recommencer une nouvelle partie quand le systeme de nouvelle partie/sauvegarde sera ajoute.
+
+Cette contrainte donne plus de poids au roleplay et aux bonus de gameplay : Pirates oriente vers les combats navals, Marine royale vers la chasse aux pirates, Ligue marchande vers le commerce, Contrebandiers vers les ressources rares, et Cultes abyssaux vers les creatures marines dangereuses.
+
+Le port doit afficher clairement l'avertissement avant validation : ce choix est definitif pour cette partie. Le HUD compact indique l'allegeance et le statut verrouille, tandis que le HUD detaille rappelle le statut, le bonus actif et le controle local.
+
 ## Piliers a long terme
 
 - Navigation lisible : le joueur doit toujours comprendre son cap, sa vitesse et les menaces proches.
