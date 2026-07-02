@@ -231,10 +231,12 @@ Correctif v0.15.2 :
 - Appliquer de faibles effets de controle territorial a la recuperation de recompense.
 - Afficher la mission de faction active dans le HUD detaille.
 - Garder hors scope la diplomatie avancee, la generation procedurale de contrats et la conquete complete de ports.
+- Correctif v0.17.1 : imposer le choix d'une vraie faction au debut de la partie, rendre le port consultatif pour l'allegeance et garder Neutre comme etat technique de compatibilite.
 
 ## v0.18 - Generation procedurale de carte
 
 - Ajouter un seed de monde pour preparer des parties differentes.
+- Varier les runs selon la faction choisie au depart.
 - Placer proceduralement ou semi-proceduralement les iles.
 - Placer proceduralement les ports secondaires.
 - Placer proceduralement les tresors et sites d'exploration.

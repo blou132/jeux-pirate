@@ -198,6 +198,20 @@ Le joueur incarne le capitaine d'un petit navire independant qui construit progr
 - Le systeme reste volontairement simple : pas de diplomatie avancee, pas de generation procedurale de contrats et pas de conquete complete de ports.
 - Les effets territoriaux restent faibles pour soutenir la sensation de monde vivant sans destabiliser la carte.
 
+## Choix initial de faction v0.17.1
+
+1. Une nouvelle partie demarre techniquement en `Neutre`, sans bonus.
+2. Avant le gameplay normal, `FactionChoiceScreen` bloque la partie et affiche les 5 voies jouables.
+3. Chaque voie presente nom, ambiance, style, bonus, atouts, faiblesses et slogan.
+4. Le joueur selectionne une carte, puis prepare le serment.
+5. Il confirme definitivement la voie choisie.
+6. `GameState.lock_player_faction()` verrouille la faction pour la partie courante.
+7. Le gameplay reprend seulement apres cette confirmation.
+8. Le port affiche ensuite la voie et ses bonus, sans bouton de changement.
+9. Les missions de faction utilisent immediatement la voie verrouillee.
+
+Neutre n'est plus une voie principale de nouvelle partie. Il reste un etat technique utile pour le chargement initial, les anciens etats et les cas invalides. Une sauvegarde neutre non verrouillee doit revenir a l'ecran de choix ; une sauvegarde avec faction valide deja verrouillee continue directement.
+
 ## Port et progression
 
 Le port sert de premier point sûr et de première interface de progression. Il établit le rythme attendu : partir en mer, obtenir des ressources, revenir au port, réparer, améliorer le bateau, accepter des missions et recruter un premier soutien allié.

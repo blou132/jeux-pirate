@@ -64,6 +64,8 @@ La v0.16.2 rend cette allegeance definitive pour la partie : le joueur commence 
 
 La v0.17 ajoute des missions de factions liees a la voie verrouillee du joueur : chaque faction propose des objectifs simples, une seule mission de faction peut etre active, les recompenses se recuperent au port et la reussite modifie legerement le controle territorial.
 
+La v0.17.1 deplace le choix de faction au debut de la partie : le joueur doit choisir Pirates, Marine royale, Ligue marchande, Contrebandiers ou Cultes abyssaux avant le gameplay normal.
+
 ## Etat v0.1
 
 - Projet Godot 4.x minimal avec scene principale.
@@ -448,6 +450,18 @@ La v0.17 ajoute des missions de factions liees a la voie verrouillee du joueur :
 - Chaque mission terminee applique une influence territoriale faible : +2 a +5 pour la faction concernee et -1 a -4 pour une faction opposee.
 - Le debug `debug_faction_missions` dans `GameState` reste desactive par defaut et peut imprimer la faction, la mission active, la progression, la recompense en attente et l'influence appliquee.
 
+## Correctif v0.17.1
+
+- `FactionChoiceScreen` affiche un ecran de selection au lancement si le joueur est encore `Neutre` et non verrouille.
+- Les 5 voies jouables sont proposees sous forme de cartes : Pirates, Marine royale, Ligue marchande, Contrebandiers et Cultes abyssaux.
+- Chaque carte affiche ambiance, description, style, bonus, atouts, faiblesses et slogan depuis `FactionCatalog`.
+- Le gameplay est mis en pause tant qu'une vraie faction n'est pas confirmee.
+- La confirmation reste en deux etapes : `Preparer le serment`, puis `Confirmer definitivement`.
+- Neutre reste seulement un etat technique avant choix ou pour compatibilite d'anciens etats.
+- Le port ne permet plus de changer d'allegeance ; la section `Allegeance` est consultative.
+- Les missions de faction restent accessibles seulement apres verrouillage de la voie choisie.
+- Les anciennes sauvegardes neutres ou invalides demandent un choix au lancement ; une ancienne faction non verrouillee est verrouillee automatiquement.
+
 ## Lancement
 
 1. Installer Godot 4.x.
@@ -511,6 +525,7 @@ Le controle territorial possede `debug_territory_control` dans `TerritoryControl
 - `TerritoryControlSystem` est configure en autoload pour suivre l'influence des factions par zone.
 - `FactionCatalog` centralise les factions, leurs libelles HUD et leurs effets sur spawns, commerce, reparations et securite.
 - `FactionMissionCatalog` centralise les missions de faction, leurs objectifs, recompenses et effets d'influence.
+- `FactionChoiceScreen` gere le choix initial de faction et bloque le gameplay tant qu'une vraie voie n'est pas confirmee.
 - `DangerZoneCatalog` centralise les zones de danger, leurs niveaux, types d'ennemis, densites, ports, tresors et multiplicateurs de recompense.
 - `MarineCreatureCatalog` centralise les creatures marines, leurs zones, comportements, stats et recompenses.
 - `MarineCreatureSpawner` gere les creatures actives, les points de spawn marins et la densite par zone.
