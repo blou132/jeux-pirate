@@ -1363,6 +1363,7 @@ func _on_join_faction_pressed() -> void:
 		return
 
 	status_label.text = String(game_state.call("set_player_faction", _selected_faction_id))
+	_show_faction_feedback(status_label.text)
 	_refresh_faction_rows()
 
 
@@ -1374,6 +1375,7 @@ func _on_neutral_faction_pressed() -> void:
 
 	_selected_faction_id = FactionCatalog.FACTION_NEUTRAL
 	status_label.text = String(game_state.call("set_player_faction", FactionCatalog.FACTION_NEUTRAL))
+	_show_faction_feedback(status_label.text)
 	_refresh_faction_rows()
 
 
@@ -1393,6 +1395,12 @@ func _get_player_faction_style(faction_id: String) -> String:
 		return "independance"
 
 	return FactionCatalog.get_style(faction_id)
+
+
+func _show_faction_feedback(message: String) -> void:
+	var hud: Node = get_tree().get_first_node_in_group("hud")
+	if hud != null and hud.has_method("show_temporary_context_message"):
+		hud.call("show_temporary_context_message", message, 2.0)
 
 
 func _on_mission_selected(index: int) -> void:

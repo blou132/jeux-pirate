@@ -308,7 +308,7 @@ func set_player_faction(faction_id: String) -> String:
 
 	player_faction_id = normalized_faction_id
 	_emit_player_faction_changed()
-	return "Allegeance : %s" % get_player_faction_name()
+	return FactionCatalog.get_player_join_message(player_faction_id)
 
 
 func get_player_faction_bonus_summary() -> String:
