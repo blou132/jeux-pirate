@@ -58,7 +58,9 @@ La v0.15.2 augmente la presence pirates/creatures, repartit mieux les points de 
 
 La v0.16 ajoute une premiere base de controle de territoire : cinq factions influencent les zones, les spawns pirates, les creatures marines, les ports, le commerce et le HUD.
 
-La v0.16.1 permet au joueur de choisir une allegeance de faction depuis le port, de rester neutre ou de changer plus tard, avec bonus faibles et affichage HUD.
+La v0.16.1 permet au joueur de choisir une allegeance de faction depuis le port, avec bonus faibles et affichage HUD.
+
+La v0.16.2 rend cette allegeance definitive pour la partie : le joueur commence neutre, confirme une seule voie de faction, puis doit recommencer une nouvelle partie plus tard pour tester une autre voie.
 
 ## Etat v0.1
 
@@ -409,7 +411,6 @@ La v0.16.1 permet au joueur de choisir une allegeance de faction depuis le port,
 
 - Le joueur commence avec l'allegeance `Neutre`.
 - Le menu du port ajoute une section `Allegeance` pour rejoindre Pirates, Marine royale, Ligue marchande, Contrebandiers ou Cultes abyssaux.
-- Le joueur peut redevenir neutre ou changer de faction plus tard.
 - Neutre : aucun bonus, aucune penalite.
 - Pirates : +10 % or sur les combats contre navires ennemis.
 - Marine royale : +10 % renom contre les pirates et influence marine accrue contre eux.
@@ -419,6 +420,19 @@ La v0.16.1 permet au joueur de choisir une allegeance de faction depuis le port,
 - Le HUD compact affiche la faction du joueur.
 - Le HUD detaille affiche l'allegeance, le bonus actif et le controle local.
 - Les factions inconnues reviennent a `Neutre` pour eviter les etats invalides.
+
+## Correctif v0.16.2
+
+- Le joueur commence toujours `Neutre`, sans bonus ni penalite.
+- Choisir Pirates, Marine royale, Ligue marchande, Contrebandiers ou Cultes abyssaux verrouille la voie pour la partie courante.
+- Le port affiche un avertissement clair : ce choix est definitif pour cette partie.
+- Le choix utilise deux clics : `Preparer le serment`, puis `Confirmer definitivement`.
+- Apres validation, le joueur ne peut plus changer de faction ni redevenir neutre.
+- Les bonus d'allegeance et les effets territoriaux ne s'appliquent que si une vraie voie est verrouillee.
+- Le HUD compact affiche l'allegeance et le statut de voie.
+- Le HUD detaille affiche `Voie du joueur`, `Statut`, bonus actif et controle local.
+- Pour jouer une autre faction, il faudra recommencer une nouvelle partie quand ce flux sera ajoute.
+- La roadmap prevoit une generation procedurale future pour varier iles, ports, tresors, secrets et zones de danger selon les parties.
 
 ## Lancement
 

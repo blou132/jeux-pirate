@@ -161,11 +161,20 @@ Le joueur incarne le capitaine d'un petit navire independant qui construit progr
 ## Boucle de jeu v0.16.1
 
 1. Le joueur ouvre le port et consulte la section `Allegeance`.
-2. Il peut rester neutre, rejoindre une faction ou redevenir neutre plus tard.
+2. Il peut rester neutre ou rejoindre une faction.
 3. Le HUD compact affiche l'allegeance courante.
 4. Le HUD detaille rappelle le bonus actif et le controle local.
 5. Les actions deja jouables appliquent de petits bonus selon la faction choisie.
 6. Les bonus influencent legerement le territoire sans creer encore de diplomatie avancee.
+
+## Boucle de jeu v0.16.2
+
+1. Le joueur commence neutre et peut continuer sans choisir de faction.
+2. Au port, il consulte les voies disponibles et leurs styles de gameplay.
+3. Il prepare un serment, puis confirme definitivement son allegeance.
+4. Une vraie faction verrouille la partie courante et active ses bonus.
+5. Apres validation, le port et `GameState` refusent tout changement de faction.
+6. Le HUD compact et detaille indiquent si la voie est verrouillee ou si le choix n'est pas encore effectue.
 
 ## Port et progression
 

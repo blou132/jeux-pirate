@@ -201,13 +201,23 @@ Correctif v0.15.2 :
 ## v0.16.1 - Allegeance de faction joueur
 
 - Ajouter l'etat `player_faction_id` dans `GameState`, par defaut `neutral`.
-- Permettre de rejoindre ou quitter une faction depuis le menu du port.
-- Garder le choix reversible et non bloquant.
+- Permettre de rejoindre une faction depuis le menu du port.
 - Afficher l'allegeance dans le HUD compact et detaille.
 - Appliquer des bonus faibles : combat naval, renom contre pirates, commerce, ressources rares ou creatures dangereuses.
 - Relier legerement l'allegeance aux changements d'influence territoriale.
 - Ajouter des garde-fous pour les factions invalides.
 - Ajouter un debug d'allegeance desactive par defaut.
+
+## v0.16.2 - Voies de faction definitives
+
+- Ajouter `player_faction_locked` dans `GameState`, false au depart.
+- Garder `neutral` comme etat initial non bloquant.
+- Verrouiller la partie quand le joueur confirme Pirates, Marine royale, Ligue marchande, Contrebandiers ou Cultes abyssaux.
+- Interdire tout changement de faction ou retour neutre apres validation.
+- Ajouter une confirmation en deux clics dans le menu du port.
+- Afficher le statut de voie dans le HUD compact et detaille.
+- Appliquer les bonus seulement si une vraie faction est verrouillee.
+- Documenter que les autres voies demanderont une nouvelle partie plus tard.
 
 ## v0.17 - Missions de factions et evenements dynamiques
 
