@@ -1356,13 +1356,10 @@ func _refresh_faction_rows() -> void:
 			FactionCatalog.get_player_bonus_summary(current_faction_id),
 		]
 	else:
-		faction_intro_label.text = "Choisissez une voie.\nCe choix est definitif pour cette partie.\nPour jouer une autre faction, il faudra commencer une nouvelle partie."
-		current_faction_label.text = "Allegeance actuelle : %s\nBonus actif : %s" % [
-			FactionCatalog.get_player_faction_name(current_faction_id),
-			FactionCatalog.get_player_bonus_summary(current_faction_id),
-		]
+		faction_intro_label.text = "Allegeance a choisir.\nLe choix de faction se fait au debut de la partie et reste definitif."
+		current_faction_label.text = "Allegeance : a choisir\nNeutre reste un etat technique temporaire avant le choix."
 
-	for faction_id in FactionCatalog.get_player_faction_ids():
+	for faction_id in FactionCatalog.get_faction_ids():
 		_faction_ids.append(faction_id)
 		faction_list.add_item(_build_faction_row_text(faction_id, current_faction_id, is_locked))
 
@@ -1422,6 +1419,8 @@ func _refresh_selected_faction() -> void:
 		warning_line = "Confirmation en attente : cliquez sur Confirmer definitivement pour verrouiller cette voie."
 	if is_locked:
 		warning_line = "Impossible de changer de faction dans cette partie."
+	elif current_faction_id == FactionCatalog.FACTION_NEUTRAL:
+		warning_line = "Le choix de faction doit etre confirme sur l'ecran de debut de partie."
 
 	faction_details_label.text = "%s\n%s\nStyle de gameplay : %s\nBonus : %s\nStatut : %s\n%s" % [
 		selected_name,
@@ -1432,23 +1431,25 @@ func _refresh_selected_faction() -> void:
 		warning_line,
 	]
 
-	join_faction_button.text = "Choisir cette voie"
-	join_faction_button.disabled = game_state == null or is_locked or _selected_faction_id == FactionCatalog.FACTION_NEUTRAL
+	join_faction_button.text = "Choix au debut de partie"
+	join_faction_button.disabled = true
 	if _selected_faction_id == current_faction_id and is_locked:
 		join_faction_button.text = "Voie deja verrouillee"
-	elif _pending_faction_id == _selected_faction_id:
-		join_faction_button.text = "Confirmer definitivement"
-	elif _selected_faction_id != FactionCatalog.FACTION_NEUTRAL:
-		join_faction_button.text = "Preparer le serment"
 
-	neutral_faction_button.text = "Annuler le serment"
-	neutral_faction_button.disabled = game_state == null or is_locked or _pending_faction_id.is_empty()
+	neutral_faction_button.text = "Choix definitif"
+	neutral_faction_button.disabled = true
 
 
 func _on_join_faction_pressed() -> void:
 	var game_state: Node = _get_game_state()
 	if game_state == null or not game_state.has_method("lock_player_faction"):
 		status_label.text = "Choix de faction indisponible"
+		return
+
+	if not _is_player_faction_locked(game_state):
+		status_label.text = "Le choix de faction se fait au debut de la partie."
+		_show_faction_feedback(status_label.text)
+		_refresh_faction_rows()
 		return
 
 	if _selected_faction_id == FactionCatalog.FACTION_NEUTRAL:
@@ -1484,6 +1485,12 @@ func _on_neutral_faction_pressed() -> void:
 	var game_state: Node = _get_game_state()
 	if game_state == null:
 		status_label.text = "Choix de faction indisponible"
+		return
+
+	if not _is_player_faction_locked(game_state):
+		status_label.text = "Neutre est seulement un etat technique avant le choix de debut de partie."
+		_show_faction_feedback(status_label.text)
+		_refresh_faction_rows()
 		return
 
 	if _is_player_faction_locked(game_state):
