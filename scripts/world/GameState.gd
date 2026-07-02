@@ -34,6 +34,7 @@ var active_player_ship_id: String = STARTING_PLAYER_SHIP_ID
 var owned_player_ship_ids: Array[String] = [STARTING_PLAYER_SHIP_ID]
 var cargo_items: Dictionary = {}
 var player_faction_id: String = FactionCatalog.FACTION_NEUTRAL
+var player_faction_locked: bool = false
 var _last_player_faction_change: String = "Neutre"
 var _last_player_faction_territory_bonus: String = "Aucun"
 
@@ -297,8 +298,23 @@ func is_player_neutral() -> bool:
 	return get_player_faction_id() == FactionCatalog.FACTION_NEUTRAL
 
 
+func is_player_faction_locked() -> bool:
+	_ensure_valid_player_faction_state()
+	return player_faction_locked
+
+
 func can_join_faction(faction_id: String) -> bool:
 	return FactionCatalog.has_player_faction(faction_id)
+
+
+func can_choose_player_faction(faction_id: String) -> bool:
+	if is_player_faction_locked():
+		return false
+	if not FactionCatalog.has_player_faction(faction_id):
+		return false
+
+	var normalized_faction_id: String = FactionCatalog.normalize_player_faction_id(faction_id)
+	return normalized_faction_id != FactionCatalog.FACTION_NEUTRAL
 
 
 func is_player_faction_valid() -> bool:
@@ -306,57 +322,94 @@ func is_player_faction_valid() -> bool:
 
 
 func set_player_faction(faction_id: String) -> String:
-	if not can_join_faction(faction_id):
-		player_faction_id = FactionCatalog.FACTION_NEUTRAL
-		_emit_player_faction_changed()
-		return "Faction inconnue - retour a la neutralite"
+	if not FactionCatalog.has_player_faction(faction_id):
+		return "Faction inconnue - choix refuse"
+
+	if is_player_faction_locked():
+		return get_player_faction_lock_message()
 
 	var normalized_faction_id: String = FactionCatalog.normalize_player_faction_id(faction_id)
 	if normalized_faction_id == player_faction_id:
 		return "Allegeance actuelle : %s" % get_player_faction_name()
+	if normalized_faction_id != FactionCatalog.FACTION_NEUTRAL:
+		return lock_player_faction(normalized_faction_id)
 
 	player_faction_id = normalized_faction_id
+	player_faction_locked = false
 	_last_player_faction_change = FactionCatalog.get_player_faction_name(player_faction_id)
 	_emit_player_faction_changed()
 	_debug_player_faction("allegeance -> %s" % _last_player_faction_change)
 	return FactionCatalog.get_player_join_message(player_faction_id)
 
 
+func lock_player_faction(faction_id: String) -> String:
+	if not FactionCatalog.has_player_faction(faction_id):
+		return "Faction inconnue - choix refuse"
+
+	var normalized_faction_id: String = FactionCatalog.normalize_player_faction_id(faction_id)
+	if normalized_faction_id == FactionCatalog.FACTION_NEUTRAL:
+		return "Neutre est l'etat de depart. Choisissez une vraie voie pour verrouiller la partie."
+	if is_player_faction_locked():
+		return get_player_faction_lock_message()
+
+	player_faction_id = normalized_faction_id
+	player_faction_locked = true
+	_last_player_faction_change = "Voie definitive : %s" % get_player_faction_name()
+	_emit_player_faction_changed()
+	_debug_player_faction("voie verrouillee -> %s" % get_player_faction_name())
+	return "%s\nVotre allegeance est desormais definitive" % _get_player_faction_path_message(player_faction_id)
+
+
+func get_player_faction_lock_message() -> String:
+	if is_player_faction_locked():
+		return "Allegeance verrouillee : %s\nCette voie est definitive pour cette partie.\nCommencez une nouvelle partie pour choisir une autre voie." % get_player_faction_name()
+
+	return "Choisissez une voie.\nCe choix est definitif pour cette partie.\nPour jouer une autre faction, il faudra commencer une nouvelle partie."
+
+
+func get_player_faction_lock_status() -> String:
+	if is_player_faction_locked():
+		return "Definitif pour cette partie"
+
+	return "choix non effectue"
+
+
 func get_player_faction_bonus_summary() -> String:
-	return FactionCatalog.get_player_bonus_summary(get_player_faction_id())
+	return FactionCatalog.get_player_bonus_summary(_get_active_player_faction_id())
 
 
 func get_player_ship_combat_gold_multiplier() -> float:
-	return FactionCatalog.get_player_bonus_modifier(get_player_faction_id(), "ship_combat_gold_multiplier", 1.0)
+	return FactionCatalog.get_player_bonus_modifier(_get_active_player_faction_id(), "ship_combat_gold_multiplier", 1.0)
 
 
 func get_player_pirate_renown_multiplier() -> float:
-	return FactionCatalog.get_player_bonus_modifier(get_player_faction_id(), "pirate_renown_multiplier", 1.0)
+	return FactionCatalog.get_player_bonus_modifier(_get_active_player_faction_id(), "pirate_renown_multiplier", 1.0)
 
 
 func get_player_trade_profit_multiplier() -> float:
-	return FactionCatalog.get_player_bonus_modifier(get_player_faction_id(), "trade_profit_multiplier", 1.0)
+	return FactionCatalog.get_player_bonus_modifier(_get_active_player_faction_id(), "trade_profit_multiplier", 1.0)
 
 
 func get_player_rare_creature_resource_multiplier() -> float:
-	return FactionCatalog.get_player_bonus_modifier(get_player_faction_id(), "rare_creature_resource_multiplier", 1.0)
+	return FactionCatalog.get_player_bonus_modifier(_get_active_player_faction_id(), "rare_creature_resource_multiplier", 1.0)
 
 
 func get_player_dangerous_creature_reward_multiplier() -> float:
-	return FactionCatalog.get_player_bonus_modifier(get_player_faction_id(), "dangerous_creature_reward_multiplier", 1.0)
+	return FactionCatalog.get_player_bonus_modifier(_get_active_player_faction_id(), "dangerous_creature_reward_multiplier", 1.0)
 
 
 func get_player_territory_bonus_faction() -> String:
-	return FactionCatalog.get_player_territory_bonus_faction(get_player_faction_id())
+	return FactionCatalog.get_player_territory_bonus_faction(_get_active_player_faction_id())
 
 
 func get_player_territory_bonus_amount() -> int:
-	return FactionCatalog.get_player_territory_bonus_amount(get_player_faction_id())
+	return FactionCatalog.get_player_territory_bonus_amount(_get_active_player_faction_id())
 
 
 func get_player_faction_debug_summary() -> String:
-	return "Faction joueur : %s\nBonus : %s\nDernier choix : %s\nDernier effet territoire : %s" % [
+	return "Faction joueur : %s\nStatut : %s\nBonus : %s\nDernier choix : %s\nDernier effet territoire : %s" % [
 		get_player_faction_name(),
+		get_player_faction_lock_status(),
 		get_player_faction_bonus_summary(),
 		_last_player_faction_change,
 		_last_player_faction_territory_bonus,
@@ -858,6 +911,9 @@ func _record_exploration_territory_change(zone_id_or_name: String, treasure_id: 
 
 
 func _apply_player_faction_territory_bonus(zone_id_or_name: String, action_id: String) -> void:
+	if not is_player_faction_locked():
+		return
+
 	var zone_id: String = DangerZoneCatalog.normalize_zone_id(zone_id_or_name)
 	var player_faction: String = get_player_faction_id()
 	match player_faction:
@@ -941,6 +997,15 @@ func _ensure_valid_player_ship_state() -> void:
 func _ensure_valid_player_faction_state() -> void:
 	if not FactionCatalog.has_player_faction(player_faction_id):
 		player_faction_id = FactionCatalog.FACTION_NEUTRAL
+		player_faction_locked = false
+		return
+
+	if player_faction_id == FactionCatalog.FACTION_NEUTRAL:
+		player_faction_locked = false
+		return
+
+	if not player_faction_locked:
+		player_faction_locked = true
 
 
 func _emit_player_faction_changed() -> void:
@@ -956,6 +1021,29 @@ func _debug_player_faction(message: String) -> void:
 		return
 
 	print("PlayerFaction: %s" % message)
+
+
+func _get_active_player_faction_id() -> String:
+	if not is_player_faction_locked():
+		return FactionCatalog.FACTION_NEUTRAL
+
+	return get_player_faction_id()
+
+
+func _get_player_faction_path_message(faction_id: String) -> String:
+	match FactionCatalog.normalize_player_faction_id(faction_id):
+		FactionCatalog.FACTION_PIRATES:
+			return "Vous avez choisi la voie des Pirates"
+		FactionCatalog.FACTION_NAVY:
+			return "Cette partie suivra la voie de la Marine royale"
+		FactionCatalog.FACTION_MERCHANTS:
+			return "Cette partie suivra la voie de la Ligue marchande"
+		FactionCatalog.FACTION_SMUGGLERS:
+			return "Cette partie suivra la voie des Contrebandiers"
+		FactionCatalog.FACTION_ABYSS_CULT:
+			return "Cette partie suivra la voie des Cultes abyssaux"
+
+	return "Allegeance mise a jour"
 
 
 func _emit_cargo_changed() -> void:
