@@ -11,6 +11,7 @@ signal exploration_progress_changed(discovered_treasures: int, explored_sites: i
 signal creature_resources_changed(resources: Dictionary, creatures_defeated: int)
 signal territory_control_changed(zone_id: String, control: Dictionary)
 signal territory_dominant_faction_changed(zone_id: String, faction_id: String, faction_name: String, message: String)
+signal player_faction_changed(faction_id: String, faction_name: String, bonus_summary: String)
 
 const ENEMIES_PER_DANGER_LEVEL := 3
 const STARTING_PLAYER_SHIP_ID := "barque"
@@ -30,13 +31,16 @@ var marine_creatures_defeated: int = 0
 var active_player_ship_id: String = STARTING_PLAYER_SHIP_ID
 var owned_player_ship_ids: Array[String] = [STARTING_PLAYER_SHIP_ID]
 var cargo_items: Dictionary = {}
+var player_faction_id: String = FactionCatalog.FACTION_NEUTRAL
 
 
 func _ready() -> void:
 	_ensure_valid_player_ship_state()
+	_ensure_valid_player_faction_state()
 	_emit_cargo_changed()
 	_emit_current_danger_zone_changed()
 	_emit_creature_resources_changed()
+	_emit_player_faction_changed()
 	call_deferred("_connect_territory_control_system")
 
 
@@ -273,6 +277,42 @@ func get_current_danger_zone_level() -> int:
 
 func get_current_danger_reward_multiplier() -> float:
 	return DangerZoneCatalog.get_reward_multiplier(current_danger_zone_id)
+
+
+func get_player_faction_id() -> String:
+	_ensure_valid_player_faction_state()
+	return player_faction_id
+
+
+func get_player_faction_name() -> String:
+	return FactionCatalog.get_player_faction_name(get_player_faction_id())
+
+
+func is_player_neutral() -> bool:
+	return get_player_faction_id() == FactionCatalog.FACTION_NEUTRAL
+
+
+func can_join_faction(faction_id: String) -> bool:
+	return FactionCatalog.has_player_faction(faction_id)
+
+
+func set_player_faction(faction_id: String) -> String:
+	if not can_join_faction(faction_id):
+		player_faction_id = FactionCatalog.FACTION_NEUTRAL
+		_emit_player_faction_changed()
+		return "Faction inconnue - retour a la neutralite"
+
+	var normalized_faction_id: String = FactionCatalog.normalize_player_faction_id(faction_id)
+	if normalized_faction_id == player_faction_id:
+		return "Allegeance actuelle : %s" % get_player_faction_name()
+
+	player_faction_id = normalized_faction_id
+	_emit_player_faction_changed()
+	return "Allegeance : %s" % get_player_faction_name()
+
+
+func get_player_faction_bonus_summary() -> String:
+	return FactionCatalog.get_player_bonus_summary(get_player_faction_id())
 
 
 func get_zone_control(zone_id_or_name: String) -> Dictionary:
@@ -796,6 +836,19 @@ func _ensure_valid_player_ship_state() -> void:
 		owned_player_ship_ids.insert(0, STARTING_PLAYER_SHIP_ID)
 	if not owned_player_ship_ids.has(active_player_ship_id):
 		owned_player_ship_ids.append(active_player_ship_id)
+
+
+func _ensure_valid_player_faction_state() -> void:
+	if not FactionCatalog.has_player_faction(player_faction_id):
+		player_faction_id = FactionCatalog.FACTION_NEUTRAL
+
+
+func _emit_player_faction_changed() -> void:
+	player_faction_changed.emit(
+		get_player_faction_id(),
+		get_player_faction_name(),
+		get_player_faction_bonus_summary()
+	)
 
 
 func _emit_cargo_changed() -> void:

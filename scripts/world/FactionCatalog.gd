@@ -1,6 +1,7 @@
 class_name FactionCatalog
 extends RefCounted
 
+const FACTION_NEUTRAL: String = "neutral"
 const FACTION_PIRATES: String = "pirates"
 const FACTION_NAVY: String = "navy"
 const FACTION_MERCHANTS: String = "merchants"
@@ -15,6 +16,25 @@ const ALL_FACTIONS: Array[String] = [
 	FACTION_ABYSS_CULT,
 ]
 
+const PLAYER_FACTIONS: Array[String] = [
+	FACTION_NEUTRAL,
+	FACTION_PIRATES,
+	FACTION_NAVY,
+	FACTION_MERCHANTS,
+	FACTION_SMUGGLERS,
+	FACTION_ABYSS_CULT,
+]
+
+const NEUTRAL_PLAYER_FACTION: Dictionary = {
+	"name": "Neutre",
+	"hud_label": "Neutre",
+	"description": "Aucune allegiance officielle. Le capitaine reste libre de ses choix.",
+	"style": "independance, flexibilite",
+	"base_relation": "neutre",
+	"player_bonus": "Aucun bonus, aucune penalite.",
+	"join_message": "Vous etes redevenu neutre",
+}
+
 const FACTIONS: Dictionary = {
 	FACTION_PIRATES: {
 		"name": "Pirates",
@@ -22,6 +42,8 @@ const FACTIONS: Dictionary = {
 		"description": "Pillage, chaos et combat naval.",
 		"style": "pillage, chaos, combat",
 		"base_relation": "hostile",
+		"player_bonus": "+10 % or sur les combats contre navires ennemis.",
+		"join_message": "Vous avez rejoint les Pirates",
 		"pirate_spawn_multiplier": 1.25,
 		"marine_spawn_multiplier": 1.05,
 		"dangerous_creature_multiplier": 1.05,
@@ -39,6 +61,8 @@ const FACTIONS: Dictionary = {
 		"description": "Ordre, securite et chasse aux pirates.",
 		"style": "ordre, securite, chasse aux pirates",
 		"base_relation": "neutre",
+		"player_bonus": "+10 % renom contre les pirates et influence marine accrue.",
+		"join_message": "Vous avez prete serment a la Marine royale",
 		"pirate_spawn_multiplier": 0.75,
 		"marine_spawn_multiplier": 0.90,
 		"dangerous_creature_multiplier": 0.90,
@@ -56,6 +80,8 @@ const FACTIONS: Dictionary = {
 		"description": "Commerce, routes maritimes et richesse.",
 		"style": "commerce, routes maritimes, richesse",
 		"base_relation": "amicale",
+		"player_bonus": "+5 % benefice commerce et influence marchande accrue.",
+		"join_message": "Vous soutenez desormais la Ligue marchande",
 		"pirate_spawn_multiplier": 0.85,
 		"marine_spawn_multiplier": 0.95,
 		"dangerous_creature_multiplier": 0.92,
@@ -73,6 +99,8 @@ const FACTIONS: Dictionary = {
 		"description": "Marche noir, ports caches et objets rares.",
 		"style": "marche noir, ports caches, objets rares",
 		"base_relation": "mefiante",
+		"player_bonus": "+10 % ressources rares de creatures marines.",
+		"join_message": "Vous travaillez avec les Contrebandiers",
 		"pirate_spawn_multiplier": 1.05,
 		"marine_spawn_multiplier": 1.00,
 		"dangerous_creature_multiplier": 1.00,
@@ -90,6 +118,8 @@ const FACTIONS: Dictionary = {
 		"description": "Monstres marins, zones maudites et tresors mythiques.",
 		"style": "monstres marins, zones maudites, tresors mythiques",
 		"base_relation": "hostile",
+		"player_bonus": "+10 % or et ressources sur creatures marines dangereuses.",
+		"join_message": "Vous avez accepte les murmures des Cultes abyssaux",
 		"pirate_spawn_multiplier": 0.85,
 		"marine_spawn_multiplier": 1.25,
 		"dangerous_creature_multiplier": 1.25,
@@ -108,8 +138,23 @@ static func get_faction_ids() -> Array[String]:
 	return ALL_FACTIONS.duplicate()
 
 
+static func get_player_faction_ids() -> Array[String]:
+	return PLAYER_FACTIONS.duplicate()
+
+
 static func has_faction(faction_id: String) -> bool:
 	return FACTIONS.has(faction_id)
+
+
+static func has_player_faction(faction_id: String) -> bool:
+	return faction_id == FACTION_NEUTRAL or has_faction(faction_id)
+
+
+static func normalize_player_faction_id(faction_id: String) -> String:
+	if has_player_faction(faction_id):
+		return faction_id
+
+	return FACTION_NEUTRAL
 
 
 static func get_faction(faction_id: String) -> Dictionary:
@@ -120,9 +165,22 @@ static func get_faction(faction_id: String) -> Dictionary:
 	return faction.duplicate(true)
 
 
+static func get_player_faction(faction_id: String) -> Dictionary:
+	var normalized_id: String = normalize_player_faction_id(faction_id)
+	if normalized_id == FACTION_NEUTRAL:
+		return NEUTRAL_PLAYER_FACTION.duplicate(true)
+
+	return get_faction(normalized_id)
+
+
 static func get_faction_name(faction_id: String) -> String:
 	var faction: Dictionary = get_faction(faction_id)
 	return String(faction.get("name", faction_id))
+
+
+static func get_player_faction_name(faction_id: String) -> String:
+	var faction: Dictionary = get_player_faction(faction_id)
+	return String(faction.get("name", "Neutre"))
 
 
 static func get_hud_label(faction_id: String) -> String:
@@ -130,9 +188,29 @@ static func get_hud_label(faction_id: String) -> String:
 	return String(faction.get("hud_label", get_faction_name(faction_id)))
 
 
+static func get_player_hud_label(faction_id: String) -> String:
+	var faction: Dictionary = get_player_faction(faction_id)
+	return String(faction.get("hud_label", get_player_faction_name(faction_id)))
+
+
 static func get_description(faction_id: String) -> String:
 	var faction: Dictionary = get_faction(faction_id)
 	return String(faction.get("description", ""))
+
+
+static func get_player_description(faction_id: String) -> String:
+	var faction: Dictionary = get_player_faction(faction_id)
+	return String(faction.get("description", ""))
+
+
+static func get_player_bonus_summary(faction_id: String) -> String:
+	var faction: Dictionary = get_player_faction(faction_id)
+	return String(faction.get("player_bonus", "Aucun bonus, aucune penalite."))
+
+
+static func get_player_join_message(faction_id: String) -> String:
+	var faction: Dictionary = get_player_faction(faction_id)
+	return String(faction.get("join_message", "Allegeance mise a jour"))
 
 
 static func get_style(faction_id: String) -> String:
