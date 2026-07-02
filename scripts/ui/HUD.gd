@@ -521,8 +521,13 @@ func _refresh_territory_labels(zone_id: String, control: Dictionary) -> void:
 
 func _refresh_player_faction_from_game_state() -> void:
 	if _game_state == null:
-		compact_player_faction_label.text = "Allegeance: Neutre\nChoix ouvert"
-		player_faction_label.text = "Voie du joueur : Neutre\nStatut : choix non effectue\nBonus : aucun\nControle local : inconnu"
+		compact_player_faction_label.text = "Allegeance: a choisir\nChoix requis"
+		player_faction_label.text = "Voie du joueur : a choisir\nStatut : choix non effectue\nBonus : aucun\nControle local : inconnu"
+		return
+
+	if _game_state.has_method("needs_start_faction_choice") and bool(_game_state.call("needs_start_faction_choice")):
+		compact_player_faction_label.text = "Allegeance: a choisir\nChoix requis"
+		player_faction_label.text = "Voie du joueur : a choisir\nStatut : choix requis au debut de partie\nBonus : aucun\nControle local : inconnu"
 		return
 
 	var faction_name: String = "Neutre"
