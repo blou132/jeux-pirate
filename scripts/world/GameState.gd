@@ -12,11 +12,16 @@ signal creature_resources_changed(resources: Dictionary, creatures_defeated: int
 signal territory_control_changed(zone_id: String, control: Dictionary)
 signal territory_dominant_faction_changed(zone_id: String, faction_id: String, faction_name: String, message: String)
 signal player_faction_changed(faction_id: String, faction_name: String, bonus_summary: String)
+signal faction_mission_changed(mission_id: String)
+signal faction_mission_progress_changed(mission_id: String, progress: int, target: int)
+signal faction_mission_completed(mission_id: String, mission_name: String)
+signal faction_mission_reward_claimed(mission_id: String, mission_name: String)
 
 const ENEMIES_PER_DANGER_LEVEL := 3
 const STARTING_PLAYER_SHIP_ID := "barque"
 
 @export var debug_player_faction: bool = false
+@export var debug_faction_missions: bool = false
 
 var danger_level: int = 1
 var current_danger_zone_id: String = DangerZoneCatalog.ZONE_SAFE
@@ -35,17 +40,24 @@ var owned_player_ship_ids: Array[String] = [STARTING_PLAYER_SHIP_ID]
 var cargo_items: Dictionary = {}
 var player_faction_id: String = FactionCatalog.FACTION_NEUTRAL
 var player_faction_locked: bool = false
+var active_faction_mission_id: String = ""
+var faction_mission_states: Dictionary = {}
 var _last_player_faction_change: String = "Neutre"
 var _last_player_faction_territory_bonus: String = "Aucun"
+var _last_faction_mission_objective: String = "Aucun"
+var _last_faction_mission_reward: String = "Aucune"
+var _last_faction_mission_influence: String = "Aucune"
 
 
 func _ready() -> void:
 	_ensure_valid_player_ship_state()
 	_ensure_valid_player_faction_state()
+	_ensure_valid_faction_mission_state()
 	_emit_cargo_changed()
 	_emit_current_danger_zone_changed()
 	_emit_creature_resources_changed()
 	_emit_player_faction_changed()
+	_emit_faction_mission_changed()
 	call_deferred("_connect_territory_control_system")
 
 
@@ -421,6 +433,219 @@ func print_player_faction_debug() -> void:
 		return
 
 	print(get_player_faction_debug_summary())
+
+
+func get_faction_mission_views() -> Array[Dictionary]:
+	_ensure_valid_faction_mission_state()
+	var views: Array[Dictionary] = []
+	if not is_player_faction_locked() or is_player_neutral():
+		return views
+
+	var mission_ids: Array[String] = FactionMissionCatalog.get_mission_ids_for_faction(get_player_faction_id())
+	for mission_id in mission_ids:
+		views.append(get_faction_mission_view(mission_id))
+
+	return views
+
+
+func get_faction_mission_view(mission_id: String) -> Dictionary:
+	if not FactionMissionCatalog.has_mission(mission_id):
+		return {}
+
+	var mission: Dictionary = FactionMissionCatalog.get_mission(mission_id)
+	var state: Dictionary = _get_faction_mission_state(mission_id)
+	var objective_type: String = String(mission.get("objective_type", ""))
+	var progress: int = clampi(int(state.get("progress", 0)), 0, FactionMissionCatalog.get_target(mission_id))
+	var target: int = FactionMissionCatalog.get_target(mission_id)
+	var view: Dictionary = mission.duplicate(true)
+	view["id"] = mission_id
+	view["progress"] = progress
+	view["target"] = target
+	view["active"] = active_faction_mission_id == mission_id
+	view["completed"] = bool(state.get("completed", false))
+	view["reward_claimed"] = bool(state.get("reward_claimed", false))
+	view["progress_text"] = _build_faction_mission_progress_text(mission_id)
+	view["short_progress_text"] = _build_faction_mission_short_progress_text(mission_id)
+	view["reward_text"] = _build_faction_mission_reward_text(mission_id)
+	view["status_text"] = _build_faction_mission_status_text(mission_id)
+	view["objective_label"] = FactionMissionCatalog.get_objective_label(objective_type)
+	view["can_accept"] = can_accept_faction_mission(mission_id)
+	view["can_claim"] = can_claim_faction_mission_reward(mission_id)
+	return view
+
+
+func get_active_faction_mission() -> Dictionary:
+	_ensure_valid_faction_mission_state()
+	if active_faction_mission_id.is_empty():
+		return {}
+
+	return get_faction_mission_view(active_faction_mission_id)
+
+
+func get_active_faction_mission_summary() -> String:
+	var active_view: Dictionary = get_active_faction_mission()
+	if active_view.is_empty():
+		return "Mission de faction : aucune"
+
+	if bool(active_view.get("completed", false)) and not bool(active_view.get("reward_claimed", false)):
+		return "Mission de faction terminee : %s" % String(active_view.get("name", "Mission"))
+
+	return "Mission de faction : %s - %s" % [
+		String(active_view.get("name", "Mission")),
+		String(active_view.get("short_progress_text", "")),
+	]
+
+
+func can_accept_faction_mission(mission_id: String) -> bool:
+	if not FactionMissionCatalog.has_mission(mission_id):
+		return false
+	if not is_player_faction_locked() or is_player_neutral():
+		return false
+	if not active_faction_mission_id.is_empty():
+		return false
+	if FactionMissionCatalog.get_mission_faction_id(mission_id) != get_player_faction_id():
+		return false
+
+	var state: Dictionary = _get_faction_mission_state(mission_id)
+	return not bool(state.get("completed", false)) and not bool(state.get("reward_claimed", false))
+
+
+func accept_faction_mission(mission_id: String) -> String:
+	_ensure_valid_faction_mission_state()
+	if not FactionMissionCatalog.has_mission(mission_id):
+		return "Mission de faction indisponible"
+	if not is_player_faction_locked() or is_player_neutral():
+		return "Vous etes Neutre. Choisissez une voie de faction pour acceder aux missions de faction."
+	if FactionMissionCatalog.get_mission_faction_id(mission_id) != get_player_faction_id():
+		return "Mission inaccessible : mauvaise faction"
+	if not active_faction_mission_id.is_empty():
+		return "Une mission de faction est deja active"
+
+	var state: Dictionary = _get_faction_mission_state(mission_id)
+	if bool(state.get("reward_claimed", false)):
+		return "Recompense deja recuperee"
+	if bool(state.get("completed", false)):
+		return "Mission deja terminee"
+
+	state["progress"] = 0
+	state["completed"] = false
+	state["reward_claimed"] = false
+	faction_mission_states[mission_id] = state
+	active_faction_mission_id = mission_id
+	_last_faction_mission_objective = "Mission acceptee : %s" % FactionMissionCatalog.get_mission_name(mission_id)
+	_emit_faction_mission_changed()
+	_debug_faction_mission(_last_faction_mission_objective)
+	return "Mission acceptee : %s\n%s" % [
+		FactionMissionCatalog.get_mission_name(mission_id),
+		FactionMissionCatalog.get_accept_text(mission_id),
+	]
+
+
+func cancel_faction_mission() -> String:
+	_ensure_valid_faction_mission_state()
+	if active_faction_mission_id.is_empty():
+		return "Aucune mission de faction active"
+
+	var mission_name: String = FactionMissionCatalog.get_mission_name(active_faction_mission_id)
+	active_faction_mission_id = ""
+	_emit_faction_mission_changed()
+	return "Mission de faction annulee : %s" % mission_name
+
+
+func update_faction_mission_progress(objective_type: String, amount: int) -> void:
+	_ensure_valid_faction_mission_state()
+	if active_faction_mission_id.is_empty() or amount <= 0:
+		return
+
+	var mission_id: String = active_faction_mission_id
+	if not FactionMissionCatalog.has_mission(mission_id):
+		active_faction_mission_id = ""
+		_emit_faction_mission_changed()
+		return
+	if FactionMissionCatalog.get_objective_type(mission_id) != objective_type:
+		return
+
+	var state: Dictionary = _get_faction_mission_state(mission_id)
+	if bool(state.get("completed", false)):
+		return
+
+	var target: int = FactionMissionCatalog.get_target(mission_id)
+	var progress: int = clampi(int(state.get("progress", 0)) + amount, 0, target)
+	state["progress"] = progress
+	faction_mission_states[mission_id] = state
+
+	_last_faction_mission_objective = "%s : %s" % [
+		FactionMissionCatalog.get_mission_name(mission_id),
+		_build_faction_mission_progress_text(mission_id),
+	]
+	if progress >= target:
+		complete_faction_mission()
+	else:
+		_emit_faction_mission_progress(mission_id)
+
+
+func complete_faction_mission() -> String:
+	_ensure_valid_faction_mission_state()
+	if active_faction_mission_id.is_empty():
+		return "Aucune mission de faction active"
+
+	var mission_id: String = active_faction_mission_id
+	if not FactionMissionCatalog.has_mission(mission_id):
+		active_faction_mission_id = ""
+		_emit_faction_mission_changed()
+		return "Mission de faction invalide"
+
+	var state: Dictionary = _get_faction_mission_state(mission_id)
+	if bool(state.get("completed", false)):
+		return "Mission deja terminee : %s" % FactionMissionCatalog.get_mission_name(mission_id)
+
+	state["progress"] = FactionMissionCatalog.get_target(mission_id)
+	state["completed"] = true
+	faction_mission_states[mission_id] = state
+	faction_mission_completed.emit(mission_id, FactionMissionCatalog.get_mission_name(mission_id))
+	_emit_faction_mission_changed()
+	_debug_faction_mission("terminee -> %s" % FactionMissionCatalog.get_mission_name(mission_id))
+	return "Mission terminee : %s" % FactionMissionCatalog.get_mission_name(mission_id)
+
+
+func can_claim_faction_mission_reward(mission_id: String = "") -> bool:
+	_ensure_valid_faction_mission_state()
+	var checked_mission_id: String = mission_id
+	if checked_mission_id.is_empty():
+		checked_mission_id = active_faction_mission_id
+	if checked_mission_id.is_empty() or not FactionMissionCatalog.has_mission(checked_mission_id):
+		return false
+	if FactionMissionCatalog.get_mission_faction_id(checked_mission_id) != get_player_faction_id():
+		return false
+
+	var state: Dictionary = _get_faction_mission_state(checked_mission_id)
+	return bool(state.get("completed", false)) and not bool(state.get("reward_claimed", false))
+
+
+func claim_faction_mission_reward() -> String:
+	return "Recompenses de missions de faction non branchees"
+
+
+func get_faction_mission_debug_summary() -> String:
+	var active_name: String = "Aucune"
+	if not active_faction_mission_id.is_empty() and FactionMissionCatalog.has_mission(active_faction_mission_id):
+		active_name = FactionMissionCatalog.get_mission_name(active_faction_mission_id)
+
+	return "Faction joueur : %s\nMission active : %s\nProgression : %s\nDernier objectif : %s\nDerniere recompense : %s\nDerniere influence : %s" % [
+		get_player_faction_name(),
+		active_name,
+		_build_faction_mission_progress_text(active_faction_mission_id),
+		_last_faction_mission_objective,
+		_last_faction_mission_reward,
+		_last_faction_mission_influence,
+	]
+
+
+func print_faction_mission_debug() -> void:
+	if not debug_faction_missions:
+		return
+
+	print(get_faction_mission_debug_summary())
 
 
 func get_zone_control(zone_id_or_name: String) -> Dictionary:
@@ -983,6 +1208,128 @@ func _emit_current_territory_control_changed() -> void:
 		return
 
 	territory_control_changed.emit(current_danger_zone_id, control)
+
+
+func _get_faction_mission_state(mission_id: String) -> Dictionary:
+	if mission_id.is_empty():
+		return _make_initial_faction_mission_state()
+	if faction_mission_states.has(mission_id):
+		var state: Dictionary = faction_mission_states[mission_id]
+		return state.duplicate(true)
+
+	return _make_initial_faction_mission_state()
+
+
+func _make_initial_faction_mission_state() -> Dictionary:
+	return {
+		"progress": 0,
+		"completed": false,
+		"reward_claimed": false,
+	}
+
+
+func _build_faction_mission_progress_text(mission_id: String) -> String:
+	if mission_id.is_empty() or not FactionMissionCatalog.has_mission(mission_id):
+		return "0/0"
+
+	var state: Dictionary = _get_faction_mission_state(mission_id)
+	var progress: int = clampi(int(state.get("progress", 0)), 0, FactionMissionCatalog.get_target(mission_id))
+	var target: int = FactionMissionCatalog.get_target(mission_id)
+	var objective_label: String = FactionMissionCatalog.get_objective_label(FactionMissionCatalog.get_objective_type(mission_id))
+	return "%d/%d %s" % [progress, target, objective_label]
+
+
+func _build_faction_mission_short_progress_text(mission_id: String) -> String:
+	if mission_id.is_empty() or not FactionMissionCatalog.has_mission(mission_id):
+		return "0/0"
+
+	var state: Dictionary = _get_faction_mission_state(mission_id)
+	var progress: int = clampi(int(state.get("progress", 0)), 0, FactionMissionCatalog.get_target(mission_id))
+	var target: int = FactionMissionCatalog.get_target(mission_id)
+	return "%d/%d" % [progress, target]
+
+
+func _build_faction_mission_reward_text(mission_id: String) -> String:
+	if mission_id.is_empty() or not FactionMissionCatalog.has_mission(mission_id):
+		return "Aucune"
+
+	var reward: Dictionary = FactionMissionCatalog.get_reward(mission_id)
+	var parts: Array[String] = []
+	var gold_reward: int = maxi(0, int(reward.get("gold", 0)))
+	var wood_reward: int = maxi(0, int(reward.get("wood", 0)))
+	var fragment_reward: int = maxi(0, int(reward.get("map_fragments", 0)))
+	var relic_reward: int = maxi(0, int(reward.get("ancient_relics", 0)))
+	var renown_reward: int = maxi(0, int(reward.get("renown", 0)))
+	if gold_reward > 0:
+		parts.append("%d or" % gold_reward)
+	if wood_reward > 0:
+		parts.append("%d bois" % wood_reward)
+	if fragment_reward > 0:
+		parts.append("%d fragment" % fragment_reward)
+	if relic_reward > 0:
+		parts.append("%d relique" % relic_reward)
+	if renown_reward > 0:
+		parts.append("%d renom" % renown_reward)
+
+	var creature_resources: Dictionary = reward.get("creature_resources", {})
+	for resource_id in creature_resources.keys():
+		var resource_key: String = String(resource_id)
+		var amount: int = maxi(0, int(creature_resources.get(resource_key, 0)))
+		if amount > 0:
+			parts.append("%s x%d" % [MarineCreatureCatalog.get_resource_name(resource_key), amount])
+
+	if parts.is_empty():
+		return "Aucune"
+
+	return ", ".join(parts)
+
+
+func _build_faction_mission_status_text(mission_id: String) -> String:
+	if not FactionMissionCatalog.has_mission(mission_id):
+		return "Indisponible"
+
+	var state: Dictionary = _get_faction_mission_state(mission_id)
+	if bool(state.get("reward_claimed", false)):
+		return "Recompense recuperee"
+	if bool(state.get("completed", false)):
+		return "Terminee"
+	if active_faction_mission_id == mission_id:
+		return "Active"
+	return "Disponible"
+
+
+func _ensure_valid_faction_mission_state() -> void:
+	if active_faction_mission_id.is_empty():
+		return
+	if not FactionMissionCatalog.has_mission(active_faction_mission_id):
+		active_faction_mission_id = ""
+		return
+	if not is_player_faction_locked() or is_player_neutral():
+		active_faction_mission_id = ""
+		return
+	if FactionMissionCatalog.get_mission_faction_id(active_faction_mission_id) != get_player_faction_id():
+		active_faction_mission_id = ""
+
+
+func _emit_faction_mission_changed() -> void:
+	faction_mission_changed.emit(active_faction_mission_id)
+
+
+func _emit_faction_mission_progress(mission_id: String) -> void:
+	var state: Dictionary = _get_faction_mission_state(mission_id)
+	faction_mission_progress_changed.emit(
+		mission_id,
+		int(state.get("progress", 0)),
+		FactionMissionCatalog.get_target(mission_id)
+	)
+	_emit_faction_mission_changed()
+
+
+func _debug_faction_mission(message: String) -> void:
+	if not debug_faction_missions:
+		return
+
+	print("FactionMission: %s" % message)
 
 
 func _ensure_valid_player_ship_state() -> void:
