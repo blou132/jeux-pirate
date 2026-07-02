@@ -44,6 +44,8 @@ var active_faction_mission_id: String = ""
 var faction_mission_states: Dictionary = {}
 var _last_player_faction_change: String = "Neutre"
 var _last_player_faction_territory_bonus: String = "Aucun"
+var _legacy_faction_state_detected: bool = false
+var _last_start_faction_choice_state: String = "Etat initial neutre"
 var _last_faction_mission_objective: String = "Aucun"
 var _last_faction_mission_reward: String = "Aucune"
 var _last_faction_mission_influence: String = "Aucune"
@@ -396,6 +398,20 @@ func needs_start_faction_choice() -> bool:
 	return player_faction_id == FactionCatalog.FACTION_NEUTRAL and not player_faction_locked
 
 
+func get_start_faction_choice_status() -> String:
+	_ensure_valid_player_faction_state()
+	if needs_start_faction_choice():
+		return "Choix de faction requis au debut de la partie"
+	if is_player_faction_locked():
+		return "Voie verrouillee : %s" % get_player_faction_name()
+
+	return "Etat de faction a verifier"
+
+
+func was_legacy_faction_state_detected() -> bool:
+	return _legacy_faction_state_detected
+
+
 func get_player_faction_bonus_summary() -> String:
 	return FactionCatalog.get_player_bonus_summary(_get_active_player_faction_id())
 
@@ -429,11 +445,13 @@ func get_player_territory_bonus_amount() -> int:
 
 
 func get_player_faction_debug_summary() -> String:
-	return "Faction joueur : %s\nStatut : %s\nBonus : %s\nDernier choix : %s\nDernier effet territoire : %s" % [
+	return "Faction joueur : %s\nStatut : %s\nBonus : %s\nDernier choix : %s\nEtat choix initial : %s\nAncienne sauvegarde detectee : %s\nDernier effet territoire : %s" % [
 		get_player_faction_name(),
 		get_player_faction_lock_status(),
 		get_player_faction_bonus_summary(),
 		_last_player_faction_change,
+		_last_start_faction_choice_state,
+		"oui" if _legacy_faction_state_detected else "non",
 		_last_player_faction_territory_bonus,
 	]
 
@@ -1488,14 +1506,22 @@ func _ensure_valid_player_faction_state() -> void:
 	if not FactionCatalog.has_player_faction(player_faction_id):
 		player_faction_id = FactionCatalog.FACTION_NEUTRAL
 		player_faction_locked = false
+		_legacy_faction_state_detected = true
+		_last_start_faction_choice_state = "Faction invalide detectee : retour a Neutre"
 		return
 
 	if player_faction_id == FactionCatalog.FACTION_NEUTRAL:
 		player_faction_locked = false
+		_last_start_faction_choice_state = "Neutre technique : choix initial requis"
 		return
 
 	if not player_faction_locked:
 		player_faction_locked = true
+		_legacy_faction_state_detected = true
+		_last_start_faction_choice_state = "Ancienne sauvegarde : faction existante verrouillee automatiquement"
+		return
+
+	_last_start_faction_choice_state = "Voie verrouillee : %s" % FactionCatalog.get_player_faction_name(player_faction_id)
 
 
 func _emit_player_faction_changed() -> void:
