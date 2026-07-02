@@ -188,6 +188,7 @@ func add_creature_resource(resource_id: String, amount: int) -> void:
 
 	var current_amount: int = maxi(0, int(creature_resources.get(resource_id, 0)))
 	creature_resources[resource_id] = current_amount + amount
+	_apply_player_faction_territory_bonus(get_current_danger_zone_id_safe(), "rare_creature_resource")
 	_emit_creature_resources_changed()
 
 
@@ -698,6 +699,7 @@ func record_trade_completed(zone_id_or_name: String, amount: int = 1) -> void:
 		1,
 		"routes marchandes securisees"
 	)
+	_apply_player_faction_territory_bonus(zone_id, "trade_completed")
 
 
 func get_owned_player_ship_ids() -> Array[String]:
@@ -777,6 +779,7 @@ func _record_enemy_destroyed_territory_change() -> void:
 	reduce_faction_influence(zone_id, FactionCatalog.FACTION_PIRATES, 2, "pirate detruit")
 	add_faction_influence(zone_id, FactionCatalog.FACTION_NAVY, 1, "pirate detruit")
 	add_faction_influence(zone_id, FactionCatalog.FACTION_MERCHANTS, 1, "route securisee")
+	_apply_player_faction_territory_bonus(zone_id, "enemy_destroyed")
 
 
 func _record_marine_creature_territory_change(creature_id: String) -> void:
@@ -806,15 +809,37 @@ func _record_exploration_territory_change(zone_id_or_name: String, treasure_id: 
 	if zone_level >= 5:
 		reduce_faction_influence(zone_id, FactionCatalog.FACTION_ABYSS_CULT, 2, "tresor explore")
 		add_faction_influence(zone_id, FactionCatalog.FACTION_SMUGGLERS, 1, "rumeurs de tresor")
+		_apply_player_faction_territory_bonus(zone_id, "exploration")
 		return
 
 	if not treasure_id.is_empty() and TreasureCatalog.get_required_ancient_relics(treasure_id) > 0:
 		reduce_faction_influence(zone_id, FactionCatalog.FACTION_ABYSS_CULT, 1, "relique recuperee")
 		add_faction_influence(zone_id, FactionCatalog.FACTION_MERCHANTS, 1, "decouverte revendable")
+		_apply_player_faction_territory_bonus(zone_id, "exploration")
 		return
 
 	reduce_faction_influence(zone_id, FactionCatalog.FACTION_PIRATES, 1, "site explore")
 	add_faction_influence(zone_id, FactionCatalog.FACTION_MERCHANTS, 1, "cartographie utile")
+	_apply_player_faction_territory_bonus(zone_id, "exploration")
+
+
+func _apply_player_faction_territory_bonus(zone_id_or_name: String, action_id: String) -> void:
+	var zone_id: String = DangerZoneCatalog.normalize_zone_id(zone_id_or_name)
+	var player_faction: String = get_player_faction_id()
+	match player_faction:
+		FactionCatalog.FACTION_PIRATES:
+			if action_id == "exploration":
+				add_faction_influence(zone_id, FactionCatalog.FACTION_PIRATES, 1, "allegeance pirate")
+		FactionCatalog.FACTION_NAVY:
+			if action_id == "enemy_destroyed":
+				reduce_faction_influence(zone_id, FactionCatalog.FACTION_PIRATES, 1, "serment marine")
+				add_faction_influence(zone_id, FactionCatalog.FACTION_NAVY, 1, "serment marine")
+		FactionCatalog.FACTION_MERCHANTS:
+			if action_id == "trade_completed":
+				add_faction_influence(zone_id, FactionCatalog.FACTION_MERCHANTS, 1, "allegeance marchande")
+		FactionCatalog.FACTION_SMUGGLERS:
+			if action_id == "rare_creature_resource" or action_id == "exploration":
+				add_faction_influence(zone_id, FactionCatalog.FACTION_SMUGGLERS, 1, "reseau contrebandier")
 
 
 func _get_quest_system() -> Node:
