@@ -216,6 +216,16 @@ Correctif v0.15.2 :
 - Preparer des reactions plus visibles des ports selon la faction dominante.
 - Garder hors scope la diplomatie avancee et la conquete complete de ports.
 
+## v0.18 - Generation procedurale de carte
+
+- Ajouter un seed de monde pour preparer des parties differentes.
+- Placer proceduralement ou semi-proceduralement les iles.
+- Placer proceduralement les ports secondaires.
+- Placer proceduralement les tresors et sites d'exploration.
+- Varier les secrets selon la partie pour eviter que le joueur connaisse toujours les emplacements.
+- Generer ou semi-generer les zones de danger.
+- Garder une carte lisible et testable avant toute extension massive.
+
 ## v1.0 - Polish global
 
 - Boucle complete : partir du port, naviguer, combattre, looter, reparer, ameliorer, recruter, commercer et accomplir des missions.
