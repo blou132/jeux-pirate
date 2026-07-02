@@ -4,7 +4,11 @@ extends Node3D
 @onready var hud: CanvasLayer = $HUD
 @onready var port_menu: CanvasLayer = $PortMenu
 @onready var island_exploration_menu: CanvasLayer = $IslandExplorationMenu
+@onready var faction_choice_screen: CanvasLayer = $FactionChoiceScreen
 @onready var fleet_manager: FleetManager = $FleetManager
+
+var _pause_state_before_start_choice: bool = false
+var _start_choice_blocking_gameplay: bool = false
 
 
 func _enter_tree() -> void:
@@ -27,6 +31,49 @@ func _ready() -> void:
 
 	for island in get_tree().get_nodes_in_group("islands"):
 		_connect_island(island)
+
+	_connect_faction_choice_screen()
+	call_deferred("_open_start_faction_choice_if_needed")
+
+
+func _connect_faction_choice_screen() -> void:
+	if faction_choice_screen == null or not faction_choice_screen.has_signal("faction_choice_confirmed"):
+		return
+
+	var callback: Callable = Callable(self, "_on_start_faction_choice_confirmed")
+	if not faction_choice_screen.is_connected("faction_choice_confirmed", callback):
+		faction_choice_screen.connect("faction_choice_confirmed", callback)
+
+
+func _open_start_faction_choice_if_needed() -> void:
+	var game_state: Node = get_node_or_null("/root/GameState")
+	if game_state == null or not game_state.has_method("needs_start_faction_choice"):
+		return
+	if not bool(game_state.call("needs_start_faction_choice")):
+		return
+	if faction_choice_screen == null or not faction_choice_screen.has_method("open"):
+		return
+
+	_set_start_choice_gameplay_blocked(true)
+	faction_choice_screen.call("open")
+
+
+func _on_start_faction_choice_confirmed(_faction_id: String, message: String) -> void:
+	_set_start_choice_gameplay_blocked(false)
+	if hud != null and hud.has_method("show_temporary_context_message"):
+		hud.call("show_temporary_context_message", message, 3.0)
+
+
+func _set_start_choice_gameplay_blocked(blocked: bool) -> void:
+	if blocked == _start_choice_blocking_gameplay:
+		return
+
+	_start_choice_blocking_gameplay = blocked
+	if blocked:
+		_pause_state_before_start_choice = get_tree().paused
+		get_tree().paused = true
+	else:
+		get_tree().paused = _pause_state_before_start_choice
 
 
 func _connect_port(port: Node) -> void:

@@ -391,6 +391,11 @@ func get_player_faction_lock_status() -> String:
 	return "choix non effectue"
 
 
+func needs_start_faction_choice() -> bool:
+	_ensure_valid_player_faction_state()
+	return player_faction_id == FactionCatalog.FACTION_NEUTRAL and not player_faction_locked
+
+
 func get_player_faction_bonus_summary() -> String:
 	return FactionCatalog.get_player_bonus_summary(_get_active_player_faction_id())
 
