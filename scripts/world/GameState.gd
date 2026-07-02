@@ -304,7 +304,7 @@ func is_player_faction_locked() -> bool:
 
 
 func can_join_faction(faction_id: String) -> bool:
-	return FactionCatalog.has_player_faction(faction_id)
+	return can_choose_player_faction(faction_id)
 
 
 func can_choose_player_faction(faction_id: String) -> bool:
