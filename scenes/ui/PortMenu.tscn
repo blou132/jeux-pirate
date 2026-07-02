@@ -307,12 +307,14 @@ theme_override_constants/separation = 6
 
 [node name="FactionIntroLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer"]
 layout_mode = 2
-text = "Choisir une faction"
+text = "Choisissez une voie.
+Ce choix est definitif pour cette partie."
 horizontal_alignment = 1
+autowrap_mode = 3
 
 [node name="CurrentFactionLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer"]
 layout_mode = 2
-text = "Faction actuelle : Neutre"
+text = "Allegeance actuelle : Neutre"
 horizontal_alignment = 1
 autowrap_mode = 3
 
@@ -321,19 +323,20 @@ custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 
 [node name="FactionDetailsLabel" type="Label" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer"]
+custom_minimum_size = Vector2(0, 108)
 layout_mode = 2
-text = "Selectionne une faction"
+text = "Selectionne une voie"
 autowrap_mode = 3
 
 [node name="JoinFactionButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
-text = "Rejoindre"
+text = "Preparer le serment"
 
 [node name="NeutralFactionButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer"]
 custom_minimum_size = Vector2(0, 32)
 layout_mode = 2
-text = "Redevenir neutre"
+text = "Annuler le serment"
 
 [node name="RecruitAllyButton" type="Button" parent="Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer"]
 custom_minimum_size = Vector2(0, 34)

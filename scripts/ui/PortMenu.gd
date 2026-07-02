@@ -53,6 +53,7 @@ const REPAIR_HEALTH_PER_WOOD := 5
 @onready var pirate_status_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/PirateStatusContainer/PirateStatusLabel
 @onready var faction_button: Button = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionButton
 @onready var faction_container: VBoxContainer = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer
+@onready var faction_intro_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer/FactionIntroLabel
 @onready var current_faction_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer/CurrentFactionLabel
 @onready var faction_list: ItemList = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer/FactionList
 @onready var faction_details_label: Label = $Root/CenterContainer/PanelContainer/VBoxContainer/ScrollContainer/ContentContainer/FactionContainer/FactionDetailsLabel
@@ -74,6 +75,7 @@ var _trade_good_ids: Array[String] = []
 var _selected_trade_good_id: String = ""
 var _faction_ids: Array[String] = []
 var _selected_faction_id: String = FactionCatalog.FACTION_NEUTRAL
+var _pending_faction_id: String = ""
 
 
 func _ready() -> void:
@@ -1281,7 +1283,8 @@ func _on_faction_pressed() -> void:
 		trade_container.visible = false
 		missions_container.visible = false
 		pirate_status_container.visible = false
-		status_label.text = "Choisis une allegeance"
+		_pending_faction_id = ""
+		status_label.text = "Choisis une voie"
 		_reset_scroll()
 		_refresh_faction_rows()
 	else:
@@ -1296,15 +1299,24 @@ func _refresh_faction_rows() -> void:
 	var current_faction_id: String = FactionCatalog.FACTION_NEUTRAL
 	if game_state != null and game_state.has_method("get_player_faction_id"):
 		current_faction_id = String(game_state.call("get_player_faction_id"))
+	var is_locked: bool = _is_player_faction_locked(game_state)
 
-	current_faction_label.text = "Faction actuelle : %s\nBonus actif : %s" % [
-		FactionCatalog.get_player_faction_name(current_faction_id),
-		FactionCatalog.get_player_bonus_summary(current_faction_id),
-	]
+	if is_locked:
+		faction_intro_label.text = "Voie deja choisie.\nCette allegeance est definitive pour cette partie."
+		current_faction_label.text = "Allegeance verrouillee : %s\nBonus actif : %s" % [
+			FactionCatalog.get_player_faction_name(current_faction_id),
+			FactionCatalog.get_player_bonus_summary(current_faction_id),
+		]
+	else:
+		faction_intro_label.text = "Choisissez une voie.\nCe choix est definitif pour cette partie.\nPour jouer une autre faction, il faudra commencer une nouvelle partie."
+		current_faction_label.text = "Allegeance actuelle : %s\nBonus actif : %s" % [
+			FactionCatalog.get_player_faction_name(current_faction_id),
+			FactionCatalog.get_player_bonus_summary(current_faction_id),
+		]
 
 	for faction_id in FactionCatalog.get_player_faction_ids():
 		_faction_ids.append(faction_id)
-		faction_list.add_item(_build_faction_row_text(faction_id, current_faction_id))
+		faction_list.add_item(_build_faction_row_text(faction_id, current_faction_id, is_locked))
 
 	var selected_index: int = _get_faction_index(_selected_faction_id)
 	if selected_index < 0:
@@ -1319,10 +1331,14 @@ func _refresh_faction_rows() -> void:
 	_refresh_selected_faction()
 
 
-func _build_faction_row_text(faction_id: String, current_faction_id: String) -> String:
-	var status: String = "disponible"
+func _build_faction_row_text(faction_id: String, current_faction_id: String, is_locked: bool) -> String:
+	var status: String = "voie disponible"
 	if faction_id == current_faction_id:
-		status = "actuelle"
+		status = "voie verrouillee" if is_locked else "actuelle"
+	elif is_locked:
+		status = "indisponible dans cette partie"
+	elif faction_id == FactionCatalog.FACTION_NEUTRAL:
+		status = "etat de depart"
 
 	return "%s - %s" % [FactionCatalog.get_player_faction_name(faction_id), status]
 
@@ -1343,38 +1359,95 @@ func _refresh_selected_faction() -> void:
 	var current_faction_id: String = FactionCatalog.FACTION_NEUTRAL
 	if game_state != null and game_state.has_method("get_player_faction_id"):
 		current_faction_id = String(game_state.call("get_player_faction_id"))
+	var is_locked: bool = _is_player_faction_locked(game_state)
+	var lock_status: String = "Choix non effectue"
+	if game_state != null and game_state.has_method("get_player_faction_lock_status"):
+		lock_status = String(game_state.call("get_player_faction_lock_status"))
 
-	faction_details_label.text = "%s\n%s\nStyle : %s\nBonus : %s" % [
-		FactionCatalog.get_player_faction_name(_selected_faction_id),
+	var selected_name: String = FactionCatalog.get_player_faction_name(_selected_faction_id)
+	var selected_bonus: String = FactionCatalog.get_player_bonus_summary(_selected_faction_id)
+	var selected_style: String = _get_player_faction_style(_selected_faction_id)
+	var warning_line: String = "Ce choix est definitif pour cette partie."
+	if _selected_faction_id == FactionCatalog.FACTION_NEUTRAL:
+		warning_line = "Neutre est l'etat de depart : aucun bonus, aucune penalite."
+	if is_locked:
+		warning_line = "Impossible de changer de faction dans cette partie."
+
+	faction_details_label.text = "%s\n%s\nStyle de gameplay : %s\nBonus : %s\nStatut : %s\n%s" % [
+		selected_name,
 		FactionCatalog.get_player_description(_selected_faction_id),
-		_get_player_faction_style(_selected_faction_id),
-		FactionCatalog.get_player_bonus_summary(_selected_faction_id),
+		selected_style,
+		selected_bonus,
+		lock_status,
+		warning_line,
 	]
 
-	join_faction_button.text = "Rejoindre : %s" % FactionCatalog.get_player_faction_name(_selected_faction_id)
-	join_faction_button.disabled = game_state == null or _selected_faction_id == current_faction_id
-	neutral_faction_button.disabled = game_state == null or current_faction_id == FactionCatalog.FACTION_NEUTRAL
+	join_faction_button.text = "Choisir cette voie"
+	join_faction_button.disabled = game_state == null or is_locked or _selected_faction_id == FactionCatalog.FACTION_NEUTRAL
+	if _selected_faction_id == current_faction_id and is_locked:
+		join_faction_button.text = "Voie deja verrouillee"
+	elif _pending_faction_id == _selected_faction_id:
+		join_faction_button.text = "Confirmer definitivement"
+	elif _selected_faction_id != FactionCatalog.FACTION_NEUTRAL:
+		join_faction_button.text = "Preparer le serment"
+
+	neutral_faction_button.text = "Annuler le serment"
+	neutral_faction_button.disabled = game_state == null or is_locked or _pending_faction_id.is_empty()
 
 
 func _on_join_faction_pressed() -> void:
 	var game_state: Node = _get_game_state()
-	if game_state == null or not game_state.has_method("set_player_faction"):
+	if game_state == null or not game_state.has_method("lock_player_faction"):
 		status_label.text = "Choix de faction indisponible"
 		return
 
-	status_label.text = String(game_state.call("set_player_faction", _selected_faction_id))
+	if _selected_faction_id == FactionCatalog.FACTION_NEUTRAL:
+		status_label.text = "Neutre est l'etat de depart. Choisissez une vraie voie pour verrouiller la partie."
+		_show_faction_feedback(status_label.text)
+		_refresh_faction_rows()
+		return
+
+	if _is_player_faction_locked(game_state):
+		if game_state.has_method("get_player_faction_lock_message"):
+			status_label.text = String(game_state.call("get_player_faction_lock_message"))
+		else:
+			status_label.text = "Impossible de changer de faction dans cette partie"
+		_show_faction_feedback("Impossible de changer de faction dans cette partie")
+		_refresh_faction_rows()
+		return
+
+	if _pending_faction_id != _selected_faction_id:
+		_pending_faction_id = _selected_faction_id
+		status_label.text = "Confirmer l'allegeance aux %s ? Ce choix est definitif pour cette partie." % FactionCatalog.get_player_faction_name(_selected_faction_id)
+		_show_faction_feedback(status_label.text)
+		_refresh_selected_faction()
+		return
+
+	status_label.text = String(game_state.call("lock_player_faction", _selected_faction_id))
 	_show_faction_feedback(status_label.text)
+	_pending_faction_id = ""
 	_refresh_faction_rows()
 
 
 func _on_neutral_faction_pressed() -> void:
 	var game_state: Node = _get_game_state()
-	if game_state == null or not game_state.has_method("set_player_faction"):
+	if game_state == null:
 		status_label.text = "Choix de faction indisponible"
 		return
 
-	_selected_faction_id = FactionCatalog.FACTION_NEUTRAL
-	status_label.text = String(game_state.call("set_player_faction", FactionCatalog.FACTION_NEUTRAL))
+	if _is_player_faction_locked(game_state):
+		status_label.text = "Impossible de changer de faction dans cette partie"
+		_show_faction_feedback("Commencez une nouvelle partie pour choisir une autre voie")
+		_refresh_faction_rows()
+		return
+
+	if _pending_faction_id.is_empty():
+		status_label.text = "Aucun serment en attente"
+		_refresh_faction_rows()
+		return
+
+	_pending_faction_id = ""
+	status_label.text = "Serment annule. Vous restez neutre pour l'instant."
 	_show_faction_feedback(status_label.text)
 	_refresh_faction_rows()
 
@@ -1395,6 +1468,13 @@ func _get_player_faction_style(faction_id: String) -> String:
 		return "independance"
 
 	return FactionCatalog.get_style(faction_id)
+
+
+func _is_player_faction_locked(game_state: Node) -> bool:
+	if game_state != null and game_state.has_method("is_player_faction_locked"):
+		return bool(game_state.call("is_player_faction_locked"))
+
+	return false
 
 
 func _show_faction_feedback(message: String) -> void:
