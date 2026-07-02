@@ -640,6 +640,7 @@ func claim_faction_mission_reward() -> String:
 	var mission_name: String = FactionMissionCatalog.get_mission_name(mission_id)
 	var reward_text: String = _build_faction_mission_reward_text(mission_id)
 	_apply_faction_mission_reward_resources(FactionMissionCatalog.get_reward(mission_id))
+	_apply_faction_mission_influence(mission_id)
 	state["reward_claimed"] = true
 	state["completed"] = true
 	faction_mission_states[mission_id] = state
@@ -1348,6 +1349,40 @@ func _apply_faction_mission_reward_resources(reward: Dictionary) -> void:
 		var reputation_system: Node = get_node_or_null("/root/ReputationSystem")
 		if reputation_system != null and reputation_system.has_method("add_reputation"):
 			reputation_system.call("add_reputation", renown_reward, "faction_mission_reward")
+
+
+func _apply_faction_mission_influence(mission_id: String) -> void:
+	if not FactionMissionCatalog.has_mission(mission_id):
+		_last_faction_mission_influence = "Aucune"
+		return
+
+	var mission: Dictionary = FactionMissionCatalog.get_mission(mission_id)
+	var zone_id: String = get_current_danger_zone_id_safe()
+	var recommended_zone: String = String(mission.get("recommended_zone", ""))
+	if not recommended_zone.is_empty() and recommended_zone != "Toutes zones":
+		zone_id = DangerZoneCatalog.normalize_zone_id(recommended_zone)
+
+	var influence: Dictionary = FactionMissionCatalog.get_influence(mission_id)
+	var gain_faction: String = String(influence.get("gain_faction", ""))
+	var reduce_faction: String = String(influence.get("reduce_faction", ""))
+	var gain_amount: int = clampi(int(influence.get("gain", 0)), 0, 5)
+	var reduce_amount: int = clampi(int(influence.get("reduce", 0)), 0, 4)
+	var lines: Array[String] = []
+	if not gain_faction.is_empty() and gain_amount > 0:
+		add_faction_influence(zone_id, gain_faction, gain_amount, "mission de faction")
+		lines.append("+%d %s" % [gain_amount, FactionCatalog.get_player_faction_name(gain_faction)])
+	if not reduce_faction.is_empty() and reduce_amount > 0:
+		reduce_faction_influence(zone_id, reduce_faction, reduce_amount, "mission de faction")
+		lines.append("-%d %s" % [reduce_amount, FactionCatalog.get_player_faction_name(reduce_faction)])
+
+	if lines.is_empty():
+		_last_faction_mission_influence = "Aucune"
+	else:
+		_last_faction_mission_influence = "%s : %s" % [
+			DangerZoneCatalog.get_zone_name(zone_id),
+			", ".join(lines),
+		]
+	_debug_faction_mission("influence -> %s" % _last_faction_mission_influence)
 
 
 func _build_faction_mission_status_text(mission_id: String) -> String:
