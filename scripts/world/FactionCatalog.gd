@@ -47,7 +47,11 @@ const FACTIONS: Dictionary = {
 		"name": "Pirates",
 		"hud_label": "Pirates",
 		"description": "Pillage, chaos et combat naval.",
+		"mood": "Drapeaux noirs, canons charges et butins arraches aux routes royales.",
 		"style": "pillage, chaos, combat",
+		"strengths": ["bonus recompenses de combat naval", "influence pirate", "tresors et butins"],
+		"weaknesses": ["ennemis avec la Marine", "ports plus risques plus tard", "voie agressive"],
+		"slogan": "Prendre la mer, prendre l'or, ne rien demander.",
 		"base_relation": "hostile",
 		"player_bonus": "+10 % or sur les combats contre navires ennemis.",
 		"join_message": "Vous avez rejoint les Pirates",
@@ -73,7 +77,11 @@ const FACTIONS: Dictionary = {
 		"name": "Marine royale",
 		"hud_label": "Marine",
 		"description": "Ordre, securite et chasse aux pirates.",
+		"mood": "Uniformes, discipline et patrouilles chargees de reprendre les mers.",
 		"style": "ordre, securite, chasse aux pirates",
+		"strengths": ["bonus contre pirates", "renom", "securite des zones"],
+		"weaknesses": ["moins libre", "commerce noir limite plus tard", "pression militaire"],
+		"slogan": "La loi flotte plus haut que le pavillon noir.",
 		"base_relation": "neutre",
 		"player_bonus": "+10 % renom contre les pirates et influence marine accrue.",
 		"join_message": "Vous avez prete serment a la Marine royale",
@@ -99,7 +107,11 @@ const FACTIONS: Dictionary = {
 		"name": "Ligue marchande",
 		"hud_label": "Marchands",
 		"description": "Commerce, routes maritimes et richesse.",
+		"mood": "Comptoirs dores, contrats serres et convois charges de marchandises.",
 		"style": "commerce, routes maritimes, richesse",
+		"strengths": ["bonus commerce", "profits", "stabilite des ports"],
+		"weaknesses": ["moins forte en combat direct", "depend des routes maritimes", "vulnerable aux pirates"],
+		"slogan": "Chaque route sure devient une fortune.",
 		"base_relation": "amicale",
 		"player_bonus": "+5 % benefice commerce et influence marchande accrue.",
 		"join_message": "Vous soutenez desormais la Ligue marchande",
@@ -125,7 +137,11 @@ const FACTIONS: Dictionary = {
 		"name": "Contrebandiers",
 		"hud_label": "Contrebande",
 		"description": "Marche noir, ports caches et objets rares.",
+		"mood": "Lanternes voilees, caches secretes et cargaisons que personne ne declare.",
 		"style": "marche noir, ports caches, objets rares",
+		"strengths": ["bonus ressources rares", "mobilite", "profits risques"],
+		"weaknesses": ["peu de soutien officiel", "zones contestees", "risques d'embuscade"],
+		"slogan": "Ce qui est interdit vaut toujours plus cher.",
 		"base_relation": "mefiante",
 		"player_bonus": "+10 % ressources rares de creatures marines.",
 		"join_message": "Vous travaillez avec les Contrebandiers",
@@ -151,7 +167,11 @@ const FACTIONS: Dictionary = {
 		"name": "Cultes abyssaux",
 		"hud_label": "Abysses",
 		"description": "Monstres marins, zones maudites et tresors mythiques.",
+		"mood": "Murmures sous la coque, reliques noires et pactes avec les profondeurs.",
 		"style": "monstres marins, zones maudites, tresors mythiques",
+		"strengths": ["bonus creatures marines", "ressources abyssales", "influence dans zones dangereuses"],
+		"weaknesses": ["voie dangereuse", "instabilite", "zones hostiles"],
+		"slogan": "Les profondeurs donnent a ceux qui ecoutent.",
 		"base_relation": "hostile",
 		"player_bonus": "+10 % or et ressources sur creatures marines dangereuses.",
 		"join_message": "Vous avez accepte les murmures des Cultes abyssaux",
@@ -256,6 +276,37 @@ static func get_player_bonus_summary(faction_id: String) -> String:
 	return String(faction.get("player_bonus", "Aucun bonus, aucune penalite."))
 
 
+static func get_choice_card_view(faction_id: String) -> Dictionary:
+	if not has_faction(faction_id):
+		return {}
+
+	var faction: Dictionary = get_faction(faction_id)
+	return {
+		"id": faction_id,
+		"name": String(faction.get("name", "Inconnu")),
+		"description": String(faction.get("description", "")),
+		"mood": String(faction.get("mood", "")),
+		"style": String(faction.get("style", "")),
+		"bonus": String(faction.get("player_bonus", "")),
+		"strengths": _get_string_array(faction, "strengths"),
+		"weaknesses": _get_string_array(faction, "weaknesses"),
+		"slogan": String(faction.get("slogan", "")),
+	}
+
+
+static func get_choice_strengths(faction_id: String) -> Array[String]:
+	return _get_string_array(get_faction(faction_id), "strengths")
+
+
+static func get_choice_weaknesses(faction_id: String) -> Array[String]:
+	return _get_string_array(get_faction(faction_id), "weaknesses")
+
+
+static func get_choice_slogan(faction_id: String) -> String:
+	var faction: Dictionary = get_faction(faction_id)
+	return String(faction.get("slogan", ""))
+
+
 static func get_player_join_message(faction_id: String) -> String:
 	var faction: Dictionary = get_player_faction(faction_id)
 	return String(faction.get("join_message", "Allegeance mise a jour"))
@@ -340,3 +391,13 @@ static func get_rare_reward_multiplier(faction_id: String) -> float:
 static func _get_float_modifier(faction_id: String, key: String, default_value: float) -> float:
 	var faction: Dictionary = get_faction(faction_id)
 	return float(faction.get(key, default_value))
+
+
+static func _get_string_array(faction: Dictionary, key: String) -> Array[String]:
+	var values: Array[String] = []
+	var raw_values: Variant = faction.get(key, [])
+	if raw_values is Array:
+		for raw_value in raw_values:
+			values.append(String(raw_value))
+
+	return values

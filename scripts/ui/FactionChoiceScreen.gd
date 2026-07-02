@@ -66,11 +66,12 @@ func _build_faction_cards() -> void:
 
 
 func _build_card_text(faction_id: String) -> String:
-	return "%s\n\n%s\n\nStyle : %s\nBonus : %s" % [
-		FactionCatalog.get_player_faction_name(faction_id),
-		FactionCatalog.get_player_description(faction_id),
-		FactionCatalog.get_style(faction_id),
-		FactionCatalog.get_player_bonus_summary(faction_id),
+	var view: Dictionary = FactionCatalog.get_choice_card_view(faction_id)
+	return "%s\n\n%s\n\nAtouts : %s\n\n\"%s\"" % [
+		String(view.get("name", "Faction")),
+		String(view.get("mood", String(view.get("description", "")))),
+		_format_short_list(view.get("strengths", [])),
+		String(view.get("slogan", "")),
 	]
 
 
@@ -88,8 +89,11 @@ func _select_faction(faction_id: String) -> void:
 
 
 func _refresh_selection() -> void:
-	for faction_id in _card_buttons.keys():
-		var button: Button = _card_buttons[faction_id]
+	for raw_faction_id in _card_buttons.keys():
+		var faction_id: String = String(raw_faction_id)
+		var button: Button = _card_buttons.get(faction_id) as Button
+		if button == null:
+			continue
 		if faction_id == _selected_faction_id:
 			button.modulate = Color(1.0, 0.86, 0.48, 1.0)
 		else:
@@ -102,11 +106,15 @@ func _refresh_selection() -> void:
 		confirm_button.disabled = true
 		return
 
-	selected_summary_label.text = "%s\n%s\nStyle : %s\nBonus : %s" % [
-		FactionCatalog.get_player_faction_name(_selected_faction_id),
-		FactionCatalog.get_player_description(_selected_faction_id),
-		FactionCatalog.get_style(_selected_faction_id),
-		FactionCatalog.get_player_bonus_summary(_selected_faction_id),
+	var view: Dictionary = FactionCatalog.get_choice_card_view(_selected_faction_id)
+	selected_summary_label.text = "%s\n%s\nStyle : %s\nBonus : %s\nAtouts : %s\nFaiblesses : %s\nVoie : %s" % [
+		String(view.get("name", "Faction")),
+		String(view.get("description", "")),
+		String(view.get("style", "")),
+		String(view.get("bonus", "")),
+		_format_short_list(view.get("strengths", [])),
+		_format_short_list(view.get("weaknesses", [])),
+		String(view.get("slogan", "")),
 	]
 
 	prepare_button.disabled = false
@@ -154,3 +162,17 @@ func _is_faction_already_locked() -> bool:
 
 func _get_game_state() -> Node:
 	return get_node_or_null("/root/GameState")
+
+
+func _format_short_list(raw_items: Variant) -> String:
+	if not (raw_items is Array):
+		return "aucun"
+
+	var items: Array[String] = []
+	for raw_item in raw_items:
+		items.append(String(raw_item))
+
+	if items.is_empty():
+		return "aucun"
+
+	return ", ".join(items)
